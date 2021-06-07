@@ -1,0 +1,6 @@
+# in /usr/share/xsessions/emacs.desktop
+[Desktop Entry]
+Name=EXWM
+Comment=Emacs is awesome!
+Exec=emacs
+Type=application
