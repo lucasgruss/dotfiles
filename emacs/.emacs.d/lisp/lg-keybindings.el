@@ -28,15 +28,24 @@
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-undo-system 'undo-redo)
-  :config
-  (evil-mode 1))
+  :config (evil-mode +1))
 
 (use-package evil-collection
   :diminish evil-collection-unimpaired-mode
   :straight t
   :after evil
-  :config
-  (evil-collection-init))
+  :config (evil-collection-init))
+
+(use-package evil-anzu
+  :straight t
+  :diminish anzu-mode
+  :config (global-anzu-mode +1))
+
+(use-package evil-escape
+  :straight t
+  :diminish evil-escape-mode
+  :init (setq evil-escape-key-sequence "jk")
+  :config (evil-esc-mode +1))
 
 (use-package which-key
   :diminish which-key-mode
