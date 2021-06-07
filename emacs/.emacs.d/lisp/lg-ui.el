@@ -89,13 +89,10 @@
   (setq modus-themes-scale-5 1.33)
   (modus-themes-load-vivendi))
 
-;; (straight-use-package '(nano-theme :type git :host github
-;;                                    :repo "rougier/nano-theme"))
-
-(use-package emacs
+(use-package modus-themes-exporter
+  :load-path "~/.emacs.d/lisp/"
+  :ensure-system-package xsettingsd
   :config
-  (use-package modus-themes-exporter
-    :load-path "~/.emacs.d/lisp/")
   (defun lg/theme-propagate ()
     "Apply system wide settings that are consistent with the
 modus themes. A suitable gtk theme is applied, icon theme is
@@ -114,17 +111,9 @@ Xresources have the settings applied to them."
        (modus-themes-exporter-export "xcolors" "~/.Xresources")))
     (shell-command "killall -HUP xsettingsd")
     (shell-command "xrdb ~/.Xresources")))
-					;(shell-command "~/spicetify-cli/spicetify apply"))
 
 (use-package centaur-tabs
   :straight t
-  ;; :init
-  ;; (map! :n "gt" #'centaur-tabs-forward
-  ;;       :n "gT" #'centaur-tabs-backward
-  ;;       "s-m" #'centaur-tabs-backward
-  ;;       "s-," #'centaur-tabs-forward
-  ;;       "s-/" #'centaur-tabs-mode
-  ;;       :nvi "C-t" #'centaur-tabs--create-new-tab)
   :hook
   (calendar-mode . centaur-tabs-local-mode)
   (dired-sidebar-mode . centaur-tabs-local-mode)
@@ -153,8 +142,7 @@ Xresources have the settings applied to them."
     :load-path "~/.emacs.d/lisp/"))
 
 (use-package display-line-numbers
-  :hook
-  (prog-mode . lg/display-line-numbers-mode-enable)
+  :hook (prog-mode . lg/display-line-numbers-mode-enable)
   :config
   (defun lg/display-line-numbers-mode-enable ()
     "Enable display-line-numbers"
