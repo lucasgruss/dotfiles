@@ -1,0 +1,14 @@
+auto-save-list/
+eln-cache/
+elpa/
+emms/
+eshell/
+image-dired/
+straight/
+transient/
+var/
+
+custom.el
+recentf
+session.*
+tramp
