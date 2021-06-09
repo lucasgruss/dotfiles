@@ -77,6 +77,17 @@ modus themes. A suitable gtk and icon themes are applied."
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
 
+(use-package dashboard
+  :straight t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-set-init-info t)
+  (setq dashboard-center-content t)
+  (setq dashboard-startup-banner 'logo)
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-navigator t))
+
 (use-package helpful
   :straight t
   :general
