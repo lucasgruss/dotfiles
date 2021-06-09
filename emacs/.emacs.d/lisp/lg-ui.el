@@ -1,6 +1,10 @@
 (use-package emacs
   :config
   (display-battery-mode +1)
+  (setq display-time-format "%H:%M")
+  (setq scroll-step 1)
+  (setq scroll-conservatively 10000)
+  (display-time-mode +1)
   (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal)
@@ -26,7 +30,43 @@ modus themes. A suitable gtk and icon themes are applied."
     (mapcar #'disable-theme custom-enabled-themes))
 
   (advice-add 'load-theme :after #'lg/theme-propagate '(depth 100))
-  (advice-add 'load-theme :before #'load-theme--disable-old-theme))
+  (advice-add 'load-theme :before #'load-theme--disable-old-theme)
+
+  ;; modeline
+  ;; https://emacs.stackexchange.com/questions/5529/how-to-right-align-some-items-in-the-modeline
+  ;; write a function to do the spacing
+
+  (defvar mode-line-format-left
+    '("%e" mode-line-front-space
+      mode-line-mule-info
+      mode-line-client
+      mode-line-modified
+      mode-line-remote
+      mode-line-frame-identification
+      mode-line-buffer-identification
+      "   "
+      mode-line-position
+      evil-mode-line-tag
+      (vc-mode vc-mode))
+    "Content of the left of the modeline")
+
+  (defvar mode-line-format-right
+    '(mode-line-modes
+      mode-line-misc-info
+      mode-line-end-spaces)
+    "Content of the right of the modeline")
+
+  (defun simple-mode-line-render (left right)
+    "Return a string of `window-width' length containing LEFT, and RIGHT
+ aligned respectively."
+    (let* ((available-width (- (window-width) (length left) 2)))
+      (format (format " %%s %%%ds " available-width) left right)))
+
+  ;; use the function in conjunction with :eval and format-mode-line in your mode-line-format
+  (setq mode-line-format
+	'((:eval (simple-mode-line-render
+		  (format-mode-line mode-line-format-left)
+		  (format-mode-line mode-line-format-right))))))
 
 (use-package helpful
   :straight t
