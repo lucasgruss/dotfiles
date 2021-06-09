@@ -227,4 +227,45 @@ settings applied to them."
     (display-line-numbers-mode +1)
     (setq display-line-numbers 'relative)))
 
+;;; * Scrolling performances
+
+(use-package fast-scroll
+  :disabled t
+  :straight t
+  :config (fast-scroll-mode +1))
+
+(use-package scroll-on-jump
+  :demand t
+  :straight   
+  (scroll-on-jump :type git :host gitlab
+		  :repo "ideasman42/emacs-scroll-on-jump")
+  :after evil
+  :config
+  (scroll-on-jump-advice-add evil-undo)
+  (scroll-on-jump-advice-add evil-redo)
+  (scroll-on-jump-advice-add evil-jump-item)
+  (scroll-on-jump-advice-add evil-jump-forward)
+  (scroll-on-jump-advice-add evil-jump-backward)
+  (scroll-on-jump-advice-add evil-search-next)
+  (scroll-on-jump-advice-add evil-search-previous)
+  (scroll-on-jump-advice-add evil-forward-paragraph)
+  (scroll-on-jump-advice-add evil-backward-paragraph)
+  ;; Actions that themselves scroll.
+  (scroll-on-jump-with-scroll-advice-add evil-goto-line)
+  (scroll-on-jump-with-scroll-advice-add evil-goto-first-line)
+  (scroll-on-jump-with-scroll-advice-add evil-scroll-down)
+  (scroll-on-jump-with-scroll-advice-add evil-scroll-up)
+  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-center)
+  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
+  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom)
+  (setq scroll-on-jump-smooth t)
+  (setq scroll-on-jump-use-curve t)
+  (setq scroll-on-jump-duration 0.1))
+
+(use-package good-scroll
+  :disabled t
+  :straight t
+  :config
+  (good-scroll-mode +1))
+
 (provide 'lg-ui)
