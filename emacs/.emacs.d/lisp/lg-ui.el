@@ -3,7 +3,30 @@
   (display-battery-mode +1)
   (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
-  (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal))
+  (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal)
+
+  ;; themes
+  (defvar lg/light-themes '(modus-operandi) "List of light themes.")
+  (defvar lg/dark-themes '(modus-vivendi doom-one doom-dark+) "List of dark themes.")
+
+  (defun lg/theme-propagate (theme &rest args)
+    "Apply system wide settings that are consistent with the
+modus themes. A suitable gtk and icon themes are applied."
+    (when (member theme lg/light-themes)
+      (shell-command "sed -i 's/ThemeName \"Adwaita-dark\"/ThemeName \"Adwaita\"/g' ~/.xsettingsd")
+      (shell-command "sed -i 's/IconThemeName \"Papirus-Dark\"/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd"))
+    (when (member theme lg/dark-themes)
+      (shell-command "sed -i 's/ThemeName \"Adwaita\"/ThemeName \"Adwaita-dark\"/g' ~/.xsettingsd")
+      (shell-command "sed -i 's/IconThemeName \"Papirus-Light\"/IconThemeName \"Papirus-Dark\"/g' ~/.xsettingsd"))
+    (shell-command "killall -HUP xsettingsd")
+    (shell-command "xrdb ~/.Xresources"))
+
+  (defun load-theme--disable-old-theme(theme &rest args)
+    "Disable current theme before loading new one."
+    (mapcar #'disable-theme custom-enabled-themes))
+
+  (advice-add 'load-theme :after #'lg/theme-propagate '(depth 100))
+  (advice-add 'load-theme :before #'load-theme--disable-old-theme))
 
 (use-package helpful
   :straight t
@@ -86,31 +109,26 @@
   (setq modus-themes-scale-2 1.15)
   (setq modus-themes-scale-3 1.21)
   (setq modus-themes-scale-4 1.27)
-  (setq modus-themes-scale-5 1.33)
-  (modus-themes-load-vivendi))
+  (setq modus-themes-scale-5 1.33))
 
 (use-package modus-themes-exporter
   :load-path "~/.emacs.d/lisp/"
+  :after modus-themes
+  :demand t
   :ensure-system-package xsettingsd
   :config
-  (defun lg/theme-propagate ()
-    "Apply system wide settings that are consistent with the
-modus themes. A suitable gtk theme is applied, icon theme is
-applied, Xresources are computed based on the
-modus-themes-exporter package and the programs that use the
-Xresources have the settings applied to them."
-    (interactive)
-    (pcase (face-background 'default)
-      ("#000000" ; modus vivendi
-       (shell-command "sed -i 's/ThemeName \"Adwaita\"/ThemeName \"Adwaita-dark\"/g' ~/.xsettingsd")
-       (shell-command "sed -i 's/IconThemeName \"Papirus-Light\"/IconThemeName \"Papirus-Dark\"/g' ~/.xsettingsd")
-       (modus-themes-exporter-export "xcolors" "~/.Xresources"))
-      ("#ffffff" ; modus operandi
-       (shell-command "sed -i 's/ThemeName \"Adwaita-dark\"/ThemeName \"Adwaita\"/g' ~/.xsettingsd")
-       (shell-command "sed -i 's/IconThemeName \"Papirus-Dark\"/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd")
-       (modus-themes-exporter-export "xcolors" "~/.Xresources")))
-    (shell-command "killall -HUP xsettingsd")
-    (shell-command "xrdb ~/.Xresources")))
+  (defun lg/modus-theme-propagate (theme &rest args)
+    "Xresources are computed based on the modus-themes-exporter
+package and the programs that use the Xresources have the
+settings applied to them."
+    (when (member theme '(modus-operandi modus-vivendi))
+      (modus-themes-exporter-export "xcolors" "~/.Xresources")))
+  (advice-add #'load-theme :after #'lg/modus-theme-propagate)
+  (load-theme 'modus-operandi t nil))
+
+(use-package doom-themes
+  :commands (load-theme)
+  :straight t)
 
 (use-package centaur-tabs
   :straight t
