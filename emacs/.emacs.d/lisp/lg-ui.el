@@ -68,6 +68,15 @@ modus themes. A suitable gtk and icon themes are applied."
 		  (format-mode-line mode-line-format-left)
 		  (format-mode-line mode-line-format-right))))))
 
+
+(use-package moody
+  :straight t
+  :config
+  (setq moody-mode-line-height 20)
+  (setq x-underline-at-descent-line t)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
+
 (use-package helpful
   :straight t
   :general
