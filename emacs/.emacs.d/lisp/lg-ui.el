@@ -97,6 +97,14 @@ modus themes. A suitable gtk and icon themes are applied."
    "hk" 'helpful-key
    "hv" 'helpful-variable))
 
+(use-package outshine
+  :hook (emacs-lisp-mode . outshine-mode)
+  :diminish outshine-mode
+  :general
+  (general-def :keymaps 'outshine-mode-map :states 'normal
+    [S-?\t] #'outshine-cycle)
+  :straight t)
+
 (use-package all-the-icons
   :straight t
   :config
