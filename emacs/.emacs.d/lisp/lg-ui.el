@@ -90,11 +90,16 @@ modus themes. A suitable gtk and icon themes are applied."
 
 (use-package helpful
   :straight t
+  :commands (helpful-callable
+	     helpful-key
+	     helpful-symbol
+	     helpful-variable)
   :general
   (my-leader-def
    :prefix "SPC" :states 'normal :keymaps 'override
    "hf" 'helpful-callable
    "hk" 'helpful-key
+   "ho" 'helpful-symbol
    "hv" 'helpful-variable))
 
 (use-package outshine
@@ -116,10 +121,12 @@ modus themes. A suitable gtk and icon themes are applied."
 
 (use-package all-the-icons-dired
   :straight t
+  :after (dired all-the-icons)
   :diminish all-the-icons-dired-mode
   :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package modus-themes
+  :demand
   :straight t
   :config
   (setq modus-themes-slanted-constructs t)
@@ -134,7 +141,7 @@ modus themes. A suitable gtk and icon themes are applied."
   ;; Options for `modus-themes-mode-line': nil, '3d, 'moody,
   ;; 'borderless, 'borderless-3d, 'borderless-moody, 'accented,
   ;; 'accented-3d, 'accented-moody
-  (setq modus-themes-mode-line nil)
+  (setq modus-themes-mode-line 'accented-moody)
 
   ;; Options for `modus-themes-syntax': nil, 'faint,
   ;; 'yellow-comments, 'green-strings,
@@ -199,11 +206,15 @@ settings applied to them."
   :straight t)
 
 (use-package centaur-tabs
+  :defer 2
   :straight t
   :hook
+  (org-ql-sidebar-buffer-setup . centaur-tabs-local-mode)
+  (dashboard-mode . centaur-tabs-local-mode)
   (calendar-mode . centaur-tabs-local-mode)
-  (dired-sidebar-mode . centaur-tabs-local-mode)
   (ibuffer-sidebar-mode . centaur-tabs-local-mode)
+  (ibuffer-mode . centaur-tabs-local-mode)
+  (dired-sidebar-mode . centaur-tabs-local-mode)
   (dired-mode . centaur-tabs-local-mode)
   (pdf-outline-buffer-mode . centaur-tabs-local-mode)
   (exwm-floating-setup . centaur-tabs-local-mode)
