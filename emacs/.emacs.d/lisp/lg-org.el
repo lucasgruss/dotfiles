@@ -38,8 +38,9 @@
 (use-package org-sidebar
   :after org
   :straight t
-  :disabled
-  :after org)
+  :general
+  (my-leader-def :keymaps 'override
+    "to" #'org-sidebar-toggle))
 
 (use-package org-tree-slide
   :straight t
