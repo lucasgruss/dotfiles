@@ -45,7 +45,7 @@
   :straight t
   :diminish evil-escape-mode
   :init (setq evil-escape-key-sequence "jk")
-  :config (evil-esc-mode +1))
+  :config (evil-escape-mode +1))
 
 (use-package which-key
   :diminish which-key-mode
