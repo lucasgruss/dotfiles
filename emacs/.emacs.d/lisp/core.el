@@ -1,6 +1,4 @@
-;;; core.el core packages needed for my configuration
-
-(setq gc-cons-threshold (* 50 1000 1000)) ;; try and speed up startup time
+;;; core.el : core packages needed for my configuration
 
 ;; magically bootstrap straight
 (defvar bootstrap-version)
@@ -16,25 +14,54 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-
 ;; USE-PACKAGE
 (straight-use-package 'use-package)
-(eval-when-compile
-  (require 'use-package))
-(use-package bind-key)
-(use-package system-packages :straight t)
-(use-package use-package-ensure-system-package :straight t)
-(use-package diminish :straight t)  ;; remove clutter in the modeline
+(use-package bind-key :straight t) ;; needed for the :bind keyword
+(use-package use-package-ensure-system-package :straight t) ;; needed for the :ensure-system-package keyword
+(use-package diminish :straight t)  ;; needed for the :diminish keyword
+
+(use-package general ;; needed for the :general keyword
+  :straight t
+  :config
+  (general-create-definer my-leader-def :states '(normal visual motion) :prefix "SPC")
+  (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m")
+  (my-leader-def
+   :keymaps 'override
+   "" '(nil :which-key "Leader prefix")
+   "i" '(nil :which-key "Insert\n")
+   "s" '(nil :which-key "Search\n")
+   "f" '(nil :which-key "Files\n")
+   "ff" '(find-file :which-key "Find file")
+   "fp" '(lg/visit-configuration :which-key "Find private configuration")
+   "fs" '(save-buffer :which-key "Save file")
+   "b" '(nil :which-key "Buffer\n")
+   "bb" '(switch-to-buffer :which-key "Buffer")
+   "bo" '(switch-to-buffer-other-window :which-key "Buffer")
+   "h" (general-key "C-h");'(lg/general-def-wrap-C-h :which-key "Help\n")
+   "ht" 'load-theme
+   "hr" 'lg/reload-configuration
+   "hb" nil
+   "t" '(nil :which-key "Toggle\n")
+   "o" '(nil :which-key "Open\n")))
+
+;; PERFORMANCES (as soon as possible)
+;; (setq gc-cons-threshold (* 4 100 1024 1024)) ;; try and speed up startup time
+(use-package gcmh
+  :straight t
+  :config
+  (gcmh-mode +1))
 
 ;; built-in package manager
 (use-package package
-  :config
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/")))
+  :straight nil
+  :defer 5
+  :commands (describe-package)
+  :config (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/")))
 
 (use-package emacs
-  :init
+  :straight nil
+  :config
   (fset 'yes-or-no-p 'y-or-n-p)
-  ;;(setq initial-buffer-choice "*Messages*")
   (setq idle-update-delay 0.3)
   (setq comp-async-report-warnings-errors nil)
   (setq make-backup-files nil)
@@ -44,6 +71,7 @@
   (setq inhibit-startup-screen t)
   (setq y-or-n-p-use-read-key t)
   (setq x-select-enable-clipboard-manager t)
+  (setq recentf-max-saved-items 100)
 
   (defun lg/visit-configuration ()
     "Prompt to get the configuration directory"
@@ -51,20 +79,19 @@
     (let* ((default-directory user-emacs-directory))
 	  (call-interactively 'find-file)))
 
-  (defun emacs-startup-time-info ()
-    "Profile emacs startup"
-    (message "*** Emacs loaded in %s with %d garbage collections."
-             (format "%.2f seconds"
-                     (float-time
-                      (time-subtract after-init-time before-init-time)))
-             gcs-done))
+  (defun lg/reload-configuration ()
+    "(re)Load configuration file"
+    (interactive)
+    (mapcar
+     #'(lambda (module) (load (format "~/.emacs.d/lisp/%s.el" module)))
+     lg/modules))
 
   (defun lg/kill-this-buffer ()
     "Kill the current buffer without confirmation"
     (interactive)
     (kill-buffer (current-buffer)))
 
- :bind ("s-<escape>" . 'lg/kill-this-buffer)
- :hook (emacs-startup . emacs-startup-time-info))
+  (recentf-mode +1)
+  :bind ("s-<escape>" . 'lg/kill-this-buffer))
 
 (provide 'core)
