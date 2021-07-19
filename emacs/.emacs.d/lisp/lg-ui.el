@@ -1,35 +1,54 @@
 (use-package emacs
-  :config
+  :hook (after-init . lg/load-theme)
+  :init
   (display-battery-mode -1)
+  (display-time-mode -1)
   (setq display-time-format "%H:%M")
   (setq scroll-step 1)
   (setq scroll-conservatively 10000)
-  (display-time-mode +1)
   (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal)
 
   ;; themes
-  (defvar lg/light-themes '(modus-operandi) "List of light themes.")
-  (defvar lg/dark-themes '(modus-vivendi doom-one doom-dark+) "List of dark themes.")
+  (defvar lg/light-themes
+    '(modus-operandi doom-solarized-light)
+    "List of light themes.")
+
+  (defvar lg/dark-themes
+    '(modus-vivendi doom-one doom-dark+ doom-xcode doom-badger)
+    "List of dark themes.")
+
+  (defvar lg/theme 'modus-operandi)
 
   (defun lg/theme-propagate (theme &rest args)
-    "Apply system wide settings that are consistent with the
-modus themes. A suitable gtk and icon themes are applied."
+    "Apply system wide settings that are consistent with the emacs
+themes. Suitable gtk and icon themes are applied, and some colors
+are changed in the Xresources file.
+
+This function is to be used with xsettingsd, but the same can be
+applied to gnome-settings or xfce-conf."
     (when (member theme lg/light-themes)
-      (shell-command "sed -i 's/ThemeName \"Adwaita-dark\"/ThemeName \"Adwaita\"/g' ~/.xsettingsd")
-      (shell-command "sed -i 's/IconThemeName \"Papirus-Dark\"/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd"))
+      (shell-command "sed -i 's/ThemeName.*/ThemeName \"Adwaita\"/g' ~/.xsettingsd")
+      (shell-command "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd"))
     (when (member theme lg/dark-themes)
-      (shell-command "sed -i 's/ThemeName \"Adwaita\"/ThemeName \"Adwaita-dark\"/g' ~/.xsettingsd")
-      (shell-command "sed -i 's/IconThemeName \"Papirus-Light\"/IconThemeName \"Papirus-Dark\"/g' ~/.xsettingsd"))
+      (shell-command "sed -i 's/ThemeName.*/ThemeName \"Adwaita-dark\"/g' ~/.xsettingsd")
+      (shell-command "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Dark\"/g' ~/.xsettingsd"))
+    (shell-command (format "sed -i 's/\*background.*/\*background\: %s/g' ~/.Xresources" (face-background 'default)))
+    (shell-command (format "sed -i 's/\*foreground.*/\*foreground\: %s/g' ~/.Xresources" (face-foreground 'default)))
     (shell-command "killall -HUP xsettingsd")
     (shell-command "xrdb ~/.Xresources"))
+
+  (advice-add 'load-theme :after #'lg/theme-propagate '(depth 100))
 
   (defun load-theme--disable-old-theme(theme &rest args)
     "Disable current theme before loading new one."
     (mapcar #'disable-theme custom-enabled-themes))
 
-  (advice-add 'load-theme :after #'lg/theme-propagate '(depth 100))
+  (defun lg/load-theme ()
+    "Load the theme defined in lg/theme"
+    (load-theme lg/theme t nil))
+
   (advice-add 'load-theme :before #'load-theme--disable-old-theme))
 
 
@@ -62,14 +81,14 @@ modus themes. A suitable gtk and icon themes are applied."
   (defvar mode-line-format-right
     '("%e"
       mode-line-modes
-      (moody-tab mode-line-misc-info)
-      mode-line-end-spaces)
+      mode-line-misc-info)
+     ; mode-line-end-spaces)
     "Content of the right of the modeline")
 
   (defun simple-mode-line-render (left right)
     "Return a string of `window-width' length containing LEFT, and RIGHT
  aligned respectively."
-    (let* ((available-width (- (window-width) (length left) 6)))
+    (let* ((available-width (- (window-width) (length left) 2)))
       (format (format " %%s %%%ds " available-width) left right)))
 
   (defun lg/force-moody ()
@@ -102,6 +121,8 @@ modus themes. A suitable gtk and icon themes are applied."
   :general
   (my-leader-def
    :prefix "SPC" :states 'normal :keymaps 'override
+   "hh" 'helpful-at-point
+   "hc" 'helpful-command
    "hf" 'helpful-callable
    "hk" 'helpful-key
    "ho" 'helpful-symbol
@@ -126,12 +147,11 @@ modus themes. A suitable gtk and icon themes are applied."
 
 (use-package all-the-icons-dired
   :straight t
-  :after (dired all-the-icons)
+  :after dired
   :diminish all-the-icons-dired-mode
   :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package modus-themes
-  :demand
   :straight t
   :config
   (setq modus-themes-slanted-constructs t)
@@ -146,7 +166,7 @@ modus themes. A suitable gtk and icon themes are applied."
   ;; Options for `modus-themes-mode-line': nil, '3d, 'moody,
   ;; 'borderless, 'borderless-3d, 'borderless-moody, 'accented,
   ;; 'accented-3d, 'accented-moody
-  (setq modus-themes-mode-line 'accented-moody)
+  (setq modus-themes-mode-line 'moody)
 
   ;; Options for `modus-themes-syntax': nil, 'faint,
   ;; 'yellow-comments, 'green-strings,
@@ -194,7 +214,7 @@ modus themes. A suitable gtk and icon themes are applied."
 (use-package modus-themes-exporter
   :load-path "~/.emacs.d/lisp/"
   :after modus-themes
-  :demand t
+  :disabled t
   :ensure-system-package xsettingsd
   :config
   (defun lg/modus-theme-propagate (theme &rest args)
@@ -203,17 +223,18 @@ package and the programs that use the Xresources have the
 settings applied to them."
     (when (member theme '(modus-operandi modus-vivendi))
       (modus-themes-exporter-export "xcolors" "~/.Xresources")))
-  (advice-add #'load-theme :after #'lg/modus-theme-propagate)
-  (load-theme 'modus-operandi t nil))
+  (advice-add #'load-theme :after #'lg/modus-theme-propagate))
 
 (use-package doom-themes
   :commands (load-theme)
   :straight t)
 
 (use-package centaur-tabs
-  :defer 2
+  :demand t
   :straight t
+  :bind ("C-t" . 'centaur-tabs--create-new-tab)
   :hook
+  (emms-playlist-mode . centaur-tabs-local-mode)
   (org-ql-sidebar-buffer-setup . centaur-tabs-local-mode)
   (dashboard-mode . centaur-tabs-local-mode)
   (calendar-mode . centaur-tabs-local-mode)
@@ -284,7 +305,7 @@ settings applied to them."
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom)
   (setq scroll-on-jump-smooth t)
   (setq scroll-on-jump-use-curve t)
-  (setq scroll-on-jump-duration 0.1))
+  (setq scroll-on-jump-duration 0.15))
 
 (use-package good-scroll
   :disabled t
