@@ -1,5 +1,15 @@
 ;;; lg-window.el : window (as in "emacs window") management configuration 
 
+(use-package emacs
+  :straight nil
+  :init
+  (setq display-buffer-alist
+	`(("\\*\\(helpful\\|Help\\).*\\*"
+	   (display-buffer-in-side-window)
+	   (window-width . ,(+ 3 fill-column))
+	   (side . right)
+	   (slot . -2)))))
+
 (use-package windmove
   :bind
   (("s-h" . windmove-left)
