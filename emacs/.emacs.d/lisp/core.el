@@ -42,7 +42,8 @@
    "hr" 'lg/reload-configuration
    "hb" nil
    "t" '(nil :which-key "Toggle\n")
-   "o" '(nil :which-key "Open\n")))
+   "o" '(nil :which-key "Open\n")
+   "SPC" '(execute-extended-command :which-key "M-x")))
 
 ;; PERFORMANCES (as soon as possible)
 ;; (setq gc-cons-threshold (* 4 100 1024 1024)) ;; try and speed up startup time
