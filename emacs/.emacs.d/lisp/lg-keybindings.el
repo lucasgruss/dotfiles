@@ -1,27 +1,6 @@
 ;; lg-keybindings.el: basic configuration needed for the keybindings
 ;; evil mode, general and more
 
-(use-package general
-  :straight t
-  :config
-  ;;(general-evil-setup)
-  ;; (general-create-definer my-leader-def :keymaps '(normal visual) :prefix "SPC")
-  ;; (general-create-definer my-local-leader-def :keymaps '(normal visual) :prefix "SPC m")
-  (general-create-definer my-leader-def :states '(normal visual motion) :prefix "SPC")
-  (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m")
-  (my-leader-def
-   :prefix "SPC" :states 'normal :keymaps 'override
-   "" '(nil :which-key "my lieutenant general prefix")
-   "f" '(:ignore t :which-key "Files")
-   "ff" '(find-file :which-key "Find file")
-   "fp" '(lg/visit-configuration :which-key "Find file")
-   "fs" '(save-buffer :which-key "Save file")
-   "b" '(:ignore t :which-key "Buffer")
-   "bb" '(switch-to-buffer :which-key "Buffer")
-   "bo" '(switch-to-buffer-other-window :which-key "Buffer")
-   "h" (general-key "C-h")
-   "ht" 'load-theme))
-
 (use-package evil
   :straight t
   :init
