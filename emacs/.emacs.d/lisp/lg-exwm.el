@@ -2,7 +2,6 @@
 
 (use-package exwm
   :straight t
-  ;;:init (add-to-list native-comp-def)
   :config
   (use-package dash
     :straight t)
@@ -79,35 +78,21 @@ buffer (=minimizing in other WM/DE)"
     (let ((command-parts (split-string command "[ ]+")))
       (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
-  (defvar efs/polybar-process nil
-    "Holds the process of the running Polybar instance, if any")
-
-  (defun efs/kill-panel ()
-    (interactive)
-    (when efs/polybar-process
-      (ignore-errors
-        (kill-process efs/polybar-process)))
-    (setq efs/polybar-process nil))
-
-  (defun efs/start-panel ()
-    (interactive)
-    (efs/kill-panel)
-    (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar -r panel")))
 
   (defun lg/exwm-init-hook ()
     (interactive)
     (shell-command "setxkbmap gb -variant extd -option ctrl:nocaps")
     (shell-command "xset r rate 300 40")
-    ;; (shell-command "killall pasystray")
-    ;; (shell-command "killall blueman-applet")
-    ;; (shell-command "killall nm-applet")
-    ;;(shell-command "killall compton")
+    (shell-command "killall pasystray")
+    (shell-command "killall blueman-applet")
+    (shell-command "killall nm-applet")
+    (shell-command "killall compton")
     ;; (shell-command "killall kdeconnect-indicator")
-    ;; (shell-command "killall xsettingsd")
+    (shell-command "killall xsettingsd")
                                         ;(shell-command "feh --bg-fill ~/Images/Wallpaper/landscapes_sand_desert_dunes.jpg")
     ;; (shell-command "feh --bg-fill ~/Images/Wallpaper/solid_blue.jpeg")
     ;; ;; (shell-command "feh --bg-fill ~/Images/Wallpaper/mountain.png")
-    ;; (efs/run-in-background "pasystray")
+    (efs/run-in-background "pasystray")
     (efs/run-in-background "compton")
     (efs/run-in-background "xfce4-power-manager")
     (efs/run-in-background "xfce4-panel")
@@ -115,8 +100,8 @@ buffer (=minimizing in other WM/DE)"
     (efs/run-in-background "nm-applet")
     ;; (efs/run-in-background "kdeconnect-indicator")
     (efs/run-in-background "xsettingsd")
-    ;; (efs/start-panel))
-    )
+    (efs/run-in-background "/home/lucas/packages/git/spotifyd/target/release/spotifyd")
+    (efs/start-panel))
 
   (add-hook 'exwm-init-hook #'lg/exwm-init-hook)
 
@@ -152,7 +137,7 @@ buffer (=minimizing in other WM/DE)"
           ([?\s-t] . lg/run-or-raise-or-dismiss-thunderbird)
           ([?\s-s] . lg/run-or-raise-or-dismiss-spotify)
           ([?\s-u] . lg/toggle-line-char-modes)
-          ([s-return] . vterm)
+          ([s-return] . vterm-toggle)
           ([s-escape] . lg/kill-this-buffer)
     
 
@@ -221,7 +206,7 @@ buffer (=minimizing in other WM/DE)"
   (exwm-randr-enable))
 
 (use-package lg-exwm-utils
-  :load-path "~/.emacs.d/lisp/")
+  :load-path "~/.emacs.d/lisp/site-packages")
 
 (use-package exwm-firefox-evil
   :straight t
@@ -308,12 +293,6 @@ firefox, it leaves fullscreen mode."
     "q" #'exwm-input-send-next-key
     "<return>" #'exwm-firefox-intercept-return)
 
-  ;; (general-def :keymaps 'exwm-mode-map
-  ;;   "<return>" #'(lambda ()
-  ;;                  (interactive)
-  ;;                  (unless exwm-firefox-evil-mode
-  ;;                    (exwm-input--fake-key (aref (kbd "<return>") 0)))))
-
   (general-def :states 'insert :keymaps 'exwm-mode-map
     "<return>" #'exwm-firefox-intercept-return
     "C-h" #'exwm-firefox-core-left
@@ -321,40 +300,122 @@ firefox, it leaves fullscreen mode."
     "C-k" #'exwm-firefox-core-up
     "C-l" #'exwm-firefox-core-right))
 
-
-;; (use-package exwm-firefox
-;;   :straight t
-;;   :after exwm-firefox-evil
-;;   :config
-;;   (defun exwm-firefox-open-in-mpv ()
-;;     (interactive)
-;;     (exwm-firefox-core-focus-search-bar)
-;;     (exwm-firefox-core-copy)
-;;     (emms-play-url (current-kill 0 nil)))
-;;   ;; I have different keybinding in firefox for tabdetach-attach : M-S-t
-;;   (defun lg/exwm-firefox-attach ()
-;;     "Attach the current tab into its parent window.
-
-;;    This requires the tabdetach extension to work."
-;;     (interactive)
-;;     (exwm-input--fake-key ?\M-\S-T))
-
-;;   (define-key! 'normal exwm-firefox-evil-mode-map
-;;     "A" #'lg/exwm-firefox-attach
-;;     "D" #'exwm-firefox-split-detach
-;;     "M" #'exwm-firefox-merge)
-;;   ;; I don't like renaming the name of the firefox window
-;;                                         ;(remove-hook 'exwm-update-title-hook 'exwm-firefox--update-title))
-;;   )
-
-(defun lg/polybar-minibuffer-hide ()
-  (call-process "polybar-msg" nil 0 nil "cmd" "hide"))
-(defun lg/polybar-minibuffer-show ()
-  (call-process "polybar-msg" nil 0 nil "cmd" "show"))
-
 (use-package app-launcher
   :straight   (app-launcher :type git :host github
 			    :repo "SebastienWae/app-launcher")
   :bind ("s-d" . 'app-launcher-run-app))
+
+(use-package lg-exwm-polybar
+  :load-path "~/.emacs.d/lisp/site-packages"
+  :demand t
+  :hook
+  (minibuffer-setup . lg/polybar-minibuffer-hide)
+  (minibuffer-exit . lg/polybar-minibuffer-show))
+
+(use-package exwm-outer-gaps
+  :straight (exwm-outer-gaps :host github :repo "lucasgruss/exwm-outer-gaps")
+  :after (xelb exwm)
+  :demand t
+  :hook
+  (minibuffer-setup . lg/exwm-outer-gaps-show-minibuffer-init-hook)
+  (minibuffer-exit . lg/exwm-outer-gaps-hide-minibuffer-exit-hook)
+  :config
+  (defvar exwm-outer-gaps-polybar-timer nil
+    "Timer to trigger redisplay of polybar on the minibuffer")
+  (setq exwm-outer-gaps-polybar-timer
+        (run-with-timer 1 nil (lambda () (efs/start-panel))))
+  (setq exwm-outer-gaps-increment-step 10)
+  (defvar exwm-outer-gaps-keymap nil
+    "keymap to resize gaps")
+  (setq exwm-outer-gaps-keymap (make-sparse-keymap))
+
+  (defvar lg/exwm-outer-gaps--is-minibuffer-shown t
+    "Whether minibuffer is hidden away or not")
+
+  (defun lg/exwm-outer-gaps-toggle-minibuffer ()
+    (interactive)
+    (lg/exwm-outer-gaps-hide-show-minibuffer lg/exwm-outer-gaps--is-minibuffer-shown)
+    (setq lg/exwm-outer-gaps--is-minibuffer-shown
+          (not lg/exwm-outer-gaps--is-minibuffer-shown)))
+
+  (defun lg/exwm-outer-gaps-hide-show-minibuffer (hide)
+    "Hide or show the minibuffer by ajusting the bottom gap.
+Argument hide is t if minibuffer should be hidden, true if shown."
+    (if hide
+        (exwm-outer-gaps-set 3 -20 nil)
+                                        ;(setq exwm-outer-gaps-width [0 0 0 -20])
+      ;; (setq exwm-outer-gaps-width [0 0 0 0]))
+      (exwm-outer-gaps-set 3 0 nil))
+    (exwm-outer-gaps-apply))
+
+  (defun lg/exwm-outer-gaps-show-minibuffer ()
+    "Show the minibuffer"
+    (interactive)
+    (lg/exwm-outer-gaps-hide-show-minibuffer nil)
+    (efs/start-panel))
+
+  (defun lg/exwm-outer-gaps-hide-minibuffer ()
+    "Hide the minibuffer"
+    (interactive)
+    (lg/exwm-outer-gaps-hide-show-minibuffer t)
+    (efs/kill-panel))
+
+  (defun lg/exwm-outer-gaps-show-minibuffer-init-hook ()
+    (when (not lg/exwm-outer-gaps--is-minibuffer-shown)
+      (lg/exwm-outer-gaps-hide-show-minibuffer nil)))
+
+  (defun lg/exwm-outer-gaps-hide-minibuffer-exit-hook ()
+    (when (not lg/exwm-outer-gaps--is-minibuffer-shown)
+      (lg/exwm-outer-gaps-hide-show-minibuffer t)))
+
+  ;; (map! (:map exwm-outer-gaps-keymap
+  ;;        :desc "Decrease left" "h" (lambda () (interactive) (exwm-outer-gaps-decrement 0))
+  ;;        :desc "Increase left" "H" (lambda () (interactive) (exwm-outer-gaps-increment 0))
+  ;;        :desc "Decrease right" "l" (lambda () (interactive) (exwm-outer-gaps-decrement 1))
+  ;;        :desc "Increase right" "L" (lambda () (interactive) (exwm-outer-gaps-increment 1))
+  ;;        :desc "Decrease top" "k" (lambda () (interactive) (exwm-outer-gaps-decrement 2))
+  ;;        :desc "Increase top" "K" (lambda () (interactive) (exwm-outer-gaps-increment 2))
+  ;;        :desc "Decrease bottom" "j" (lambda () (interactive) (exwm-outer-gaps-decrement 3))
+  ;;        :desc "Increase bottom" "J" (lambda () (interactive) (exwm-outer-gaps-increment 3))
+  ;;        :desc "Shift frame left" "y" (lambda () (interactive)
+  ;;                                       (exwm-outer-gaps-increment 1)
+  ;;                                       (exwm-outer-gaps-decrement 0))
+  ;;        :desc "Shift frame right" "o" (lambda () (interactive)
+  ;;                                        (exwm-outer-gaps-increment 0)
+  ;;                                        (exwm-outer-gaps-decrement 1))
+  ;;        :desc "Shift frame down" "u" (lambda () (interactive)
+  ;;                                       (exwm-outer-gaps-increment 2)
+  ;;                                       (exwm-outer-gaps-decrement 3))
+  ;;        :desc "Shift frame up" "i" (lambda () (interactive)
+  ;;                                     (exwm-outer-gaps-increment 3)
+  ;;                                     (exwm-outer-gaps-decrement 2))))
+
+  ;; (defun lg/exwm-outer-gaps-hercules ()
+  ;;   (interactive))
+
+  ;; (hercules-def
+  ;;  :toggle-funs #'lg/exwm-outer-gaps-hercules
+  ;;  :keymap 'exwm-outer-gaps-keymap
+  ;;  :transient t)
+
+  (defun lg/exwm-outer-gaps-setenv-and-polybar ()
+    "Set environment variables that are used by polybar to overlay
+  the minibuffer, and restart polybar after a timer."
+    (setenv "GAP_RIGHT" "50%")
+    (setenv "GAP_BOTTOM" (number-to-string
+                          (if exwm-outer-gaps-mode
+                              (aref exwm-outer-gaps-width 3)
+                            0)))
+    (setenv "PANEL_WIDTH" (concat "50%:-"
+                                  (number-to-string
+                                   (if exwm-outer-gaps-mode
+                                       (aref exwm-outer-gaps-width 0)
+                                     0))))
+    (cancel-timer exwm-outer-gaps-polybar-timer)
+    (setq exwm-outer-gaps-polybar-timer
+          (run-with-timer 1 nil (lambda () (efs/start-panel)))))
+
+  (advice-add #'exwm-outer-gaps-apply :before #'lg/exwm-outer-gaps-setenv-and-polybar)
+  (exwm-outer-gaps-mode +1))
 
 (provide 'lg-exwm)
