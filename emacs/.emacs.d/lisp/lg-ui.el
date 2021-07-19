@@ -292,4 +292,14 @@ settings applied to them."
   :config
   (good-scroll-mode +1))
 
+(use-package hl-line
+  :straight nil
+  :config
+  (global-hl-line-mode +1))
+  
+(use-package git-gutter-fringe
+  :straight t
+  :config
+  (global-git-gutter-mode +1))
+
 (provide 'lg-ui)
