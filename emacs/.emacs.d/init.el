@@ -2,14 +2,18 @@
 
 (defvar lg/configuration-path (expand-file-name "lisp" "~/.emacs.d"))
 (add-to-list 'load-path lg/configuration-path)
+(setq custom-file "~/.emacs.d/lisp/custom.el")
+(load-file custom-file)
 
 (defvar lg/modules
   '("core"
+    "private"
     "lg-keybindings"
     "lg-window"
     "lg-completion"
     "lg-ui"
     "lg-tools"
+    "lg-mail"
     "lg-org"
     "lg-exwm")
   "List of enabled modules in my configuration.")
@@ -23,6 +27,17 @@ on completion."
 	     (format "%.2f seconds"
 		     (float-time
 		     (time-since before-load-time))))))
+
+
+(defun lg/emacs-startup-time-info ()
+  "Profile emacs startup"
+  (message "*** Emacs loaded in %s with %d garbage collections."
+	   (format "%.2f seconds"
+		   (float-time
+		    (time-subtract after-init-time before-init-time)))
+	   gcs-done))
+
+(add-hook 'emacs-startup-hook #'lg/emacs-startup-time-info)
 
 (mapcar #'lg/require lg/modules)
 
