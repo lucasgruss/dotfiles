@@ -38,4 +38,9 @@
    ("s-o"    . windower-toggle-single)
    ("s-\\"   . windower-toggle-split)))
 
+(use-package framemove
+  :load-path "~/.emacs.d/lisp/site-packages"
+  :config
+  (setq framemove-hook-into-windmove t))
+
 (provide 'lg-window)
