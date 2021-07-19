@@ -9,7 +9,8 @@ margin-top = 0
 margin-bottom = 0
 
 [colors]
-background = ${xrdb:Polybar*background}
+;background = ${xrdb:Polybar*background}
+background = ${xrdb:background}
 background-alt = ${xrdb:background}
 foreground = ${xrdb:foreground}
 foreground-alt = ${xrdb:foreground}
@@ -50,7 +51,7 @@ modules-right = cpu temperature battery0 battery1
 tray-position = right
 tray-padding = 10
 tray-maxsize = 28
-tray-background = ${colors.background-alt}
+tray-background = ${colors.background}
 
 cursor-click = pointer
 cursor-scroll = ns-resize
