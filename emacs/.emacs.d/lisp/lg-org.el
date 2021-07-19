@@ -1,13 +1,15 @@
 ;; lg-org.el : configuration for org
 
 (use-package org
+  :mode ("\\.org\\'" . org-mode)
   :init
+  (defun org-clocking-buffer () nil) ;; without it, impossible to exit emacs with C-x C-c
   (setq org-directory "~/org/")
   (setq org-fontify-quote-and-verse-blocks nil)
   (setq org-fontify-whole-heading-line nil)
   (setq org-agenda-include-diary t)
   (setq org-startup-with-latex-preview t)
-  (setq org-hide-leading-stars t)
+  (setq org-hide-leading-stars nil)
   (setq org-startup-indented nil)
   (setq org-archive-location "archive/%s_archive::")
   :config
