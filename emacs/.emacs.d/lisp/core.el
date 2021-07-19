@@ -49,6 +49,7 @@
 ;; (setq gc-cons-threshold (* 4 100 1024 1024)) ;; try and speed up startup time
 (use-package gcmh
   :straight t
+  :diminish gcmh-mode
   :config
   (gcmh-mode +1))
 

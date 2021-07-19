@@ -136,6 +136,9 @@ applied to gnome-settings or xfce-conf."
     [S-?\t] #'outshine-cycle)
   :straight t)
 
+(use-package outline
+  :diminish outline-mode)
+
 (use-package all-the-icons
   :straight t
   :config
@@ -319,6 +322,7 @@ settings applied to them."
   (global-hl-line-mode +1))
   
 (use-package git-gutter-fringe
+  :diminish global-git-gutter-mode
   :straight t
   :config
   (global-git-gutter-mode +1))
