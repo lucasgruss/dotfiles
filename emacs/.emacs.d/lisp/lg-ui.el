@@ -237,18 +237,18 @@ settings applied to them."
   :straight t
   :bind ("C-t" . 'centaur-tabs--create-new-tab)
   :hook
-  (emms-playlist-mode . centaur-tabs-local-mode)
-  (org-ql-sidebar-buffer-setup . centaur-tabs-local-mode)
-  (dashboard-mode . centaur-tabs-local-mode)
-  (calendar-mode . centaur-tabs-local-mode)
-  (ibuffer-sidebar-mode . centaur-tabs-local-mode)
-  (ibuffer-mode . centaur-tabs-local-mode)
-  (dired-sidebar-mode . centaur-tabs-local-mode)
-  (dired-mode . centaur-tabs-local-mode)
-  (pdf-outline-buffer-mode . centaur-tabs-local-mode)
-  (exwm-floating-setup . centaur-tabs-local-mode)
-  (calc-mode . centaur-tabs-local-mode)
-  (calc-trail-mode . centaur-tabs-local-mode)
+  ((emms-playlist-mode
+  org-ql-sidebar-buffer-setup
+  dashboard-mode
+  calendar-mode
+  ibuffer-sidebar-mode
+  ibuffer-mode
+  dired-sidebar-mode
+  dired-mode
+  pdf-outline-buffer-mode
+  exwm-floating-setup
+  calc-mode
+  calc-trail-mode) . centaur-tabs-local-mode)
   :config
   (setq centaur-tabs-style "bar")
   (setq centaur-tabs-set-modified-marker t)
