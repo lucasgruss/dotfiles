@@ -1,5 +1,7 @@
 ;;; core.el : core packages needed for my configuration
 
+(server-start)
+
 (setq native-comp-async-report-warnings-errors nil)
 
 ;; magically bootstrap straight
