@@ -1,0 +1,20 @@
+# Sample minimal config file.  Copy this to ~/.offlineimaprc and edit to
+# get started fast.
+
+[general]
+accounts = laposte
+
+[Account laposte]
+localrepository = Local_laposte
+remoterepository = Remote_laposte
+
+[Repository Local_laposte]
+type = Maildir
+localfolders = ~/Mails/Laposte
+
+[Repository Remote_laposte]
+type = IMAP
+ssl = yes
+sslcacertfile = OS-DEFAULT
+remotehost = imap.laposte.net
+remoteuser = lucas.gruss
