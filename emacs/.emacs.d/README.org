@@ -1,0 +1,94 @@
+#+TITLE: My emacs configuration
+
+* Components
+
+I try to live within Emacs as much as possible, that's how much I love
+the integration of the tools and the configurability.  Here are the
+main components of my configuration:
+
+- EXWM :: emacs is also my window manager, which is the biggest step
+  towards living in emacs (even when using other software). The WM and
+  editor have unified keybindings (through simulation keys), and I can
+  have another level of integration between my tools. For instance, I
+  use the ~no-tabs~ extension in firefox that makes all the new tabs
+  open in their own X-window. They are each managed by emacs, and
+  therefore I can use the completion framework to select my tabs or
+  use a filter to delete some of them. I can also unify the look of
+  tabs, because they are displayed through centaur-tabs, which means
+  that my tabs look the same everywhere : editor, browser, terminal,
+  etc.
+
+- vterm :: use emacs as terminal emulator through vterm.
+
+- use-package :: configure packages in an elegant manner. I try to
+  keep all the configuration in ~use-package~ forms, which keeps
+  configuration of packages all in the same place, self-contained, and
+  provides useful features (~ensure-system-package~ for instance,
+  which will pull dependencies from your OS package manager).
+
+- org-mode :: org is its own beast, and there are extensions for a lot
+  of use cases. My use case is mainly using it as a markup language
+  and some light planning tool. 
+
+- evil-mode :: I am not a vim user, but I do like the modal
+  approach. I sometimes feel sore in my wrists and hands : at the ripe
+  age of 24, it would be a little early for my taste to develop RSI. I
+  am not trying to argue whether or not emacs-style keybindings cause
+  RSI, but in my case I believe to have had less issues after
+  switching to evil-mode.
+
+* Some context 
+** First configuration
+
+I started using emacs in late 2018, and used to have a literate org
+configuration file. This first configuration attempt was pretty poor,
+as I did not know any elisp, and was stealing pieces of code left and
+right on the internet. Performances were really bad (both startup and
+actual use) to the point were I could not bear it anymore.
+
+I eventually declared init bankrupcy, and gave Doom Emacs a spin
+sometime in 2020.
+
+[[./img/bankrupcy.jpeg]]
+
+** Doom Emacs
+
+I want to say that Doom is a great distribution of Emacs. The
+community is great, the Doom API is really useful and a lot of
+integration is provided between packages.
+
+However at some point, I got frustrated with it. Having things configured
+for you is nice at first, but it can get in your way after a while. I did not
+like being tied to Doom, and was quite dependent on it.
+
+At some point, a Doom update failed for some reason (not the first
+time I experienced it), and something was broken which would have
+ended up with me reinstalling Doom. This is common: things break in
+the software world and we always have to repair something at some
+point, there is no avoiding reinstallation and it's often the easiest
+fix. But I decided that a configuration framework just means more
+surface area for failure, and I felt ready to do my own configuration
+again.
+
+Also, reconfiguring some of the packages of Doom gets messy after a
+while, as you have settings for the same package split into different
+locations (=.emacs.d=, =.doom.d=, =.doom.d/modules=, ...), which was
+not something I felt at ease with.
+
+** Current configuration
+
+Being a Doom Emacs user has really helped me understand emacs and
+elisp more, and here are some key ideas that I will bring with me from
+Doom:
+
+- modularity : splitting the configuration in small modules that can
+  easily be selected.
+- no literate configuration : configurations in org look very nice and
+  are nice projects, but I feel like it's a lot of work and I don't
+  really want to document everything in my configuratin, but rather
+  highlight the important pieces (which is what this document is for)
+- the keybindings : I loved the keybindings in Doom Emacs and will
+  be missing them for a long time (until I manage to incorporate
+  them again)
+
+
