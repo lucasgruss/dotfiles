@@ -285,4 +285,10 @@ playlist in a side-window"
                                 :repo "phundrak/eshell-info-banner.el")
   :hook (eshell-banner-load . eshell-info-banner-update-banner))
 
+;;; * Ledger mode
+(use-package ledger-mode :straight t)
+(use-package evil-ledger
+  :straight t
+  :hook (ledger-mode . evil-ledger-mode))
+
 (provide 'lg-tools)
