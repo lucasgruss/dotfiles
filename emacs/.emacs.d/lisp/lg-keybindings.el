@@ -24,7 +24,9 @@
   :straight t
   :diminish evil-escape-mode
   :init (setq evil-escape-key-sequence "jk")
-  :config (evil-escape-mode +1))
+  :config
+  (setq evil-escape-excluded-major-modes 'magit-mode)
+  (evil-escape-mode +1))
 
 (use-package which-key
   :diminish which-key-mode
