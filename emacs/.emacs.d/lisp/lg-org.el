@@ -234,4 +234,14 @@ Format is a string matching the following format specification:
 ;(use-package org-zotxt :straight t)
 ;(use-package org-zotxt-noter :straight t)
 
+(defun dw/org-mode-visual-fill ()
+  (setq visual-fill-column-width 110
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :defer t
+  :straight t
+  :hook (org-mode . dw/org-mode-visual-fill))
+
 (provide 'lg-org)
