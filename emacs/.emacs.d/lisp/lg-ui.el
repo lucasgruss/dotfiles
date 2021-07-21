@@ -10,7 +10,7 @@
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal)
 
-  ;; themes
+  ;;;; Syncing system themes with emacs theme
   (defvar lg/light-themes
     '(modus-operandi doom-solarized-light)
     "List of light themes.")
@@ -51,7 +51,50 @@ applied to gnome-settings or xfce-conf."
     "Load the theme defined in lg/theme"
     (load-theme lg/theme t nil))
 
-  (advice-add 'load-theme :before #'load-theme--disable-old-theme))
+  (advice-add 'load-theme :before #'load-theme--disable-old-theme)
+
+  ;;;; Transparency
+  (setq frame-alpha-lower-limit 1)
+  (defvar lg/transparency-alpha 80
+    "Transparency of all frames.")
+
+  (defvar lg/transparency-default-increment 5
+    "Default {in, de}-crement value for the transparency alpha")
+
+  (defun lg/toggle-transparency ()
+    "Toggle the transparency of Emacs on and off"
+    (interactive)
+    (let ((alpha (frame-parameter nil 'alpha)))
+      (set-frame-parameter
+       nil 'alpha
+       (if (eql (cond ((numberp alpha) alpha)
+		      ((numberp (cdr alpha)) (cdr alpha))
+		      ;; Also handle undocumented (<active> <inactive>) form.
+		      ((numberp (cadr alpha)) (cadr alpha)))
+		100)
+	   lg/transparency-alpha '(100 . 100)))))
+
+  (defun lg/transparency-alpha-increase (arg)
+    "Increase transparency of the frame"
+    (interactive "P")
+    (let ((inc (if arg arg lg/transparency-default-increment)))
+      (setq lg/transparency-alpha (+ lg/transparency-alpha inc)))
+    (lg/transparency-apply))
+
+  (defun lg/transparency-alpha-decrease (arg)
+    "Increase transparency of the frame"
+    (interactive "P")
+    (let ((inc (if arg arg lg/transparency-default-increment)))
+      (setq lg/transparency-alpha (- lg/transparency-alpha inc)))
+    (lg/transparency-apply))
+
+  (defun lg/transparency-apply ()
+    "Apply the transparency parameter to the frame"
+    (interactive)
+    (when (< 100 lg/transparency-alpha) (setq lg/transparency-alpha 100))
+    (when (> 0 lg/transparency-alpha) (setq lg/transparency-alpha 0))
+    (set-frame-parameter
+     nil 'alpha lg/transparency-alpha)))
 
 
 (use-package moody
