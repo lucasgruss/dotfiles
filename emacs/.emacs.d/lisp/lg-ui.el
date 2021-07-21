@@ -34,6 +34,8 @@ applied to gnome-settings or xfce-conf."
     (when (member theme lg/dark-themes)
       (shell-command "sed -i 's/ThemeName.*/ThemeName \"Adwaita-dark\"/g' ~/.xsettingsd")
       (shell-command "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Dark\"/g' ~/.xsettingsd"))
+    (shell-command (format "sed -i 's/background =.*/background = \"%s\"/g' ~/.config/dunst/dunstrc" (face-foreground 'default)))
+    (shell-command (format "sed -i 's/foreground =.*/foreground = \"%s\"/g' ~/.config/dunst/dunstrc" (face-background 'default)))
     (shell-command (format "sed -i 's/\*background.*/\*background\: %s/g' ~/.Xresources" (face-background 'default)))
     (shell-command (format "sed -i 's/\*foreground.*/\*foreground\: %s/g' ~/.Xresources" (face-foreground 'default)))
     (shell-command "killall -HUP xsettingsd")
