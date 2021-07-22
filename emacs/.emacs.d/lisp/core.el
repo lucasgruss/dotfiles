@@ -78,6 +78,8 @@
   (setq y-or-n-p-use-read-key t)
   (setq x-select-enable-clipboard-manager t)
   (setq recentf-max-saved-items 100)
+  (setq custom-file "~/.emacs.d/lisp/custom.el")
+  (load-file custom-file)
 
   (defun lg/visit-configuration ()
     "Prompt to get the configuration directory"
