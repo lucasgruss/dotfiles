@@ -316,9 +316,10 @@ settings applied to them."
   (setq centaur-tabs-plain-icons nil)
   (setq centaur-tabs-label-fixed-length 15)
   (setq uniquify-separator "/")
-  (centaur-tabs-mode +1)
-  (use-package lg-centaur-tabs
-    :load-path "~/.emacs.d/lisp/"))
+  (centaur-tabs-mode +1))
+
+(use-package lg-centaur-tabs
+  :load-path "~/.emacs.d/lisp/site-packages/")
 
 (use-package display-line-numbers
   :hook (prog-mode . lg/display-line-numbers-mode-enable)
