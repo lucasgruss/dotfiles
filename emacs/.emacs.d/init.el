@@ -8,10 +8,10 @@
 (defvar lg/modules
   '("core"
     "private"
+    "lg-ui"
     "lg-keybindings"
     "lg-window"
     "lg-completion"
-    "lg-ui"
     "lg-tools"
     "lg-mail"
     "lg-org"
