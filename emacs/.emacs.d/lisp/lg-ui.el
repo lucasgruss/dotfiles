@@ -1,5 +1,5 @@
 (use-package emacs
-  :hook (after-init . lg/load-theme)
+  ;:hook (after-init . lg/load-theme)
   :init
   (display-battery-mode -1)
   (display-time-mode -1)
@@ -96,6 +96,14 @@ applied to gnome-settings or xfce-conf."
     (set-frame-parameter
      nil 'alpha lg/transparency-alpha)))
 
+(use-package circadian
+  :straight t
+  :config
+  (setq calendar-latitude 48.856613)
+  (setq calendar-longitude 2.352222)
+  (setq circadian-themes '((:sunrise . modus-operandi)
+			   (:sunset . modus-vivendi)))
+  (circadian-setup))
 
 (use-package moody
   :straight t
