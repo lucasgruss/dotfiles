@@ -1,5 +1,13 @@
 ;;; lg-exwm.el : my configuration for exwm
 
+(use-package desktop-environment
+  :straight t
+  :config
+  (general-def
+    ;:states '(normal insert visual)
+    ;:keymaps 'desktop-environment-mode-map
+    "s-l" nil))
+
 (use-package exwm
   :straight t
   :config
