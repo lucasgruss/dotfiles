@@ -2,11 +2,15 @@
 
 (use-package desktop-environment
   :straight t
+  :diminish
+  :ensure-system-package (scrot brightnessctl slock)
   :config
+  (desktop-environment-exwm-set-global-keybindings t)
   (general-def
-    ;:states '(normal insert visual)
-    ;:keymaps 'desktop-environment-mode-map
-    "s-l" nil))
+    :keymaps 'desktop-environment-mode-map
+    "s-l" nil)
+  (setq desktop-environment-screenshot-directory "~/Images/screenshots/")
+  (desktop-environment-mode +1))
 
 (use-package exwm
   :straight t
@@ -102,8 +106,8 @@ buffer (=minimizing in other WM/DE)"
     ;; ;; (shell-command "feh --bg-fill ~/Images/Wallpaper/mountain.png")
     (efs/run-in-background "pasystray")
     (efs/run-in-background "compton")
-    (efs/run-in-background "xfce4-power-manager")
-    (efs/run-in-background "xfce4-panel")
+    ;; (efs/run-in-background "xfce4-power-manager")
+    ;; (efs/run-in-background "xfce4-panel")
     (efs/run-in-background "blueman-applet")
     (efs/run-in-background "nm-applet")
     ;; (efs/run-in-background "kdeconnect-indicator")
@@ -197,9 +201,6 @@ buffer (=minimizing in other WM/DE)"
   (push (aref (kbd "<escape>") 0) exwm-input-prefix-keys)
   (push (aref (kbd "<return>") 0) exwm-input-prefix-keys)
   (push (aref (kbd "s-<SPC>") 0) exwm-input-prefix-keys)
-
-  ;; relaunch the panel so that it auto-hide correctly
-  ;;(shell-command "xfce4-panel")
   (exwm-enable))
 
 (use-package exwm-randr
