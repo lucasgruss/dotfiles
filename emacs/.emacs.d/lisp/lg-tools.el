@@ -43,7 +43,8 @@
   :straight t
   :commands (elfeed elfeed-update)
   :config
-  (use-package lg-elfeed)
+  (use-package lg-elfeed
+    :load-path "~/.emacs.d/lisp/site-packages")
   (setq elfeed-feeds
 	'(("https://xkcd.com/atom.xml" comic)
 	  ("https://protesilaos.com/codelog.xml" code)
