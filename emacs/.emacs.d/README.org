@@ -1,5 +1,16 @@
 #+TITLE: My emacs configuration
 
+* Core concepts
+
+  Here are the handful of concepts that I try to apply in configuring emacs:
+   - modularity : splitting the configuration in small modules that can easily
+     be selected.
+   - no literate configuration : configurations in org look very nice and are
+     nice projects, but I feel like it's a lot of work to maintain and I don't
+     really want to document everything in my configuration, but rather
+     highlight the important pieces.
+   - use built-in packages as much as possible to promote integration.
+
 * Components
 
   I try to live within Emacs as much as possible, that's how much I love the
@@ -33,7 +44,6 @@
     be a little early for my taste to develop RSI. I am not trying to argue
     whether or not emacs-style keybindings cause RSI, but in my case I believe
     to have had less issues after switching to evil-mode.
-
 
   The following snippet of code can be used to graph a mapping of all the
   dependencies between the packages.
@@ -89,17 +99,4 @@
    am going to reset most variables set by Doom Emacs, I might as well go
    vanilla.
 
-** Current configuration
-
-   Being a Doom Emacs user has really helped me understand emacs and here are
-   some key ideas that I will bring with me from Doom:
-
-   - modularity : splitting the configuration in small modules that can easily
-     be selected.
-   - no literate configuration : configurations in org look very nice and are
-     nice projects, but I feel like it's a lot of work to maintain and I don't
-     really want to document everything in my configuration, but rather
-     highlight the important pieces.
-   - the keybindings : I loved the keybindings in Doom Emacs and will be missing
-     them until I manage to incorporate them again
-
+     
