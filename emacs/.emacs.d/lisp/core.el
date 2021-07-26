@@ -47,7 +47,7 @@
    "hb" nil
    "t" '(nil :which-key "Toggle\n")
    "o" '(nil :which-key "Open\n")
-   "SPC" '(execute-extended-command :which-key "M-x")))
+   "SPC" '(execute-extended-command :which-key "M-x\n")))
 
 ;; PERFORMANCES (as soon as possible)
 ;; (setq gc-cons-threshold (* 4 100 1024 1024)) ;; try and speed up startup time
@@ -100,6 +100,7 @@
     (kill-buffer (current-buffer)))
 
   (recentf-mode +1)
+  (show-paren-mode +1)
   :bind ("s-<escape>" . 'lg/kill-this-buffer))
 
 (provide 'core)
