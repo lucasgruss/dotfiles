@@ -34,9 +34,7 @@
 
 (use-package evil-collection-webkit
   :config
-  :after webkit
   (evil-collection-xwidget-setup))
 
 (use-package webkit-ace)
-
-(use-package evil-collection-webkit)
+(use-package webkit-dark)
