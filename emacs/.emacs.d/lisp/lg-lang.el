@@ -21,3 +21,12 @@
   :init
   (add-to-list 'exec-path "/home/lucas/.local/bin/")
   (apheleia-global-mode +1))
+
+;;; * Emacs lisp
+(use-package eldoc
+  :straight nil
+  :diminish (global-eldoc-mode eldoc-mode))
+
+;;; * Graphviz
+(use-package graphviz-dot-mode :straight t)
+(use-package company-graphviz-dot)
