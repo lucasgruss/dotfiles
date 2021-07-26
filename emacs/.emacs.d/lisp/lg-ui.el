@@ -376,7 +376,7 @@ settings applied to them."
   (global-hl-line-mode +1))
   
 (use-package git-gutter-fringe
-  :diminish global-git-gutter-mode
+  :diminish (global-git-gutter-mode git-gutter-mode)
   :straight t
   :config
   (global-git-gutter-mode +1))
