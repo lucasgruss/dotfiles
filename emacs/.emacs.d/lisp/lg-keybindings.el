@@ -38,7 +38,10 @@
   :straight t
   :config
   (setq which-key-idle-delay 0.7)
-  (which-key-mode +1))
+  (which-key-mode +1)
+  ;; fix how SPC h appears in which-key
+  (which-key-add-key-based-replacements
+    "SPC h" "Help\n"))
 
 ;;; Matcha
 (use-package matcha

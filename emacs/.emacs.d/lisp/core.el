@@ -41,7 +41,7 @@
    "b" '(nil :which-key "Buffer\n")
    "bb" '(switch-to-buffer :which-key "Buffer")
    "bo" '(switch-to-buffer-other-window :which-key "Buffer")
-   "h" (general-key "C-h");'(lg/general-def-wrap-C-h :which-key "Help\n")
+   "h" (general-key "C-h")
    "ht" 'load-theme
    "hr" 'lg/reload-configuration
    "hb" nil
