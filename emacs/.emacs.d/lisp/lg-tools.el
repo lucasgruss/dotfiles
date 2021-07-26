@@ -252,6 +252,12 @@ playlist in a side-window"
     "g" '(nil :which-key "Magit\n")
     "gg" #'magit-status))
 
+;;;; Magit-todos
+(use-package magit-todos
+  :straight t
+  :config
+  (magit-todos-mode +1))
+
 ;;;; Bluetooth
 (use-package bluetooth
   :straight t
