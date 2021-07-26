@@ -1,5 +1,7 @@
-;; lg-mail.el : configuration for the mails
+;;; lg-mail: configuration for mail
+;; Author: Lucas Gruss
 
+;;; Mu4e
 (use-package mu4e
   :ensure-system-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e"

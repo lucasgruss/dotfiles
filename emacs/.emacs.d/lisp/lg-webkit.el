@@ -1,3 +1,7 @@
+;;; lg-webkit: configuration for the emacs-webkit web browser
+;; Author: Lucas Gruss
+
+;;; Emacs-webkit
 (use-package webkit
   :demand t
   :straight
@@ -32,6 +36,7 @@
 		  (dolist (window hide-windows)
 		    (switch-to-prev-buffer window)))))))))))
 
+;;; Evil-collection-webkit
 (use-package evil-collection-webkit
   :config
   (evil-collection-xwidget-setup))

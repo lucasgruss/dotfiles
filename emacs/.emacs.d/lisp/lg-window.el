@@ -1,5 +1,6 @@
 ;;; lg-window.el : window (as in "emacs window") management configuration 
 
+;;; Emacs settings
 (use-package emacs
   :straight nil
   :init
@@ -10,6 +11,7 @@
 	   (side . right)
 	   (slot . -2)))))
 
+;;; Windmove
 (use-package windmove
   :bind
   (("s-h" . windmove-left)
@@ -20,6 +22,7 @@
   (setq windmove-wrap-around nil)
   (setq windmove-window-distance-delta 1))
 
+;;; Windower
 (use-package windower
   :straight t
   :init
@@ -38,6 +41,7 @@
    ("s-o"    . windower-toggle-single)
    ("s-\\"   . windower-toggle-split)))
 
+;;; Framemove
 (use-package framemove
   :load-path "~/.emacs.d/lisp/site-packages"
   :config

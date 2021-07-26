@@ -1,5 +1,7 @@
-;; lg-org.el : configuration for org
+;;; lg-org: configuration for org
+;; Author: Lucas Gruss
 
+;;; Org
 (use-package org
   :mode ("\\.org\\'" . org-mode)
   :init
@@ -38,6 +40,7 @@
           ("conf" modus-themes-nuanced-cyan)
           ("docker" modus-themes-nuanced-cyan))))
 
+;;; Org-sidebar
 (use-package org-sidebar
   :after org
   :straight t
@@ -45,6 +48,7 @@
   (my-leader-def :keymaps 'override
     "to" #'org-sidebar-toggle))
 
+;;; Org-tree-slide
 (use-package org-tree-slide
   :straight t
   :after org
@@ -95,6 +99,7 @@
 	 ("C-j" . org-tree-slide-move-next-tree)
 	 ("C-k" . org-tree-slide-move-previous-tree)))
 
+;;; Org-noter
 (use-package org-noter
   :straight t
   :after org
@@ -115,18 +120,22 @@
     :keymaps 'pdf-view-mode-map
     "i" #'org-noter-insert-note))
 
+;;; Ox-report
 (use-package ox-report
   :straight t
   :after org)
 
+;;; org-ref
 (use-package org-ref
   :straight t
   :after org)
 
+;;; org-contrib
 (use-package org-contrib
   :straight t
   :after org)
 
+;;; org-contacts
 (use-package org-contacts
   :after org-contrib
   :config
@@ -187,9 +196,11 @@ Format is a string matching the following format specification:
 							     (calendar-extract-year anniv))))
 					       (format "%d%s" years (diary-ordinal-suffix years))))))))))
 
+;;; org-protocol
 (use-package org-protocol
   :after org)
 
+;;; org-capture
 (use-package org-capture
   :after org
   :config
@@ -220,6 +231,7 @@ Format is a string matching the following format specification:
 	  ("l" "Link" entry (file+headline "~/org/links.org" "Links")
 	   "* %a %^g\n %?\n %T\n %i"))))
 
+;;; org-pomodoro
 (use-package org-pomodoro
   :straight t
   :after org
@@ -237,6 +249,8 @@ Format is a string matching the following format specification:
 ;(use-package org-zotxt :straight t)
 ;(use-package org-zotxt-noter :straight t)
 
+
+;;; visual-fill-column
 (defun dw/org-mode-visual-fill ()
   (setq visual-fill-column-width 110
         visual-fill-column-center-text t)

@@ -1,5 +1,7 @@
-;;; lg-completion.el : completion configuration
+;;; lg-completion: completion configuration
+;; Author: Lucas Gruss
 
+;;; Selectrum
 (use-package selectrum
   :straight t
   :defer nil
@@ -24,21 +26,21 @@
   (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
   (selectrum-mode +1))
 
-
+;;; Prescient
 (use-package prescient
   :straight t
   :after selectrum
   :config
   (prescient-persist-mode +1))
 
-
+;;; Orderless
 (use-package orderless
   :straight t
   :config
   (setq orderless-skip-highlighting (lambda () selectrum-is-active))
   (setq completion-styles '(orderless)))
 
-
+;;; selectrum-prescient
 (use-package selectrum-prescient
   ;;:disabled t
   :straight t
@@ -47,7 +49,7 @@
   (setq selectrum-prescient-enable-filtering nil)
   (selectrum-prescient-mode +1))
 
-
+;;; Marginalia
 (use-package marginalia
   :straight t
   :init
@@ -55,7 +57,7 @@
   :config
   (marginalia-mode))
 
-
+;;; Consult
 (use-package consult
   :straight t
   :general
@@ -74,8 +76,10 @@
     (interactive)
     (consult-ripgrep "~/.emacs.d/lisp" "\\(use-package ")))
 
+;;; Consult-selectrum
 (use-package consult-selectrum :after consult)
 
+;;; Consult-spotify
 (use-package consult-spotify
   :straight t
   :disabled t
@@ -83,6 +87,7 @@
   :init
   (load "~/.config/doom/private.el"))
 
+;;; Embark
 (use-package embark
   :straight t
   :bind ("s-;" . embark-act)
@@ -109,17 +114,20 @@
 
   (add-hook 'embark-collect-mode-hook #'shrink-selectrum))
 
+;;; Company
 (use-package company
   :diminish company-mode
   :straight t
   :config
   (global-company-mode +1))
 
+;;; Company-box
 (use-package company-box
   :diminish company-box-mode
   :straight t
   :hook (company-mode . company-box-mode))
 
+;;; Company-prescient
 (use-package company-prescient
   :straight t
   :after company

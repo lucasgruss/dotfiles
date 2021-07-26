@@ -1,5 +1,8 @@
+;;; lg-ui: Configuration for the UI of Emacs
+;; Author: Lucas Gruss
+
+;;; Emacs settings
 (use-package emacs
-  ;:hook (after-init . lg/load-theme)
   :init
   (display-battery-mode -1)
   (display-time-mode -1)
@@ -8,9 +11,12 @@
   (setq scroll-conservatively 10000)
   (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
-  (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal)
+  (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal))
 
-  ;;;; Syncing system themes with emacs theme
+;;;; Syncing system themes with emacs theme
+(use-package emacs
+  ;:hook (after-init . lg/load-theme)
+  :init
   (defvar lg/light-themes
     '(modus-operandi doom-solarized-light)
     "List of light themes.")
@@ -51,9 +57,11 @@ applied to gnome-settings or xfce-conf."
     "Load the theme defined in lg/theme"
     (load-theme lg/theme t nil))
 
-  (advice-add 'load-theme :before #'load-theme--disable-old-theme)
+  (advice-add 'load-theme :before #'load-theme--disable-old-theme))
 
-  ;;;; Transparency
+;;;; Transparency
+(use-package emacs
+  :init
   (setq frame-alpha-lower-limit 1)
   (defvar lg/transparency-alpha 80
     "Transparency of all frames.")
@@ -96,6 +104,7 @@ applied to gnome-settings or xfce-conf."
     (set-frame-parameter
      nil 'alpha lg/transparency-alpha)))
 
+;;; Circadian
 (use-package circadian
   :straight t
   :config
@@ -105,6 +114,8 @@ applied to gnome-settings or xfce-conf."
 			   (:sunset . modus-vivendi)))
   (circadian-setup))
 
+;;; Modeline
+;;;; Moody
 (use-package moody
   :straight t
   :demand t
@@ -154,6 +165,7 @@ applied to gnome-settings or xfce-conf."
 					;(moody-replace-mode-line-buffer-identification)
 					;(moody-replace-vc-mode))
 
+;;; Dashboard
 (use-package dashboard
   :straight t
   :config
@@ -165,6 +177,7 @@ applied to gnome-settings or xfce-conf."
   (setq dashboard-set-file-icons t)
   (setq dashboard-set-navigator t))
 
+;;; Helpful
 (use-package helpful
   :straight t
   :commands (helpful-callable
@@ -181,6 +194,7 @@ applied to gnome-settings or xfce-conf."
    "ho" 'helpful-symbol
    "hv" 'helpful-variable))
 
+;;; Outshine
 (use-package outshine
   :hook (emacs-lisp-mode . outshine-mode)
   :diminish outshine-mode
@@ -189,9 +203,12 @@ applied to gnome-settings or xfce-conf."
     [S-?\t] #'outshine-cycle)
   :straight t)
 
+;;; Outline
 (use-package outline
   :diminish outline-mode)
 
+;;; Icons
+;;;; all-the-icons
 (use-package all-the-icons
   :straight t
   :config
@@ -201,12 +218,15 @@ applied to gnome-settings or xfce-conf."
   (add-to-list 'all-the-icons-icon-alist
                '("\\.m$" all-the-icons-fileicon "matlab" :face all-the-icons-orange)))
 
+;;;; all-the-icons-dired
 (use-package all-the-icons-dired
   :straight t
   :after dired
   :diminish all-the-icons-dired-mode
   :hook (dired-mode . all-the-icons-dired-mode))
 
+;;; Themes 
+;;;; modus-themes
 (use-package modus-themes
   :straight t
   :config
@@ -267,6 +287,7 @@ applied to gnome-settings or xfce-conf."
   (setq modus-themes-scale-4 1.27)
   (setq modus-themes-scale-5 1.33))
 
+;;;; modus-themes-exporter
 (use-package modus-themes-exporter
   :load-path "~/.emacs.d/lisp/"
   :after modus-themes
@@ -281,10 +302,13 @@ settings applied to them."
       (modus-themes-exporter-export "xcolors" "~/.Xresources")))
   (advice-add #'load-theme :after #'lg/modus-theme-propagate))
 
+;;;; Doom themes
 (use-package doom-themes
   :commands (load-theme)
   :straight t)
 
+;;; Tabs
+;;;; centaur-tabs
 (use-package centaur-tabs
   :demand t
   :straight t
@@ -318,9 +342,11 @@ settings applied to them."
   (setq uniquify-separator "/")
   (centaur-tabs-mode +1))
 
+;;;; lg-centaur-tabs : further configuration for centaur-tabs
 (use-package lg-centaur-tabs
   :load-path "~/.emacs.d/lisp/site-packages/")
 
+;;; display-line-numbers
 (use-package display-line-numbers
   :hook (prog-mode . lg/display-line-numbers-mode-enable)
   :config
@@ -329,13 +355,14 @@ settings applied to them."
     (display-line-numbers-mode +1)
     (setq display-line-numbers 'relative)))
 
-;;; * Scrolling performances
-
+;;; Scrolling performances
+;;;; fast-scroll
 (use-package fast-scroll
   :disabled t
   :straight t
   :config (fast-scroll-mode +1))
 
+;;;; scroll-on-jump
 (use-package scroll-on-jump
   :demand t
   :straight   
@@ -364,17 +391,26 @@ settings applied to them."
   (setq scroll-on-jump-use-curve t)
   (setq scroll-on-jump-duration 0.15))
 
+;;;; good-scroll
 (use-package good-scroll
   :disabled t
   :straight t
   :config
   (good-scroll-mode +1))
 
+;;; hl-line
 (use-package hl-line
   :straight nil
   :config
   (global-hl-line-mode +1))
   
+;;; hl-todo
+(use-package hl-todo
+  :straight t
+  :config
+  (global-hl-todo-mode +1))
+
+;;; git-gutter-fringe
 (use-package git-gutter-fringe
   :diminish (global-git-gutter-mode git-gutter-mode)
   :straight t

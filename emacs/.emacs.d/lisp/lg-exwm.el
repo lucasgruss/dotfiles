@@ -1,5 +1,7 @@
 ;;; lg-exwm.el : my configuration for exwm
+;; Author: Lucas Gruss
 
+;;; Desktop-environment
 (use-package desktop-environment
   :straight t
   :diminish
@@ -12,6 +14,13 @@
   (setq desktop-environment-screenshot-directory "~/Images/screenshots/")
   (desktop-environment-mode +1))
 
+;;; App-launcher
+(use-package app-launcher
+  :straight   (app-launcher :type git :host github
+			    :repo "SebastienWae/app-launcher")
+  :bind ("s-d" . 'app-launcher-run-app))
+
+;;; EXWM
 (use-package exwm
   :straight t
   :config
@@ -203,6 +212,7 @@ buffer (=minimizing in other WM/DE)"
   (push (aref (kbd "s-<SPC>") 0) exwm-input-prefix-keys)
   (exwm-enable))
 
+;;;; EXWM-randr
 (use-package exwm-randr
   :after exwm
   :config
@@ -214,9 +224,11 @@ buffer (=minimizing in other WM/DE)"
   (add-hook 'exwm-randr-screen-change-hook #'lg/setup-screens)
   (exwm-randr-enable))
 
+;;;; lg-exwm-utils
 (use-package lg-exwm-utils
   :load-path "~/.emacs.d/lisp/site-packages")
 
+;;;; exwm-firefox-evil
 (use-package exwm-firefox-evil
   :straight t
   :hook ((exwm-manage-finish . exwm-firefox-evil-activate-if-firefox)
@@ -309,11 +321,7 @@ firefox, it leaves fullscreen mode."
     "C-k" #'exwm-firefox-core-up
     "C-l" #'exwm-firefox-core-right))
 
-(use-package app-launcher
-  :straight   (app-launcher :type git :host github
-			    :repo "SebastienWae/app-launcher")
-  :bind ("s-d" . 'app-launcher-run-app))
-
+;;;; lg-exwm-polybar
 (use-package lg-exwm-polybar
   :load-path "~/.emacs.d/lisp/site-packages"
   :demand t
@@ -321,6 +329,7 @@ firefox, it leaves fullscreen mode."
   (minibuffer-setup . lg/polybar-minibuffer-hide)
   (minibuffer-exit . lg/polybar-minibuffer-show))
 
+;;;; exwm-outer-gaps
 (use-package exwm-outer-gaps
   :straight (exwm-outer-gaps :host github :repo "lucasgruss/exwm-outer-gaps")
   :after (xelb exwm)

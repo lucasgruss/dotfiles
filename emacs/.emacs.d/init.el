@@ -1,8 +1,10 @@
 ;;; init.el : where all the magic starts
 
+;;; Add the modules to the load-path
 (defvar lg/configuration-path (expand-file-name "lisp" "~/.emacs.d"))
 (add-to-list 'load-path lg/configuration-path)
 
+;;; Declare the modules to be enabled
 (defvar lg/modules
   '("core"
     "private"
@@ -27,7 +29,7 @@ on completion."
 		     (time-since before-load-time))))))
 
 (defun lg/emacs-startup-time-info ()
-  "Profile emacs startup"
+  "Profile emacs startup."
   (message "*** Emacs loaded in %s with %d garbage collections."
 	   (format "%.2f seconds"
 		   (float-time
@@ -36,4 +38,5 @@ on completion."
 
 (add-hook 'emacs-startup-hook #'lg/emacs-startup-time-info)
 
+;;; Require all the modules
 (mapcar #'lg/require lg/modules)

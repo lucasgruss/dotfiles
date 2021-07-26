@@ -1,7 +1,7 @@
-;;; lg-tools.el : tools for emacs, to do everything in emacs
+;;; lg-tools: tools for emacs, to do everything in emacs
+;; Author: Lucas Gruss
 
-;; * Dired
-
+;;; Dired
 (use-package dired
   :hook (dired-mode . dired-hide-details-mode)
   :config
@@ -10,11 +10,13 @@
     "h" #'dired-up-directory
     "l" #'dired-find-file))
 
+;;; Diredfl
 (use-package diredfl
   :straight t
   :after dired
   :hook (dired-mode . diredfl-mode))
 
+;;; Dired-sidebar
 (use-package dired-sidebar
   :straight t
   :after dired
@@ -32,13 +34,13 @@
   ;;(setq dired-sidebar-mode-line-format nil)
   (setq dired-sidebar-no-delete-other-windows t))
 
+;;; Dired-hide-dotfiles
 (use-package dired-hide-dotfiles
   :after dired
   :hook (dired-mode . dired-hide-dotfiles-mode)
   :straight t)
 
-;; * Elfeed
-
+;;; Elfeed
 (use-package elfeed
   :straight t
   :commands (elfeed elfeed-update)
@@ -67,6 +69,7 @@
     "of" '(elfeed :which-key "Open elfeed")
     "oF" '(elfeed-update :which-key "update elfeed")))
 
+;;; Elfeed-org
 (use-package elfeed-org
   :disabled t
   :after elfeed
@@ -74,8 +77,8 @@
   (elfeed-org)
   (setq rmh-elfeed-org-files "~/org/elfeed.org"))
 
-;; * Emms
-
+;;; Multimedia
+;;;; Emms
 (use-package emms
   :straight t
   :ensure-system-package (exiftool
@@ -151,7 +154,7 @@ playlist in a side-window"
   (setq emms-info-functions '(emms-info-mp3info emms-info-cueinfo))
   (add-hook 'emms-player-stopped-hook #'lg/emms-kill-mpv))
 
-
+;;;; Smudge (spotify)
 (use-package smudge
   :ensure-system-package curl
   :straight (smudge :host github :repo "danielfm/smudge")
@@ -161,12 +164,12 @@ playlist in a side-window"
   :config
   (setq smudge-transport 'connect))
 
+;;;; Espotify
 (use-package espotify
   :commands (espotify-next espotify-previous espotify-play-pause)
   :straight t)
 
-;; * Misc
-
+;;; Pdf-tools
 (use-package pdf-tools
   :straight t
   :hook (pdf-view-mode . (lambda () (blink-cursor-mode -1)
@@ -183,7 +186,7 @@ playlist in a side-window"
 
   (advice-add 'load-theme :after #'lg/pdf-tools-midnight-colors-with-theme))
 
-;; * Vterm
+;;; Vterm
 (use-package vterm
   ;; :ensure-system-package (libvterm . libvterm-dev)
   :straight (vterm :type git :repo "akermu/emacs-libvterm")
@@ -193,10 +196,12 @@ playlist in a side-window"
   (setq vterm-always-compile-module t)
   (setq vterm-module-cmake-args "-DUSE_SYSTEM_VTERM=YES"))
 
+;;; Multi-vterm
 (use-package multi-vterm
   :straight t
   :after vterm)
 
+;;; Vterm-toggle
 ;; run-or-raise-or-dismiss for vterm
 (use-package vterm-toggle
   :straight t
@@ -205,11 +210,13 @@ playlist in a side-window"
   :config
   (setq vterm-toggle-fullscreen-p t))
 
+;;; ibuffer
 (use-package ibuffer
   :commands ibuffer
   :general (my-leader-def :keymaps 'override "bi" #'ibuffer)
   :config (setq ibuffer-use-header-line nil))
 
+;;; ibuffer-sidebar
 (use-package ibuffer-sidebar
   :straight t
   :commands ibuffer-sidebar-toggle-sidebar
@@ -226,12 +233,15 @@ playlist in a side-window"
   (setq ibuffer-sidebar-width 30))
   ;;(setq ibuffer-sidebar-mode-line-format nil))
 
+;;; Integration with external tools
+;;;; Ripgrep
 (use-package rg
   :commands rg
   :straight t
   :ensure-system-package rg
   :config (setq rg-executable "/usr/bin/rg"))
 
+;;;; Magit
 (use-package magit
   :straight t
   :ensure-system-package git
@@ -242,6 +252,26 @@ playlist in a side-window"
     "g" '(nil :which-key "Magit\n")
     "gg" #'magit-status))
 
+;;;; Bluetooth
+(use-package bluetooth
+  :straight t
+  :commands bluetooth-list-devices)
+
+;;;; Disk-usage
+(use-package disk-usage
+  :straight t
+  :commands disk-usage)
+
+;;;; Pass
+(use-package password-store
+  :straight t
+  :commands (password-store-copy password-store-insert)
+  :general
+  (my-leader-def
+    :keymaps 'override
+    "ip" '(password-store-copy :which-key "Copy password")))
+
+;;; EWW
 (use-package eww
   :commands (eww eww-browse-with-history)
   :general (my-leader-def :keymaps 'override "ow" #'eww-browse-with-history)
@@ -263,22 +293,7 @@ playlist in a side-window"
   (use-package lg-eww
     :load-path "lisp/site-packages"))
 
-(use-package bluetooth
-  :straight t
-  :commands bluetooth-list-devices)
-
-(use-package disk-usage
-  :straight t
-  :commands disk-usage)
-
-(use-package password-store
-  :straight t
-  :commands (password-store-copy password-store-insert)
-  :general
-  (my-leader-def
-    :keymaps 'override
-    "ip" '(password-store-copy :which-key "Copy password")))
-
+;;; Eshell
 (use-package eshell-info-banner
   :commands eshell
   :straight (eshell-info-banner :type git
@@ -286,7 +301,7 @@ playlist in a side-window"
                                 :repo "phundrak/eshell-info-banner.el")
   :hook (eshell-banner-load . eshell-info-banner-update-banner))
 
-;;; * Ledger mode
+;;; Ledger mode
 (use-package ledger-mode :straight t)
 (use-package evil-ledger
   :straight t
