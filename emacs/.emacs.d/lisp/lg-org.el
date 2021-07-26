@@ -12,6 +12,9 @@
   (setq org-hide-leading-stars nil)
   (setq org-startup-indented nil)
   (setq org-archive-location "archive/%s_archive::")
+  (setq org-babel-load-languages
+	'((emacs-lisp . t)
+	  (dot . t)))
   :config
   (setq org-src-block-faces
         `(("emacs-lisp" modus-themes-nuanced-magenta)
