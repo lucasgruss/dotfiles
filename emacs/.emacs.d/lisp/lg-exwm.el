@@ -14,6 +14,13 @@
   (setq desktop-environment-screenshot-directory "~/Images/screenshots/")
   (desktop-environment-mode +1))
 
+;;; Ednc
+(use-package ednc
+  :straight t
+  :diminish
+  :config
+  (ednc-mode +1))
+
 ;;; App-launcher
 (use-package app-launcher
   :straight   (app-launcher :type git :host github
