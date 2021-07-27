@@ -15,7 +15,11 @@
   :diminish evil-collection-unimpaired-mode
   :straight t
   :after evil
-  :config (evil-collection-init))
+  :config
+  (evil-collection-init)
+  :general
+  (general-def :states 'normal :keymaps 'Info-mode-map
+    "RET" 'Info-follow-nearest-node))
 
 ;;; Evil-anzu
 (use-package evil-anzu
