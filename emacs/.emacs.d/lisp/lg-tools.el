@@ -6,6 +6,7 @@
   :hook (dired-mode . dired-hide-details-mode)
   :config
   (setq dired-listing-switches "-al --group-directories-first")
+  (setq dired-compress-directory-default-suffix ".zip")
   (general-def :keymaps 'dired-mode-map :states 'normal
     "h" #'dired-up-directory
     "l" #'dired-find-file))
