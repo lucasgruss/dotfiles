@@ -45,7 +45,11 @@
   (which-key-mode +1)
   ;; fix how SPC h appears in which-key
   (which-key-add-key-based-replacements
-    "SPC h" "Help\n"))
+    "SPC c" "C-c\n")
+  (which-key-add-key-based-replacements
+    "SPC h" "Help\n")
+  (which-key-add-key-based-replacements
+    "SPC x" "C-x\n"))
 
 ;;; Matcha
 (use-package matcha

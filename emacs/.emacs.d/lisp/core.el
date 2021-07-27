@@ -32,6 +32,8 @@
   (my-leader-def
    :keymaps 'override
    "" '(nil :which-key "Leader prefix")
+   "c" (general-key "C-c")
+   "x" (general-key "C-x")
    "i" '(nil :which-key "Insert\n")
    "s" '(nil :which-key "Search\n")
    "f" '(nil :which-key "Files\n")
