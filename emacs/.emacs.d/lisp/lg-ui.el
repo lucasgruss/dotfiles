@@ -309,6 +309,14 @@ settings applied to them."
   :straight t)
 
 ;;; Tabs
+;;;; tab-bar
+(use-package tab-bar
+  :config
+  (setq tab-bar-format '(;; tab-bar-format-tabs
+			 tab-bar-format-align-right
+			 tab-bar-format-global))
+  (tab-bar-mode +1))
+
 ;;;; centaur-tabs
 (use-package centaur-tabs
   :demand t
