@@ -103,6 +103,9 @@
 
   (recentf-mode +1)
   (show-paren-mode +1)
-  :bind ("s-<escape>" . 'lg/kill-this-buffer))
+  :bind ("s-<escape>" . 'lg/kill-this-buffer)
+  :general
+  (general-def :states 'normal :keymaps 'Info-mode-map
+    "RET" 'Info-follow-nearest-node))
 
 (provide 'core)

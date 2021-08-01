@@ -16,10 +16,7 @@
   :straight t
   :after evil
   :config
-  (evil-collection-init)
-  :general
-  (general-def :states 'normal :keymaps 'Info-mode-map
-    "RET" 'Info-follow-nearest-node))
+  (evil-collection-init))
 
 ;;; Evil-anzu
 (use-package evil-anzu
