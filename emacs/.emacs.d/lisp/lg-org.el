@@ -123,12 +123,14 @@
 ;;; Ox-report
 (use-package ox-report
   :straight t
-  :after org)
+  :after org
+  :defer t)
 
 ;;; org-ref
 (use-package org-ref
   :straight t
-  :after org)
+  :after org
+  :defer t)
 
 ;;; org-contrib
 (use-package org-contrib
@@ -137,7 +139,8 @@
 
 ;;; org-contacts
 (use-package org-contacts
-  :after org-contrib
+  :after org
+  :defer t
   :config
   (setq org-contacts-files '("~/org/contacts.org"))
   ;; (setq org-contacts-keymap)
