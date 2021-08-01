@@ -51,14 +51,21 @@
    "o" '(nil :which-key "Open\n")
    "SPC" '(execute-extended-command :which-key "M-x\n")))
 
-;; PERFORMANCES (as soon as possible)
+;;; PERFORMANCES (as soon as possible)
 ;; (setq gc-cons-threshold (* 4 100 1024 1024)) ;; try and speed up startup time
+
+;;;; GCMH : Garbage collector magic hack
 (use-package gcmh
   :straight t
   :diminish gcmh-mode
   :config
   (gcmh-mode +1))
 
+;;;; Esup : emacs statup time profiler
+(use-package esup
+  :straight t)
+
+;;; Package.el
 ;; built-in package manager
 (use-package package
   :straight nil
