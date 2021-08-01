@@ -51,6 +51,10 @@
   (which-key-add-key-based-replacements
     "SPC x" "C-x\n"))
 
+;;; Hercules
+(use-package hercules
+  :straight t)
+
 ;;; Matcha
 (use-package matcha
   :disabled t
