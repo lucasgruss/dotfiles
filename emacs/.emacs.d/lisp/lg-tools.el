@@ -259,6 +259,7 @@ playlist in a side-window"
 ;;;; Magit-todos
 (use-package magit-todos
   :straight t
+  :after magit
   :config
   (magit-todos-mode +1))
 
@@ -312,9 +313,12 @@ playlist in a side-window"
   :hook (eshell-banner-load . eshell-info-banner-update-banner))
 
 ;;; Ledger mode
-(use-package ledger-mode :straight t)
+(use-package ledger-mode
+  :straight t
+  :defer t)
 (use-package evil-ledger
   :straight t
-  :hook (ledger-mode . evil-ledger-mode))
+  :hook (ledger-mode . evil-ledger-mode)
+  :after ledger-mode)
 
 (provide 'lg-tools)

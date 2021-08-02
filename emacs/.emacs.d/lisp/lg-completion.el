@@ -125,6 +125,7 @@
 (use-package company-box
   :diminish company-box-mode
   :straight t
+  :after company
   :hook (company-mode . company-box-mode))
 
 ;;; Company-prescient
