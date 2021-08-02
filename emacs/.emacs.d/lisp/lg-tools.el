@@ -159,11 +159,14 @@ playlist in a side-window"
 (use-package smudge
   :ensure-system-package curl
   :straight (smudge :host github :repo "danielfm/smudge")
-  :init
-  (setq httpd-port 8081)
-  (setq smudge-oauth2-callback-port "8081")
-  :config
-  (setq smudge-transport 'connect))
+  :commands
+  (smudge-my-playlists
+   smudge-track-search
+   smudge-playlist-search)
+  :custom
+  (httpd-port 8081)
+  (smudge-oauth2-callback-port "8081")
+  (smudge-transport 'connect))
 
 ;;;; Espotify
 (use-package espotify
