@@ -108,11 +108,25 @@ applied to gnome-settings or xfce-conf."
 ;;; Circadian
 (use-package circadian
   :straight t
+  :custom
+  (calendar-latitude 48.856613)
+  (calendar-longitude 2.352222)
+  (circadian-themes '((:sunrise . modus-operandi)
+		      (:sunset . modus-vivendi)))
   :config
-  (setq calendar-latitude 48.856613)
-  (setq calendar-longitude 2.352222)
-  (setq circadian-themes '((:sunrise . modus-operandi)
-			   (:sunset . modus-vivendi)))
+  (defun circadian-enable-theme (theme)
+    "Clear previous `custom-enabled-themes' and load THEME."
+    (unless (equal (list theme) custom-enabled-themes)
+      ;; Only load the argument theme, when `custom-enabled-themes'
+      ;; does not contain it.
+      (mapc #'disable-theme custom-enabled-themes)
+      (condition-case nil
+	  (progn
+	    (run-hook-with-args 'circadian-before-load-theme-hook theme)
+	    (load-theme theme) ;; (load-theme theme t)
+	    (message "circadian.el — enabled %s" theme)
+	    (run-hook-with-args 'circadian-after-load-theme-hook theme))
+	(error "Problem loading theme %s" theme))))
   (circadian-setup))
 
 ;;; Modeline
