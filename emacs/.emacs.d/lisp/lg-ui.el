@@ -4,11 +4,13 @@
 ;;; Emacs settings
 (use-package emacs
   :init
-  (display-battery-mode -1)
-  (display-time-mode -1)
-  (setq display-time-format "%H:%M")
-  (setq scroll-step 1)
-  (setq scroll-conservatively 10000)
+  ;; (display-battery-mode -1)
+  ;; (display-time-mode -1)
+  :custom
+  (display-time-format "%H:%M")
+  (scroll-step 1)
+  (scroll-conservatively 10000)
+  :config
   (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal))
@@ -183,14 +185,16 @@ applied to gnome-settings or xfce-conf."
 ;;; Dashboard
 (use-package dashboard
   :straight t
+  :demand t
+  :custom
+  (dashboard-set-init-info nil)
+  (dashboard-center-content t)
+  (dashboard-startup-banner 'logo)
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+  (dashboard-set-navigator t)
   :config
-  (dashboard-setup-startup-hook)
-  (setq dashboard-set-init-info t)
-  (setq dashboard-center-content t)
-  (setq dashboard-startup-banner 'logo)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-set-navigator t))
+  (dashboard-setup-startup-hook))
 
 ;;; Helpful
 (use-package helpful
@@ -338,31 +342,32 @@ settings applied to them."
   :bind ("C-t" . 'centaur-tabs--create-new-tab)
   :hook
   ((emms-playlist-mode
-  org-ql-sidebar-buffer-setup
-  dashboard-mode
-  calendar-mode
-  ibuffer-sidebar-mode
-  ibuffer-mode
-  dired-sidebar-mode
-  dired-mode
-  pdf-outline-buffer-mode
-  exwm-floating-setup
-  calc-mode
-  calc-trail-mode) . centaur-tabs-local-mode)
+    org-ql-sidebar-buffer-setup
+    dashboard-mode
+    calendar-mode
+    ibuffer-sidebar-mode
+    ibuffer-mode
+    dired-sidebar-mode
+    dired-mode
+    pdf-outline-buffer-mode
+    exwm-floating-setup
+    calc-mode
+    calc-trail-mode) . centaur-tabs-local-mode)
+  :custom
+  (centaur-tabs-style "bar")
+  (centaur-tabs-set-modified-marker t)
+  (centaur-tabs-set-icons t)
+  (centaur-tabs-gray-out-icons t)
+  (centaur-tabs-set-bar 'under)
+  (centaur-tabs-show-navigation-buttons t)
+  (centaur-tabs-show-new-tab-button t)
+  (centaur-tabs-height 21)
+  (centaur-tabs-enable-ido-completion nil)
+  (centaur-tabs-cycle-scope 'tabs)
+  (centaur-tabs-plain-icons nil)
+  (centaur-tabs-label-fixed-length 15)
+  (uniquify-separator "/")
   :config
-  (setq centaur-tabs-style "bar")
-  (setq centaur-tabs-set-modified-marker t)
-  (setq centaur-tabs-set-icons t)
-  (setq centaur-tabs-gray-out-icons t)
-  (setq centaur-tabs-set-bar 'under)
-  (setq centaur-tabs-show-navigation-buttons t)
-  (setq centaur-tabs-show-new-tab-button t)
-  (setq centaur-tabs-height 21)
-  (setq centaur-tabs-enable-ido-completion nil)
-  (setq centaur-tabs-cycle-scope 'tabs)
-  (setq centaur-tabs-plain-icons nil)
-  (setq centaur-tabs-label-fixed-length 15)
-  (setq uniquify-separator "/")
   (centaur-tabs-mode +1))
 
 ;;;; lg-centaur-tabs : further configuration for centaur-tabs
@@ -410,9 +415,10 @@ settings applied to them."
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-center)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom)
-  (setq scroll-on-jump-smooth t)
-  (setq scroll-on-jump-use-curve t)
-  (setq scroll-on-jump-duration 0.15))
+  :custom
+  (scroll-on-jump-smooth t)
+  (scroll-on-jump-use-curve t)
+  (scroll-on-jump-duration 0.15))
 
 ;;;; good-scroll
 (use-package good-scroll

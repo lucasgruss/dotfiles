@@ -28,17 +28,19 @@
 (use-package evil-escape
   :straight t
   :diminish evil-escape-mode
-  :init (setq evil-escape-key-sequence "jk")
+  :custom
+  (evil-escape-key-sequence "jk")
+  (evil-escape-excluded-major-modes '(magit-status-mode))
   :config
-  (setq evil-escape-excluded-major-modes '(magit-status-mode))
   (evil-escape-mode +1))
 
 ;;; Which-key
 (use-package which-key
   :diminish which-key-mode
   :straight t
+  :custom
+  (which-key-idle-delay 0.7)
   :config
-  (setq which-key-idle-delay 0.7)
   (which-key-mode +1)
   ;; fix how SPC h appears in which-key
   (which-key-add-key-based-replacements

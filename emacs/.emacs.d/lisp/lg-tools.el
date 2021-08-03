@@ -4,8 +4,9 @@
 ;;; Dired
 (use-package dired
   :hook (dired-mode . dired-hide-details-mode)
+  :custom
+  (dired-listing-switches "-al --group-directories-first")
   :config
-  (setq dired-listing-switches "-al --group-directories-first")
   (setq dired-compress-directory-default-suffix ".zip")
   (general-def :keymaps 'dired-mode-map :states 'normal
     "h" #'dired-up-directory
@@ -30,10 +31,9 @@
     "l" #'dired-sidebar-find-file)
   :hook
   (dired-sidebar-mode . (lambda () (setq-local header-line-format "Dired-sidebar")))
-  :config
-  (setq dired-sidebar-width 30)
-  ;;(setq dired-sidebar-mode-line-format nil)
-  (setq dired-sidebar-no-delete-other-windows t))
+  :custom
+  (dired-sidebar-width 30)
+  (dired-sidebar-no-delete-other-windows t))
 
 ;;; Dired-hide-dotfiles
 (use-package dired-hide-dotfiles
@@ -87,22 +87,22 @@
 			  (mpv . mpv)
 			  (mplayer . mplayer))
   :defer 5
+  :custom
+  (emms-source-file-default-directory "~/Audio/Musique/")
+  (emms-streams-file "~/.config/doom/emms/streams.emms")
+  (emms-playlist-buffer-name "*Music*")
+  (emms-info-asynchronously t) ; update tags asynchronously)
+  (emms-info-functions '(emms-info-exiftool))
+  (emms-source-file-directory-tree-function 'emms-source-file-directory-tree-find)
+  (emms-player-list '(emms-player-mplayer emms-player-mpv))
+  (emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display"))
+  (emms-info-functions '(emms-info-mp3info emms-info-cueinfo))
   :init
-  (setq emms-source-file-default-directory "~/Audio/Musique/")
-  (setq emms-streams-file "~/.config/doom/emms/streams.emms")
-  (setq emms-playlist-buffer-name "*Music*")
-  (setq emms-info-asynchronously t) ; update tags asynchronously)
-  (setq emms-info-functions '(emms-info-exiftool))
-  (setq emms-source-file-directory-tree-function 'emms-source-file-directory-tree-find)
-  (setq emms-player-list '(emms-player-mplayer emms-player-mpv))
-  (setq emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display"))
-
   (defun lg/find-music-directory ()
     (interactive)
     ;;(find-file "~/Audio/Musique")
     (let ((default-directory "~/Audio/Musique"))
       (dired-sidebar-toggle-sidebar)))
-
   :general
   (my-leader-def
     :keymaps 'override
@@ -152,7 +152,6 @@ playlist in a side-window"
 	(let ((window-size-fixed))
 	  (dired-sidebar-set-width dired-sidebar-width)))))
 
-  (setq emms-info-functions '(emms-info-mp3info emms-info-cueinfo))
   (add-hook 'emms-player-stopped-hook #'lg/emms-kill-mpv))
 
 ;;;; Smudge (spotify)
@@ -195,10 +194,10 @@ playlist in a side-window"
   ;; :ensure-system-package (libvterm . libvterm-dev)
   :straight (vterm :type git :repo "akermu/emacs-libvterm")
   :commands vterm
-  :init
-  (setq vterm-shell "bash")
-  (setq vterm-always-compile-module t)
-  (setq vterm-module-cmake-args "-DUSE_SYSTEM_VTERM=YES"))
+  :custom
+  (vterm-shell "bash")
+  (vterm-always-compile-module t)
+  (vterm-module-cmake-args "-DUSE_SYSTEM_VTERM=YES"))
 
 ;;; Multi-vterm
 (use-package multi-vterm
@@ -211,14 +210,14 @@ playlist in a side-window"
   :straight t
   :after vterm
   :bind ("s-<return>" . 'vterm-toggle)
-  :config
-  (setq vterm-toggle-fullscreen-p t))
+  :custom
+  (vterm-toggle-fullscreen-p nil))
 
 ;;; ibuffer
 (use-package ibuffer
   :commands ibuffer
   :general (my-leader-def :keymaps 'override "bi" #'ibuffer)
-  :config (setq ibuffer-use-header-line nil))
+  :custom (ibuffer-use-header-line nil))
 
 ;;; ibuffer-sidebar
 (use-package ibuffer-sidebar
@@ -233,8 +232,8 @@ playlist in a side-window"
 			    (setq-local ibuffer-use-header-line nil)
 			    (setq-local ibuffer-header-line-format "Buffers")
 			    (setq header-line-format "Buffers")))
-  :config
-  (setq ibuffer-sidebar-width 30))
+  :custom
+  (ibuffer-sidebar-width 30))
   ;;(setq ibuffer-sidebar-mode-line-format nil))
 
 ;;; Integration with external tools
@@ -243,7 +242,7 @@ playlist in a side-window"
   :commands rg
   :straight t
   :ensure-system-package rg
-  :config (setq rg-executable "/usr/bin/rg"))
+  :custom (rg-executable "/usr/bin/rg"))
 
 ;;;; Magit
 (use-package magit
@@ -302,10 +301,10 @@ playlist in a side-window"
   ;;        "a" #'eww-mpv-audio-at-point
   ;;        "C-j" #'eww-next-url
   ;;        "C-k" #'eww-previous-url))
+  :custom
+  (eww-download-directory "~/Téléchargements/eww/")
+  (eww-desktop-data-save '(:url :title))
   :config
-  (setq eww-download-directory "~/Téléchargements/eww/")
-  (setq eww-desktop-data-save '(:url :title))
-  (add-hook 'eww-after-render-hook #'prot-eww--rename-buffer)
   (advice-add 'eww-back-url :after #'prot-eww--rename-buffer)
   (advice-add 'eww-forward-url :after #'prot-eww--rename-buffer)
   (use-package lg-eww
