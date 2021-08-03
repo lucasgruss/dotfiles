@@ -202,16 +202,7 @@ applied to gnome-settings or xfce-conf."
   :commands (helpful-callable
 	     helpful-key
 	     helpful-symbol
-	     helpful-variable)
-  :general
-  (my-leader-def
-   :prefix "SPC" :states 'normal :keymaps 'override
-   "hh" 'helpful-at-point
-   "hc" 'helpful-command
-   "hf" 'helpful-callable
-   "hk" 'helpful-key
-   "ho" 'helpful-symbol
-   "hv" 'helpful-variable))
+	     helpful-variable))
 
 ;;; Outshine
 (use-package outshine

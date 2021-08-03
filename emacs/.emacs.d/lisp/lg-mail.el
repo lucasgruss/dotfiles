@@ -5,10 +5,7 @@
 (use-package mu4e
   :ensure-system-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e"
-  :general
-  (my-leader-def
-    :keymaps 'override
-    "om" '(mu4e :which-key "Mail - mu4e"))
+  :commands mu4e
   :config
   (setq user-mail-address nil)
   (setq message-send-mail-function 'smtpmail-send-it)

@@ -63,12 +63,6 @@
   :general
   (general-def
     "s-\'" 'consult-buffer)
-  (my-leader-def :keymaps 'override
-    "fr" 'consult-recent-file
-    "fc" 'lg-consult-use-package
-    "bb" 'consult-buffer
-    "bo" 'consult-buffer-other-window
-    "ss" 'consult-line)
   :config
   (setq consult-preview-key nil)
   (defun lg-consult-use-package ()

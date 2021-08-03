@@ -43,10 +43,8 @@
 ;;; Org-sidebar
 (use-package org-sidebar
   :after org
-  :straight t
-  :general
-  (my-leader-def :keymaps 'override
-    "to" #'org-sidebar-toggle))
+  :commands org-sidebar-toggle
+  :straight t)
 
 ;;; Org-tree-slide
 (use-package org-tree-slide

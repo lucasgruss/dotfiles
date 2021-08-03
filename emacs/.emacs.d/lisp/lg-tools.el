@@ -24,8 +24,6 @@
   :after dired
   :commands (dired-sidebar-find-file dired-sidebar-toggle)
   :general
-  (my-leader-def :keymaps 'override
-    "td" #'dired-sidebar-toggle-sidebar)
   (general-def :keymaps 'dired-sidebar-mode-map :states 'normal
     "h" #'dired-sidebar-up-directory
     "l" #'dired-sidebar-find-file)
@@ -56,19 +54,13 @@
 	  ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL0H7ONNEUnnt59niYAZ07dFTi99u2L2n_" ouvrez_les_guillements usul)
 	  ("https://www.youtube.com/feeds/videos.xml?channel_id=UCKH_iLhhkTyt8Dk4dmeCQ9w" science)
 	  ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL43OynbWaTMLEbdAWr-DnAfveOonmhlT1" france_inter)
-	  "https://api.lemediatv.fr/rss.xml"))
+	  "https://api.lemediatv.fr/rss.xml")))
   ;; :bind ((:map elfeed-search-mode-map
   ;;         ("v" . #'elfeed-view-mpv)
   ;;         ("a" . #'elfeed-listen-mpv))
   ;;        (:map elfeed-show-mode-map
   ;;         ("v" . #'elfeed-view-mpv)
   ;;         ("a" . #'elfeed-listen-mpv)))
-  :general
-  (my-leader-def
-    :keymaps 'override
-    "o" '(nil :which-key "Open\n")
-    "of" '(elfeed :which-key "Open elfeed")
-    "oF" '(elfeed-update :which-key "update elfeed")))
 
 ;;; Elfeed-org
 (use-package elfeed-org
@@ -104,18 +96,6 @@
     (let ((default-directory "~/Audio/Musique"))
       (dired-sidebar-toggle-sidebar)))
   :general
-  (my-leader-def
-    :keymaps 'override
-    "e" '(nil :which-key "emms\n")
-    "ej" #'emms-next
-    "ek" #'emms-previous
-    "es" #'emms-stop
-    "ee" #'emms-pause
-    "eS" #'emms-shuffle
-    "ea" #'emms-show-all
-    "eb" #'lg/find-music-directory
-    "em" #'lg/emms-go-playlist
-    "er" #'emms-streams)
   (my-local-leader-def
     :keymaps 'dired-sidebar-mode-map
     "" nil
@@ -216,16 +196,12 @@ playlist in a side-window"
 ;;; ibuffer
 (use-package ibuffer
   :commands ibuffer
-  :general (my-leader-def :keymaps 'override "bi" #'ibuffer)
   :custom (ibuffer-use-header-line nil))
 
 ;;; ibuffer-sidebar
 (use-package ibuffer-sidebar
   :straight t
   :commands ibuffer-sidebar-toggle-sidebar
-  :general
-  (my-leader-def :keymaps 'override
-    "tb" #'ibuffer-sidebar-toggle-sidebar)
   :hook
   (ibuffer-sidebar-mode . (lambda ()
 			    ;; avoid ibuffer hijacking the header-line
@@ -248,12 +224,7 @@ playlist in a side-window"
 (use-package magit
   :straight t
   :ensure-system-package git
-  :commands magit-status
-  :general
-  (my-leader-def
-    :keymaps 'override
-    "g" '(nil :which-key "Magit\n")
-    "gg" #'magit-status))
+  :commands magit-status)
 
 ;;;; Magit-todos
 (use-package magit-todos
@@ -282,16 +253,16 @@ playlist in a side-window"
 ;;;; Password-store: integration of pass into emacs
 (use-package password-store
   :straight t
-  :commands (password-store-copy password-store-insert)
-  :general
-  (my-leader-def
-    :keymaps 'override
-    "ip" '(password-store-copy :which-key "Copy password")))
+  :commands (password-store-copy password-store-insert))
+
+;;;; Pass: frontend to pass in Emacs
+(use-package pass
+  :straight t)
 
 ;;; EWW
 (use-package eww
   :commands (eww eww-browse-with-history)
-  :general (my-leader-def :keymaps 'override "ow" #'eww-browse-with-history)
+  :hook (eww-after-render . prot-eww--rename-buffer)
   ;; :init
   ;; (map! (:leader
   ;;        :prefix ("o" . "open")

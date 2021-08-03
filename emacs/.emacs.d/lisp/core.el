@@ -30,29 +30,7 @@
   :straight t
   :config
   (general-create-definer my-leader-def :states '(normal visual motion) :prefix "SPC")
-  (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m")
-  (my-leader-def
-   :keymaps 'override
-   "" '(nil :which-key "Leader prefix")
-   "c" (general-key "C-c")
-   "x" (general-key "C-x")
-   "i" '(nil :which-key "Insert\n")
-   "s" '(nil :which-key "Search\n")
-   "f" '(nil :which-key "Files\n")
-   "ff" '(find-file :which-key "Find file")
-   "fo" '(find-file-other-window :which-key "Find file in other window")
-   "fp" '(lg/visit-configuration :which-key "Find private configuration")
-   "fs" '(save-buffer :which-key "Save file")
-   "b" '(nil :which-key "Buffer\n")
-   "bb" '(switch-to-buffer :which-key "Buffer")
-   "bo" '(switch-to-buffer-other-window :which-key "Buffer")
-   "h" (general-key "C-h")
-   "ht" 'load-theme
-   "hr" 'lg/reload-configuration
-   "hb" nil
-   "t" '(nil :which-key "Toggle\n")
-   "o" '(nil :which-key "Open\n")
-   "SPC" '(execute-extended-command :which-key "M-x\n")))
+  (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m"))
 
 ;;; PERFORMANCES (as soon as possible)
 ;; (setq gc-cons-threshold (* 4 100 1024 1024)) ;; try and speed up startup time
