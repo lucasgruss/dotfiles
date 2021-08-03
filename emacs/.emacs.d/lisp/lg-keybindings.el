@@ -94,6 +94,19 @@
   :config
   (evil-collection-init))
 
+;;;; Evil bindings for bluetooth.el
+(use-package evil-collection-bluetooth
+  :straight nil ;; This is a site package until I submit a PR to evil-collection
+  :after bluetooth
+  :config
+  (evil-collection-bluetooth-setup))
+
+;;; Evil-ledger
+(use-package evil-ledger
+  :straight t
+  :hook (ledger-mode . evil-ledger-mode)
+  :after ledger-mode)
+
 ;;; Evil-anzu
 (use-package evil-anzu
   :straight t

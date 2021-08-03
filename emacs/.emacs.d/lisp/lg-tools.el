@@ -238,13 +238,6 @@ playlist in a side-window"
   :straight t
   :commands bluetooth-list-devices)
 
-;;;; Evil bindings for bluetooth.el
-(use-package evil-collection-bluetooth
-  :straight nil ;; This is a site package until I submit a PR to evil-collection
-  :after bluetooth
-  :config
-  (evil-collection-bluetooth-setup))
-
 ;;;; Disk-usage
 (use-package disk-usage
   :straight t
@@ -293,10 +286,6 @@ playlist in a side-window"
 (use-package ledger-mode
   :straight t
   :defer t)
-(use-package evil-ledger
-  :straight t
-  :hook (ledger-mode . evil-ledger-mode)
-  :after ledger-mode)
 
 ;;; Scanner
 (use-package scanner
