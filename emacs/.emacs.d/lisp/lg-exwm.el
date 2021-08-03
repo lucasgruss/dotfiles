@@ -17,7 +17,8 @@
 ;;; Ednc
 (use-package ednc
   :straight t
-  :diminish
+  :disabled t
+  :diminish ednc-mode
   :config
   (ednc-mode +1))
 
