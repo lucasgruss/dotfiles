@@ -3,6 +3,7 @@
 (server-start)
 
 (setq native-comp-async-report-warnings-errors nil)
+(setq native-comp-async-jobs-number 4)
 
 ;; magically bootstrap straight
 (defvar bootstrap-version)
