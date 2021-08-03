@@ -321,4 +321,14 @@ playlist in a side-window"
   :hook (ledger-mode . evil-ledger-mode)
   :after ledger-mode)
 
+;;; Scanner
+(use-package scanner
+  :ensure-system-package sane-utils
+  :commands
+  (scanner-scan-document
+   scanner-scan-multi-doc
+   scanner-scan-image
+   scanner-scan-multi-images)
+  :straight t)
+
 (provide 'lg-tools)
