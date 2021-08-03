@@ -268,12 +268,19 @@ playlist in a side-window"
   :straight t
   :commands bluetooth-list-devices)
 
+;;;; Evil bindings for bluetooth.el
+(use-package evil-collection-bluetooth
+  :straight nil ;; This is a site package until I submit a PR to evil-collection
+  :after bluetooth
+  :config
+  (evil-collection-bluetooth-setup))
+
 ;;;; Disk-usage
 (use-package disk-usage
   :straight t
   :commands disk-usage)
 
-;;;; Pass
+;;;; Password-store: integration of pass into emacs
 (use-package password-store
   :straight t
   :commands (password-store-copy password-store-insert)
