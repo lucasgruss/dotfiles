@@ -40,6 +40,7 @@
    "s" '(nil :which-key "Search\n")
    "f" '(nil :which-key "Files\n")
    "ff" '(find-file :which-key "Find file")
+   "fo" '(find-file-other-window :which-key "Find file in other window")
    "fp" '(lg/visit-configuration :which-key "Find private configuration")
    "fs" '(save-buffer :which-key "Save file")
    "b" '(nil :which-key "Buffer\n")
