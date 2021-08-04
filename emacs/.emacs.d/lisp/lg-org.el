@@ -236,15 +236,17 @@ Format is a string matching the following format specification:
 (use-package org-pomodoro
   :straight t
   :after org
-  :config
-  (setq org-pomodoro-length 45)
-  (setq org-pomodoro-short-break-length 10)
-  (setq org-pomodoro-long-break-frequency 3)
-  (setq org-pomodoro-ticking-sound-p nil)
-  (setq org-pomodoro-play-sounds nil)
-  (setq org-pomodoro-short-break-sound "/usr/share/sounds/freedesktop/stereo/complete.oga")
-  (setq org-pomodoro-long-break-sound "/usr/share/sounds/freedesktop/stereo/complete.oga")
-  (setq org-pomodoro-finished-sound "/usr/share/sounds/freedesktop/stereo/complete.oga"))
+  :defer t
+  :commands org-pomodoro
+  :custom
+  (org-pomodoro-length 45 "You can only focus for 45 minutes consecutively")
+  (org-pomodoro-short-break-length 10 "Taking breaks help your brain process your work")
+  (org-pomodoro-long-break-frequency 3)
+  (org-pomodoro-ticking-sound-p nil)
+  (org-pomodoro-play-sounds nil)
+  (org-pomodoro-short-break-sound "/usr/share/sounds/freedesktop/stereo/complete.oga")
+  (org-pomodoro-long-break-sound "/usr/share/sounds/freedesktop/stereo/complete.oga")
+  (org-pomodoro-finished-sound "/usr/share/sounds/freedesktop/stereo/complete.oga"))
 
 ;(use-package zotxt :straight t)
 ;(use-package org-zotxt :straight t)
