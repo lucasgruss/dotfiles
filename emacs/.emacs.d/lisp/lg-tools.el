@@ -256,7 +256,8 @@ playlist in a side-window"
 
 ;;;; Pass: frontend to pass in Emacs
 (use-package pass
-  :straight t)
+  :straight t
+  :commands pass)
 
 ;;; EWW
 (use-package eww
