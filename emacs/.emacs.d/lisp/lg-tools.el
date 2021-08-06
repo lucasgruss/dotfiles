@@ -213,6 +213,12 @@ playlist in a side-window"
   ;;(setq ibuffer-sidebar-mode-line-format nil))
 
 ;;; Integration with external tools
+;;;; exec-path-from-shell
+(use-package exec-path-from-shell
+  :straight t
+  :config
+  (exec-path-from-shell-initialize))
+
 ;;;; Ripgrep
 (use-package rg
   :commands rg
