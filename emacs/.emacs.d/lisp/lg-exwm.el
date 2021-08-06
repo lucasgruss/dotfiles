@@ -22,11 +22,6 @@
   :config
   (ednc-mode +1))
 
-;;; App-launcher
-(use-package app-launcher
-  :straight   (app-launcher :type git :host github
-			    :repo "SebastienWae/app-launcher")
-  :bind ("s-d" . 'app-launcher-run-app))
 
 ;;; EXWM
 (use-package exwm

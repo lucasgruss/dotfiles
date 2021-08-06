@@ -312,4 +312,10 @@ playlist in a side-window"
   (zotero-sync)
   (zotero-browser-sync))
 
+;;; App-launcher
+(use-package app-launcher
+  :straight (app-launcher :type git :host github
+			  :repo "SebastienWae/app-launcher")
+  :bind ("s-d" . 'app-launcher-run-app))
+
 (provide 'lg-tools)
