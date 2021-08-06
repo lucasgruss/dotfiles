@@ -22,13 +22,16 @@
   :config
   (ednc-mode +1))
 
+;;; Dash (needed by exwm)
+(use-package dash
+  :straight t
+  :demand t)
 
 ;;; EXWM
 (use-package exwm
   :straight t
-  :config
-  (use-package dash
-    :straight t)
+  :demand t
+  :init
   (defun lg/exwm-async-run (name)
     "Run a process asynchronously"
     (interactive)
@@ -115,89 +118,85 @@ buffer (=minimizing in other WM/DE)"
     (efs/run-in-background "spotifyd --config-path ~/.config/spotifyd/spotifyd.conf")
     (efs/start-panel))
 
-  (add-hook 'exwm-init-hook #'lg/exwm-init-hook)
-
   (defun lg/exwm-update-title-hook ()
     "Hook to be ran when window title is updated"
     (if (not (string= exwm-class-name "Firefox-esr"))
         (exwm-workspace-rename-buffer exwm-class-name)
       (exwm-workspace-rename-buffer exwm-title)))
 
-  (add-hook 'exwm-update-title-hook #'lg/exwm-update-title-hook)
-
+  :hook
+  (exwm-init . lg/exwm-init-hook)
+  (exwm-update-title . lg/exwm-update-title-hook)
   ;; disable tab bar for floating frames
-  (add-hook 'exwm-floating-setup-hook
-            (lambda ()
-              (toggle-tab-bar-mode-from-frame -1)))
-
-  (setq exwm-input-global-keys
-        `(([S-s-backspace] . exwm-workspace-delete)
-          ([?\s-f] . exwm-layout-toggle-fullscreen)
-          ([?\s-F] . exwm-floating-toggle-floating)
-          ([?\s-R] . exwm-reset)
-          ([?\s-w] . exwm-utils-workspace-switch-cyclically)
-          ([?\s-W] . exwm-utils-workspace-move-cyclically)
-          ([?\s-\'] . consult-buffer)
-          ([?\s-\@] . ibuffer)
-          ([?\s-b] . bury-buffer)
-          ([s-f2]  . lg/lock-screen)
-          ([?\s-d] . app-launcher-run-app)
-          ;; ([?\s-d] . (lambda (command)
-          ;;                (interactive (list (read-shell-command "$ ")))
-          ;;                (start-process-shell-command command nil command)))
-          ([?\s-i] . lg/run-or-raise-or-dismiss-firefox)
-          ([?\s-t] . lg/run-or-raise-or-dismiss-thunderbird)
-          ([?\s-s] . lg/run-or-raise-or-dismiss-spotify)
-          ([?\s-u] . lg/toggle-line-char-modes)
-          ([s-return] . vterm-toggle)
-          ([s-escape] . lg/kill-this-buffer)
-    
-
-      ([?\s-/]  . centaur-tabs-mode)
-          ([?\s-m]  . centaur-tabs-backward)
-          ([?\s-,]  . centaur-tabs-forward)
-          ([?\s-?]  . tab-bar-mode)
-          ([?\s-M]  . lg/tab-previous-and-hide-maybe)
-          ([?\s-<]  . lg/tab-next-and-hide-maybe)
-          ([?\s-O]  . exwm-outer-gaps-mode)
-          ([?\s-y]  . exwm-outer-gaps-increment)
-          ([?\s-p]  . exwm-outer-gaps-decrement)
-          ;; Everything window
-          ([?\s-q] . evil-window-delete)
-          ([?\s-v] . split-window-horizontally)
-          ([?\s-z] . split-window-vertically)
-          ([s-tab]  . windower-switch-to-last-buffer)
-          ([?\s-r]  . windower-switch-to-last-buffer)
-          ([?\s-\\] . windower-toggle-split)
-          ([?\s-o]  . windower-toggle-single)
-          ([142606440] . windower-move-border-left) ; M-s-h
-          ([142606442] . windower-move-border-below); M-s-j
-          ([142606443] . windower-move-border-above); M-s-k
-          ([142606444] . windower-move-border-right); M-s-l
-          ([?\s-h] . windmove-left)  ([?\s-H] . windower-swap-left)
-          ([?\s-j] . windmove-down)  ([?\s-J] . windower-swap-below)
-          ([?\s-k] . windmove-up)    ([?\s-K] . windower-swap-above)
-          ([?\s-l] . windmove-right) ([?\s-L] . windower-swap-right)))
-  (setq exwm-workspace-show-all-buffers t)
-  (setq exwm-layout-show-all-buffers t)
-  (setq exwm-workspace-number 2)
-  (setq exwm-workspace-minibuffer-position nil)
-  (setq exwm-workspace-display-echo-area-timeout 1)
-
-  (setq exwm-manage-configurations
-         '(((or (equal "hl2-linux" exwm-class-name)
-                (equal "hl2-linux" exwm-title))
-            floating nil
-            fullscreen nil
-            tiling-mode-line nil
-            ;;char-mode t
-            managed t)
-           ((equal exwm-class-name "openspades")
-            floating nil
-            managed t)
-           ((equal exwm-class-name "Firefox-esr")
-            floating-mode-line nil)))
-
+  ;; ('exwm-floating-setup
+  ;;  (lambda ()
+  ;;    (toggle-tab-bar-mode-from-frame -1)))
+  :custom
+  (exwm-input-global-keys
+   `(([S-s-backspace] . exwm-workspace-delete)
+     ([?\s-f] . exwm-layout-toggle-fullscreen)
+     ([?\s-F] . exwm-floating-toggle-floating)
+     ([?\s-R] . exwm-reset)
+     ([?\s-w] . exwm-utils-workspace-switch-cyclically)
+     ([?\s-W] . exwm-utils-workspace-move-cyclically)
+     ([?\s-\'] . consult-buffer)
+     ([?\s-\@] . ibuffer)
+     ([?\s-b] . bury-buffer)
+     ([s-f2]  . lg/lock-screen)
+     ([?\s-d] . app-launcher-run-app)
+     ;; ([?\s-d] . (lambda (command)
+     ;;                (interactive (list (read-shell-command "$ ")))
+     ;;                (start-process-shell-command command nil command)))
+     ([?\s-i] . lg/run-or-raise-or-dismiss-firefox)
+     ([?\s-t] . lg/run-or-raise-or-dismiss-thunderbird)
+     ([?\s-s] . lg/run-or-raise-or-dismiss-spotify)
+     ([?\s-u] . lg/toggle-line-char-modes)
+     ([s-return] . vterm-toggle)
+     ([s-escape] . lg/kill-this-buffer)
+     ([?\s-/]  . centaur-tabs-mode)
+     ([?\s-m]  . centaur-tabs-backward)
+     ([?\s-,]  . centaur-tabs-forward)
+     ([?\s-?]  . tab-bar-mode)
+     ([?\s-M]  . lg/tab-previous-and-hide-maybe)
+     ([?\s-<]  . lg/tab-next-and-hide-maybe)
+     ([?\s-O]  . exwm-outer-gaps-mode)
+     ([?\s-y]  . exwm-outer-gaps-increment)
+     ([?\s-p]  . exwm-outer-gaps-decrement)
+     ;; Everything window
+     ([?\s-q] . evil-window-delete)
+     ([?\s-v] . split-window-horizontally)
+     ([?\s-z] . split-window-vertically)
+     ([s-tab]  . windower-switch-to-last-buffer)
+     ([?\s-r]  . windower-switch-to-last-buffer)
+     ([?\s-\\] . windower-toggle-split)
+     ([?\s-o]  . windower-toggle-single)
+     ([142606440] . windower-move-border-left) ; M-s-h
+     ([142606442] . windower-move-border-below); M-s-j
+     ([142606443] . windower-move-border-above); M-s-k
+     ([142606444] . windower-move-border-right); M-s-l
+     ([?\s-h] . windmove-left)  ([?\s-H] . windower-swap-left)
+     ([?\s-j] . windmove-down)  ([?\s-J] . windower-swap-below)
+     ([?\s-k] . windmove-up)    ([?\s-K] . windower-swap-above)
+     ([?\s-l] . windmove-right) ([?\s-L] . windower-swap-right)))
+  (exwm-workspace-show-all-buffers t)
+  (exwm-layout-show-all-buffers t)
+  (exwm-workspace-number 2)
+  (exwm-workspace-minibuffer-position nil)
+  (exwm-workspace-display-echo-area-timeout 1)
+  (exwm-manage-configurations
+   '(((or (equal "hl2-linux" exwm-class-name)
+	  (equal "hl2-linux" exwm-title))
+      floating nil
+      fullscreen nil
+      tiling-mode-line nil
+      ;;char-mode t
+      managed t)
+     ((equal exwm-class-name "openspades")
+      floating nil
+      managed t)
+     ((equal exwm-class-name "Firefox-esr")
+      floating-mode-line nil)))
+  :config
   (push (aref (kbd "<escape>") 0) exwm-input-prefix-keys)
   (push (aref (kbd "<return>") 0) exwm-input-prefix-keys)
   (push (aref (kbd "s-<SPC>") 0) exwm-input-prefix-keys)
@@ -217,7 +216,8 @@ buffer (=minimizing in other WM/DE)"
 
 ;;;; lg-exwm-utils
 (use-package lg-exwm-utils
-  :load-path "~/.emacs.d/lisp/site-packages")
+  :load-path "~/.emacs.d/lisp/site-packages"
+  :after exwm)
 
 ;;;; exwm-firefox-evil
 (use-package exwm-firefox-evil
