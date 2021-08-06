@@ -5,6 +5,11 @@
 (setq native-comp-async-report-warnings-errors nil)
 (setq native-comp-async-jobs-number 4)
 
+;;; set *some* security settings early
+;; cf https://glyph.twistedmatrix.com/2015/11/editor-malware.html
+(setq tls-checktrust t)
+(setq gnutls-verify-error t)
+
 ;; magically bootstrap straight
 (defvar bootstrap-version)
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
@@ -52,7 +57,7 @@
   :straight nil
   :defer 5
   :commands (describe-package)
-  :config (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/")))
+  :config (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")))
 
 (use-package emacs
   :straight nil
