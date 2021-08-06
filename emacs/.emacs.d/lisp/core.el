@@ -94,6 +94,10 @@
     (interactive)
     (kill-buffer (current-buffer)))
 
+  (defun efs/run-in-background (command)
+    (let ((command-parts (split-string command "[ ]+")))
+      (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
   (recentf-mode +1)
   (show-paren-mode +1)
   :bind ("s-<escape>" . 'lg/kill-this-buffer)
