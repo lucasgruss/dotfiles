@@ -36,10 +36,5 @@
 		  (dolist (window hide-windows)
 		    (switch-to-prev-buffer window)))))))))))
 
-;;; Evil-collection-webkit
-(use-package evil-collection-webkit
-  :config
-  (evil-collection-xwidget-setup))
-
 (use-package webkit-ace)
 (use-package webkit-dark)

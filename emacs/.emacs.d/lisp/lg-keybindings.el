@@ -101,6 +101,12 @@
   :config
   (evil-collection-bluetooth-setup))
 
+;;;; Evil-collection-webkit
+(use-package evil-collection-webkit
+  :after webkit
+  :config
+  (evil-collection-xwidget-setup))
+
 ;;; Evil-ledger
 (use-package evil-ledger
   :straight t
