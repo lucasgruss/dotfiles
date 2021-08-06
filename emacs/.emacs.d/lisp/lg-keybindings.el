@@ -9,80 +9,7 @@
   (setq evil-want-keybinding nil)
   (setq evil-undo-system 'undo-redo)
   :config
-  ;; declaration the leader map through general.el
-  (my-leader-def
-    :keymaps 'override
-    "" '(nil :which-key "Leader prefix")
-    "c" (general-key "C-c")
-    "x" (general-key "C-x")
-    "i" '(nil :which-key "Insert\n")
-    "s" '(nil :which-key "Search\n")
-    "f" '(nil :which-key "Files\n")
-    "ff" '(find-file :which-key "Find file\n")
-    "fo" '(find-file-other-window :which-key "Find file in other window\n")
-    "fp" '(lg/visit-configuration :which-key "Find private configuration\n")
-    "fs" '(save-buffer :which-key "Save file\n")
-
-    ;; consult 
-    "fr" '(consult-recent-file :which-key "Find-recent-file\n")
-    "fc" '(lg-consult-use-package :which-key "Find package config \n")
-    "bb" 'consult-buffer
-    "bo" 'consult-buffer-other-window
-    "ss" 'consult-line
-
-    ;; buffers
-    "b" '(nil :which-key "Buffer\n")
-    "bb" '(switch-to-buffer :which-key "Switch to buffer\n")
-    "bo" '(switch-to-buffer-other-window :which-key "Buffer other window\n")
-    "bi" '(ibuffer :which-key "iBuffer\n")
-
-    ;; help
-    "h" (general-key "C-h")
-    "ht" 'load-theme
-    "hr" 'lg/reload-configuration
-    "hb" nil
-    "SPC" '(execute-extended-command :which-key "M-x\n")
-
-    ;; sidebars
-    "t" '(nil :which-key "Toggle\n")
-    "tb" '(ibuffer-sidebar-toggle-sidebar :which-key "Toggle iBuffer-sidebar\n")
-    "td" '(dired-sidebar-toggle-sidebar :which-key "Toggle dired-sidebar\n")
-    "to" '(org-sidebar-toggle :which-key "Toggle org-sidebar\n")
-
-    ;; Open
-    "o" '(nil :which-key "Open\n")
-    "ob" '(bluetooth-list-devices :which-key "Bluetooth\n")
-    "of" '(elfeed :which-key "Elfeed\n")
-    "oF" '(elfeed-update :which-key "Update elfeed\n")
-    "om" '(mu4e :which-key "Open mail - mu4e\n")
-    "op" '(pass :which-key "Pass\n")
-    "ow" '(eww-browse-with-history :which-key "Eww with history")
-    "og" '(magit-status :which-key "Magit\n")
-
-    ;; pass
-    "ip" '(password-store-copy :which-key "Copy password")
-
-    ;; emms
-    "e" '(nil :which-key "emms\n")
-    "ej" '(emms-next :which-key "Next song\n")
-    "ek" '(emms-previous :which-key "Previous song\n")
-    "es" '(emms-stop :which-key "Stop\n")
-    "ee" '(emms-pause :which-key "Pause/play\n")
-    "eS" '(emms-shuffle :which-key "Shuffle\n")
-    "ea" '(emms-show-all :which-key "Show all\n")
-    "eb" '(lg/find-music-directory :which-key "Music library (sidebar)\n")
-    "em" '(lg/emms-go-playlist :which-key "Emms playlist\n")
-    "er" '(emms-streams :which-key "Emms streams\n")
-
-    ;; helpful
-    "hh" 'helpful-at-point
-    "hc" 'helpful-command
-    "hf" 'helpful-callable
-    "hk" 'helpful-key
-    "ho" 'helpful-symbol
-    "hv" 'helpful-variable
-    )
-
+  (my-leader-def :keymaps 'override "" 'lg/transient-root)
   ;; activate evil-mode
   (evil-mode +1))
 
@@ -136,23 +63,134 @@
   :custom
   (which-key-idle-delay 0.7)
   :config
-  (which-key-mode +1)
-  ;; fix how SPC h appears in which-key
-  (which-key-add-key-based-replacements
-    "SPC c" "C-c\n")
-  (which-key-add-key-based-replacements
-    "SPC h" "Help\n")
-  (which-key-add-key-based-replacements
-    "SPC x" "C-x\n"))
+  (which-key-mode +1))
 
 ;;; Hercules
 (use-package hercules
   :straight t)
 
-;;; Matcha
-(use-package matcha
-  :disabled t
-  :straight (matcha :type git :host github :repo "jojojames/matcha")
-  :config (matcha-setup))
+;;; Transient
+(use-package transient
+  :config
+  (define-transient-command lg/transient-root ()
+    "Main transient, accessed through SPC"
+    [["Quick access"
+      ("SPC" "M-x" execute-extended-command)]
+     ["Dispatch"
+      ("b" "Buffers" lg/transient-b)
+      ("e" "Emms" lg/transient-e)
+      ("f" "Files" lg/transient-f)
+      ("h" "Help" lg/transient-h)
+      ("o" "Open/Org" lg/transient-o)
+      ("q" "Quit" lg/transient-q)
+      ("s" "Search/Sidebar" lg/transient-s)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-b ()
+    "Buffers"
+    [["Buffers"
+      ("b" "Switch to buffer" switch-to-buffer)
+      ("i" "iBuffer" ibuffer)
+      ("o" "Switch to buffer in other window" switch-to-buffer-other-window)]
+     ["Bookmarks"
+      ("j" "Save" bookmark-jump)
+      ("s" "Save" bookmark-save)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-c ()
+    "Completion"
+    [["Consult"
+      ("r" ("Consult ripgrep") consult-ripgrep)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-e ()
+    "Emms"
+    [["Emms"
+      ("a" "Show all" emms-show-all)
+      ("b" "Music library (sidebar)" lg/find-music-directory)
+      ("e" "Pause" emms-pause)
+      ("j" "Next" emms-next)
+      ("k" "Previous" emms-previous)
+      ("p" "Playlist (sidebar)" lg/emms-go-playlist)
+      ("r" "Radios" emms-streams)
+      ("s" "Stop" emms-stop)
+      ("S" "Shuffle" emms-shuffle)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-f ()
+    "Files"
+    [["Files"
+      ("f" "Open file" find-file)
+      ("o" "Find in other window" find-file-other-window)
+      ("r" "Recent" consult-recent-file)
+      ("s" "Save" save-buffer)]
+     ["Configuration files"
+      ("d" "dotfiles" (lambda () (interactive) (dired "~/dotfiles")))
+      ("e" ".emacs.d" lg/visit-configuration)
+      ("p" "Package" lg/consult-use-package)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-h ()
+    "Help"
+    [["Help and documentation"
+      ("c" "Command (helpful)" helpful-command)
+      ("f" "Functions (helpful)" helpful-callable)
+      ("h" "Thing at point (helpful)" helpful-at-point)
+      ("i" "Info" info)
+      ("k" "Key (helpful)" helpful-key)
+      ("m" "Mode" describe-mode)
+      ("o" "Symbol (helpful)" helpful-symbol)
+      ("p" "Package" describe-package)
+      ("v" "Variable (helpful)" helpful-variable)]
+     ["Helper functions"
+      ("r" "Reload configuration" lg/reload-configuration)
+      ("t" "Change theme" load-theme)]
+     ["Profiling"
+      ("s" "Start up profiler (esup)" esup)
+      ("P" "Start profiler" profiler-start)
+      ("S" "Stop profiler" profiler-stop)
+      ("R" "Profiler report" profiler-report)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-o ()
+    "Open/Org"
+    [["Open"
+      ("a" "Application" app-launcher-run-app)
+      ("b" "Bluetooth" bluetooth-list-devices)
+      ("c" "Calendar" calendar)
+      ("C" "Calc" calc)
+      ("d" "Dired" dired)
+      ("f" "Elfeed" elfeed)
+      ("g" "Magit" magit-status)
+      ("p" "Pass" pass)
+      ("P" "Proced" proced)
+      ("r" "Ripgrep" rg)
+      ("t" "Terminal" vterm)
+      ("u" "Disk-usage" disk-usage)
+      ;;("s" "Smudge" lg/transient-smudge)
+      ("w" "Eww" eww)]
+     ["Org"
+      ("A" "Agenda" org-agenda)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-q ()
+    "Quit"
+    [["Quit"
+      ("e" "Exit emacs" (lambda () (interactive) (when (y-or-n-p "Really exit emacs ?") (kill-emacs))))
+      ("q" "Turn computer off" lg/poweroff-computer)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-s ()
+    "Search/sidebars"
+    [["Search"
+      ("s" "Consult line" consult-line)
+      ("r" "Ripgrep" rg)]
+     ["Sidebars"
+      ("b" "iBuffer-sidebar" ibuffer-sidebar-toggle-sidebar)
+      ("d" "Dired-sidebar" dired-sidebar-toggle-sidebar)
+      ("m" "Emms-sidebar" lg/find-music-directory)
+      ("o" "Org-sidebar" org-sidebar-toggle)
+      ("p" "Emms-sidebar" lg/emms-go-playlist)]]
+    [:hide (lambda () t)]))
 
 (provide 'lg-keybindings)
