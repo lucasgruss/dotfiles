@@ -303,4 +303,13 @@ playlist in a side-window"
    scanner-scan-multi-images)
   :straight t)
 
+;;; Zotero
+(use-package zotero
+  :disabled t
+  :straight t
+  :commands (zotero-browser zotero-sync)
+  :config
+  (zotero-sync)
+  (zotero-browser-sync))
+
 (provide 'lg-tools)
