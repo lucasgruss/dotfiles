@@ -319,4 +319,26 @@ playlist in a side-window"
 			  :repo "SebastienWae/app-launcher")
   :bind ("s-d" . 'app-launcher-run-app))
 
+;;; wttrin
+(use-package wttrin
+  :straight t
+  :commands wttrin
+  :custom
+  (wttrin-default-cities '("Paris" "Nantes" "Russange" ":help"))
+  :config
+  ;; https://github.com/bcbcarl/emacs-wttrin/issues/16
+  (defun wttrin-fetch-raw-string (query)
+    "Get the weather information based on your QUERY."
+    (let ((url-user-agent "curl"))
+      (add-to-list 'url-request-extra-headers wttrin-default-accept-language)
+      (with-current-buffer
+	  (url-retrieve-synchronously
+	   (concat "http://fr.wttr.in/" query "?A")
+	   (lambda (status) (switch-to-buffer (current-buffer))))
+	(decode-coding-string (buffer-string) 'utf-8)))))
+
+;;; Deamons
+(use-package daemons
+  :straight t)
+
 (provide 'lg-tools)
