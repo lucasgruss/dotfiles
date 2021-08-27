@@ -7,6 +7,7 @@
   :init
   (defun org-clocking-buffer () nil) ;; without it, impossible to exit emacs with C-x C-c
   (setq org-directory "~/org/")
+  (setq org-agenda-files '("~/org/todo.org"))
   (setq org-fontify-quote-and-verse-blocks nil)
   (setq org-fontify-whole-heading-line nil)
   (setq org-agenda-include-diary t)
@@ -17,28 +18,29 @@
   (setq org-babel-load-languages
 	'((emacs-lisp . t)
 	  (dot . t)))
-  :config
-  (setq org-src-block-faces
-        `(("emacs-lisp" modus-themes-nuanced-magenta)
-          ("elisp" modus-themes-nuanced-magenta)
-          ("clojure" modus-themes-nuanced-magenta)
-          ("clojurescript" modus-themes-nuanced-magenta)
-          ("c" modus-themes-nuanced-blue)
-          ("c++" modus-themes-nuanced-blue)
-          ("sh" modus-themes-nuanced-green)
-          ("shell" modus-themes-nuanced-green)
-          ("html" modus-themes-nuanced-yellow)
-          ("xml" modus-themes-nuanced-yellow)
-          ("css" modus-themes-nuanced-red)
-          ("scss" modus-themes-nuanced-red)
-          ("matlab" modus-themes-nuanced-red)
-          ("octave" modus-themes-nuanced-red)
-          ("python" modus-themes-nuanced-green)
-          ("ipython" modus-themes-nuanced-magenta)
-          ("r" modus-themes-nuanced-cyan)
-          ("yaml" modus-themes-nuanced-cyan)
-          ("conf" modus-themes-nuanced-cyan)
-          ("docker" modus-themes-nuanced-cyan))))
+  :custom
+  (org-hide-emphasis-markers t)
+  (org-src-block-faces
+   `(("emacs-lisp" modus-themes-nuanced-magenta)
+     ("elisp" modus-themes-nuanced-magenta)
+     ("clojure" modus-themes-nuanced-magenta)
+     ("clojurescript" modus-themes-nuanced-magenta)
+     ("c" modus-themes-nuanced-blue)
+     ("c++" modus-themes-nuanced-blue)
+     ("sh" modus-themes-nuanced-green)
+     ("shell" modus-themes-nuanced-green)
+     ("html" modus-themes-nuanced-yellow)
+     ("xml" modus-themes-nuanced-yellow)
+     ("css" modus-themes-nuanced-red)
+     ("scss" modus-themes-nuanced-red)
+     ("matlab" modus-themes-nuanced-red)
+     ("octave" modus-themes-nuanced-red)
+     ("python" modus-themes-nuanced-green)
+     ("ipython" modus-themes-nuanced-magenta)
+     ("r" modus-themes-nuanced-cyan)
+     ("yaml" modus-themes-nuanced-cyan)
+     ("conf" modus-themes-nuanced-cyan)
+     ("docker" modus-themes-nuanced-cyan))))
 
 ;;; Org-sidebar
 (use-package org-sidebar
@@ -127,6 +129,7 @@
 ;;; org-ref
 (use-package org-ref
   :straight t
+  :disabled t
   :after org
   :defer t)
 
@@ -204,33 +207,33 @@ Format is a string matching the following format specification:
 ;;; org-capture
 (use-package org-capture
   :after org
-  :config
-  (setq org-capture-templates
-	'(("t" "Personal todo" entry
-	   (file+headline +org-capture-todo-file "Inbox")
-	   "* [ ] %?\n%i\n%a" :prepend t)
-	  ("n" "Personal notes" entry
-	   (file+headline +org-capture-notes-file "Inbox")
-	   "* %u %?\n%i\n%a" :prepend t)
-	  ("j" "Journal" entry
-	   (file+olp+datetree +org-capture-journal-file)
-	   "* %U %?\n%i\n%a" :prepend t)
-	  ("p" "Templates for projects")
-	  ("pt" "Project-local todo" entry
-	   (file+headline +org-capture-project-todo-file "Inbox")
-	   "* TODO %?\n%i\n%a" :prepend t)
-	  ("pn" "Project-local notes" entry
-	   (file+headline +org-capture-project-notes-file "Inbox")
-	   "* %U %?\n%i\n%a" :prepend t)
-	  ("pc" "Project-local changelog" entry
-	   (file+headline +org-capture-project-changelog-file "Unreleased")
-	   "* %U %?\n%i\n%a" :prepend t)
-	  ("o" "Centralized templates for projects")
-	  ("ot" "Project todo" entry #'+org-capture-central-project-todo-file "* TODO %?\n %i\n %a" :heading "Tasks" :prepend nil)
-	  ("on" "Project notes" entry #'+org-capture-central-project-notes-file "* %U %?\n %i\n %a" :heading "Notes" :prepend t)
-	  ("oc" "Project changelog" entry #'+org-capture-central-project-changelog-file "* %U %?\n %i\n %a" :heading "Changelog" :prepend t)
-	  ("l" "Link" entry (file+headline "~/org/links.org" "Links")
-	   "* %a %^g\n %?\n %T\n %i"))))
+  :custom
+  (org-capture-templates
+   '(("t" "Personal todo" entry
+      (file+headline +org-capture-todo-file "Inbox")
+      "* [ ] %?\n%i\n%a" :prepend t)
+     ("n" "Personal notes" entry
+      (file+headline +org-capture-notes-file "Inbox")
+      "* %u %?\n%i\n%a" :prepend t)
+     ("j" "Journal" entry
+      (file+olp+datetree +org-capture-journal-file)
+      "* %U %?\n%i\n%a" :prepend t)
+     ("p" "Templates for projects")
+     ("pt" "Project-local todo" entry
+      (file+headline +org-capture-project-todo-file "Inbox")
+      "* TODO %?\n%i\n%a" :prepend t)
+     ("pn" "Project-local notes" entry
+      (file+headline +org-capture-project-notes-file "Inbox")
+      "* %U %?\n%i\n%a" :prepend t)
+     ("pc" "Project-local changelog" entry
+      (file+headline +org-capture-project-changelog-file "Unreleased")
+      "* %U %?\n%i\n%a" :prepend t)
+     ("o" "Centralized templates for projects")
+     ("ot" "Project todo" entry #'+org-capture-central-project-todo-file "* TODO %?\n %i\n %a" :heading "Tasks" :prepend nil)
+     ("on" "Project notes" entry #'+org-capture-central-project-notes-file "* %U %?\n %i\n %a" :heading "Notes" :prepend t)
+     ("oc" "Project changelog" entry #'+org-capture-central-project-changelog-file "* %U %?\n %i\n %a" :heading "Changelog" :prepend t)
+     ("l" "Link" entry (file+headline "~/org/links.org" "Links")
+      "* %a %^g\n %?\n %T\n %i"))))
 
 ;;; org-pomodoro
 (use-package org-pomodoro
