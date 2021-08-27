@@ -252,16 +252,20 @@ Format is a string matching the following format specification:
 ;(use-package org-zotxt :straight t)
 ;(use-package org-zotxt-noter :straight t)
 
-
-;;; visual-fill-column
-(defun dw/org-mode-visual-fill ()
-  (setq visual-fill-column-width 110
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :defer t
+;;; org-appear
+(use-package org-appear
   :straight t
-  :hook (org-mode . dw/org-mode-visual-fill))
+  :hook
+  (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autolinks t)
+  (org-appear-autosubmarkers t)
+  (org-appear-autoentities t))
+
+;;; org-fragtog
+(use-package org-fragtog
+  :straight t
+  :hook
+  (org-mode . org-fragtog-mode))
 
 (provide 'lg-org)
