@@ -60,26 +60,24 @@
 ;;; Consult
 (use-package consult
   :straight t
+  :init
+  (defun lg/consult-use-package ()
+    "Consult the use-package forms in the configuration."
+    (interactive)
+    (consult-ripgrep "~/.emacs.d/lisp" "\\(use-package "))
   :general
   (general-def
     "s-\'" 'consult-buffer)
   :config
-  (setq consult-preview-key nil)
-  (defun lg-consult-use-package ()
-    "Consult the use-package forms in the configuration."
-    (interactive)
-    (consult-ripgrep "~/.emacs.d/lisp" "\\(use-package ")))
+  (setq consult-preview-key nil))
+
+;;;; espotify-consult
+(use-package consult-spotify
+  :straight t
+  :after espotify)
 
 ;;; Consult-selectrum
 (use-package consult-selectrum :after consult)
-
-;;; Consult-spotify
-(use-package consult-spotify
-  :straight t
-  :disabled t
-  :load-path "~/.config/doom/espotify/"
-  :init
-  (load "~/.config/doom/private.el"))
 
 ;;; Embark
 (use-package embark
