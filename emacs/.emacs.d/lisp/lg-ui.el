@@ -20,14 +20,26 @@
   ;:hook (after-init . lg/load-theme)
   :init
   (defvar lg/light-themes
-    '(modus-operandi doom-solarized-light)
+    '(modus-operandi
+      doom-solarized-light)
     "List of light themes.")
 
   (defvar lg/dark-themes
-    '(modus-vivendi doom-one doom-dark+ doom-xcode doom-badger)
+    '(modus-vivendi
+      doom-one
+      doom-dark+
+      doom-xcode
+      doom-badger
+      doom-1337)
     "List of dark themes.")
 
   (defvar lg/theme 'modus-operandi)
+
+  (defvar lg/dark-background "~/Images/Wallpaper_bis/space3.jpg"
+    "A background to be used when theme is dark.")
+
+  (defvar lg/light-background "~/Images/Wallpaper/moutain.jpg"
+    "A background to be used when theme is light.")
 
   (defun lg/theme-propagate (theme &rest args)
     "Apply system wide settings that are consistent with the emacs
@@ -37,18 +49,20 @@ are changed in the Xresources file.
 This function is to be used with xsettingsd, but the same can be
 applied to gnome-settings or xfce-conf."
     (when (member theme lg/light-themes)
-      (efs/run-in-background "sed -i 's/ThemeName.*/ThemeName \"Adwaita\"/g' ~/.xsettingsd")
-      (efs/run-in-background "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd"))
+      (shell-command (format "feh --bg-fill %s" lg/light-background))
+      (shell-command "sed -i 's/ThemeName.*/ThemeName \"Adwaita\"/g' ~/.xsettingsd")
+      (shell-command "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd"))
     (when (member theme lg/dark-themes)
-      (efs/run-in-background "sed -i 's/ThemeName.*/ThemeName \"Adwaita-dark\"/g' ~/.xsettingsd")
-      (efs/run-in-background "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Dark\"/g' ~/.xsettingsd"))
-    (efs/run-in-background (format "sed -i 's/background =.*/background = \"%s\"/g' ~/.config/dunst/dunstrc" (face-foreground 'default)))
-    (efs/run-in-background (format "sed -i 's/foreground =.*/foreground = \"%s\"/g' ~/.config/dunst/dunstrc" (face-background 'default)))
+      (shell-command (format "feh --bg-fill %s" lg/dark-background))
+      (shell-command "sed -i 's/ThemeName.*/ThemeName \"Adwaita-dark\"/g' ~/.xsettingsd")
+      (shell-command "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Dark\"/g' ~/.xsettingsd"))
+    (shell-command (format "sed -i 's/background =.*/background = \"%s\"/g' ~/.config/dunst/dunstrc" (face-foreground 'default)))
+    (shell-command (format "sed -i 's/foreground =.*/foreground = \"%s\"/g' ~/.config/dunst/dunstrc" (face-background 'default)))
     (efs/run-in-background "killall dunst")
-    (efs/run-in-background (format "sed -i 's/\*background.*/\*background\: %s/g' ~/.Xresources" (face-background 'default)))
-    (efs/run-in-background (format "sed -i 's/\*foreground.*/\*foreground\: %s/g' ~/.Xresources" (face-foreground 'default)))
+    (shell-command (format "sed -i 's/\*background.*/\*background\: %s/g' ~/.Xresources" (face-background 'default)))
+    (shell-command (format "sed -i 's/\*foreground.*/\*foreground\: %s/g' ~/.Xresources" (face-foreground 'default)))
     (efs/run-in-background "killall -HUP xsettingsd")
-    (efs/run-in-background "xrdb ~/.Xresources"))
+    (shell-command "xrdb ~/.Xresources"))
 
   (advice-add 'load-theme :after #'lg/theme-propagate '(depth 100))
 
@@ -107,30 +121,6 @@ applied to gnome-settings or xfce-conf."
     (set-frame-parameter
      nil 'alpha lg/transparency-alpha)))
 
-;;; Circadian
-(use-package circadian
-  :straight t
-  :custom
-  (calendar-latitude 48.856613)
-  (calendar-longitude 2.352222)
-  (circadian-themes '((:sunrise . modus-operandi)
-		      (:sunset . modus-vivendi)))
-  :config
-  (defun circadian-enable-theme (theme)
-    "Clear previous `custom-enabled-themes' and load THEME."
-    (unless (equal (list theme) custom-enabled-themes)
-      ;; Only load the argument theme, when `custom-enabled-themes'
-      ;; does not contain it.
-      (mapc #'disable-theme custom-enabled-themes)
-      (condition-case nil
-	  (progn
-	    (run-hook-with-args 'circadian-before-load-theme-hook theme)
-	    (load-theme theme) ;; (load-theme theme t)
-	    (message "circadian.el — enabled %s" theme)
-	    (run-hook-with-args 'circadian-after-load-theme-hook theme))
-	(error "Problem loading theme %s" theme))))
-  (circadian-setup))
-
 ;;; Modeline
 ;;;; Moody
 (use-package moody
@@ -161,8 +151,8 @@ applied to gnome-settings or xfce-conf."
 
   (defvar mode-line-format-right
     '("%e"
-      mode-line-modes
-      mode-line-misc-info)
+      mode-line-modes)
+     ; mode-line-misc-info)
      ; mode-line-end-spaces)
     "Content of the right of the modeline")
 
@@ -215,12 +205,15 @@ applied to gnome-settings or xfce-conf."
 
 ;;; Outline
 (use-package outline
-  :diminish outline-mode)
+  :diminish outline-mode
+  :defer t)
 
 ;;; Icons
 ;;;; all-the-icons
 (use-package all-the-icons
   :straight t
+  :custom
+  (all-the-icons-scale-factor 1.0)
   :config
   (add-to-list 'all-the-icons-mode-icon-alist
                '(exwm-mode  all-the-icons-faicon "toggle-on" :height 1.0 :v-adjust -0.2
@@ -239,63 +232,63 @@ applied to gnome-settings or xfce-conf."
 ;;;; modus-themes
 (use-package modus-themes
   :straight t
-  :config
-  (setq modus-themes-slanted-constructs t)
-  (setq modus-themes-bold-constructs nil)
-  (setq modus-themes-fringes 'subtle) ; {nil,'subtle,'intense})
+  :custom
+  (modus-themes-slanted-constructs t)
+  (modus-themes-bold-constructs nil)
+  (modus-themes-fringes 'subtle) ; {nil,'subtle,'intense})
   ;; Options for `modus-themes-lang-checkers': nil,
   ;; 'straight-underline, 'subtle-foreground,
   ;; 'subtle-foreground-straight-underline, 'intense-foreground,
   ;; 'intense-foreground-straight-underline, 'colored-background
-  (setq modus-themes-lang-checkers 'straight-underline)
+  (modus-themes-lang-checkers 'straight-underline)
 
   ;; Options for `modus-themes-mode-line': nil, '3d, 'moody,
   ;; 'borderless, 'borderless-3d, 'borderless-moody, 'accented,
   ;; 'accented-3d, 'accented-moody
-  (setq modus-themes-mode-line 'moody)
+  (modus-themes-mode-line 'moody)
 
   ;; Options for `modus-themes-syntax': nil, 'faint,
   ;; 'yellow-comments, 'green-strings,
   ;; 'yellow-comments-green-strings, 'alt-syntax,
   ;; 'alt-syntax-yellow-comments, 'faint-yellow-comments
-  (setq modus-themes-syntax nil)
+  (modus-themes-syntax nil)
 
   ;; Options for `modus-themes-hl-line': nil, 'intense-background,
   ;; 'accented-background, 'underline-neutral,
   ;; 'underline-accented, 'underline-only-neutral,
   ;; 'underline-only-accented
-  (setq modus-themes-intense-hl-line 'accented-background)
-  (setq modus-themes-subtle-line-numbers nil)
-  (setq modus-themes-paren-match 'subtle-bold) ; {nil,'subtle-bold,'intense,'intense-bold}
+  (modus-themes-intense-hl-line 'accented-background)
+  (modus-themes-subtle-line-numbers nil)
+  (modus-themes-paren-match '(intense bold)) ; {nil,'subtle-bold,'intense,'intense-bold}
 
   ;; Options for `modus-themes-links': nil, 'faint,
   ;; 'neutral-underline, 'faint-neutral-underline, 'no-underline,
   ;; 'underline-only, 'neutral-underline-only
-  (setq modus-themes-links 'neutral-underline)
+  (modus-themes-links 'neutral-underline)
 
   ;; Options for `modus-themes-prompts': nil, 'subtle-accented,
   ;; 'intense-accented, 'subtle-gray, 'intense-gray
-  (setq modus-themes-prompts 'intense-gray)
-  (setq modus-themes-completions 'moderate) ; {nil,'moderate,'opinionated})
+  (modus-themes-prompts 'intense-gray)
+  (modus-themes-completions 'moderate) ; {nil,'moderate,'opinionated})
 
   ;; Options for `modus-themes-region': nil, 'no-extend, 'bg-only,
   ;; 'bg-only-no-extend, 'accent, 'accent-no-extend
-  (setq modus-themes-region 'accent)
+  (modus-themes-region 'accent)
 
   ;; Options for `modus-themes-diffs': nil, 'desaturated,
   ;; 'fg-only, 'bg-only, 'deuteranopia,
-  (setq modus-themes-diffs 'deuteranopia) ;
-  (setq modus-themes-org-blocks 'rainbow) ; {nil,'greyscale,'rainbow}
-  (setq modus-themes-org-habit nil) ; {nil,'simplified,'traffic-light}
-  (setq modus-themes-headings '((t . highlight)))
-  (setq modus-themes-variable-pitch-ui nil)
-  (setq modus-themes-variable-pitch-headings t)
-  (setq modus-themes-scale-headings t)
-  (setq modus-themes-scale-1 1.1)
-  (setq modus-themes-scale-2 1.15)
-  (setq modus-themes-scale-3 1.21)
-  (setq modus-themes-scale-4 1.27)
-  (setq modus-themes-scale-5 1.33))
+  (modus-themes-diffs 'deuteranopia) ;
+  (modus-themes-org-blocks 'rainbow) ; {nil,'greyscale,'rainbow}
+  (modus-themes-org-habit nil) ; {nil,'simplified,'traffic-light}
+  (modus-themes-headings '((t . highlight)))
+  (modus-themes-variable-pitch-ui nil)
+  (modus-themes-variable-pitch-headings t)
+  (modus-themes-scale-headings t)
+  (modus-themes-scale-1 1.1)
+  (modus-themes-scale-2 1.15)
+  (modus-themes-scale-3 1.21)
+  (modus-themes-scale-4 1.27)
+  (modus-themes-scale-5 1.33))
 
 ;;;; modus-themes-exporter
 (use-package modus-themes-exporter
@@ -314,8 +307,32 @@ settings applied to them."
 
 ;;;; Doom themes
 (use-package doom-themes
-  :commands (load-theme)
+  :commands load-theme
   :straight t)
+
+;;;; Circadian
+(use-package circadian
+  :straight t
+  :custom
+  (calendar-latitude 48.856613)
+  (calendar-longitude 2.352222)
+  (circadian-themes '((:sunrise . modus-operandi)
+		      (:sunset . modus-vivendi)))
+  :config
+  ;; (defun circadian-enable-theme (theme)
+  ;;   "Clear previous `custom-enabled-themes' and load THEME."
+  ;;   (unless (equal (list theme) custom-enabled-themes)
+  ;;     ;; Only load the argument theme, when `custom-enabled-themes'
+  ;;     ;; does not contain it.
+  ;;     (mapc #'disable-theme custom-enabled-themes)
+  ;;     (condition-case nil
+  ;; 	  (progn
+  ;; 	    (run-hook-with-args 'circadian-before-load-theme-hook theme)
+  ;; 	    (load-theme theme) ;; (load-theme theme t)
+  ;; 	    (message "circadian.el — enabled %s" theme)
+  ;; 	    (run-hook-with-args 'circadian-after-load-theme-hook theme))
+  ;; 	(error "Problem loading theme %s" theme))))
+  (circadian-setup))
 
 ;;; Tabs
 ;;;; tab-bar
@@ -324,13 +341,14 @@ settings applied to them."
   (setq tab-bar-format '(;; tab-bar-format-tabs
 			 tab-bar-format-align-right
 			 tab-bar-format-global))
-  (tab-bar-mode +1))
+  (tab-bar-mode -1))
 
 ;;;; centaur-tabs
 (use-package centaur-tabs
   :demand t
   :straight t
-  :bind ("C-t" . 'centaur-tabs--create-new-tab)
+  :general
+  (general-def :states 'normal "C-t" 'centaur-tabs--create-new-tab)
   :hook
   ((emms-playlist-mode
     org-ql-sidebar-buffer-setup
@@ -344,21 +362,22 @@ settings applied to them."
     exwm-floating-setup
     calc-mode
     calc-trail-mode) . centaur-tabs-local-mode)
-  :custom
-  (centaur-tabs-style "bar")
-  (centaur-tabs-set-modified-marker t)
-  (centaur-tabs-set-icons t)
-  (centaur-tabs-gray-out-icons t)
-  (centaur-tabs-set-bar 'under)
-  (centaur-tabs-show-navigation-buttons t)
-  (centaur-tabs-show-new-tab-button t)
-  (centaur-tabs-height 21)
-  (centaur-tabs-enable-ido-completion nil)
-  (centaur-tabs-cycle-scope 'tabs)
-  (centaur-tabs-plain-icons nil)
-  (centaur-tabs-label-fixed-length 15)
-  (uniquify-separator "/")
   :config
+  (setq centaur-tabs-style "bar")
+  (setq centaur-tabs-set-modified-marker t)
+  (setq centaur-tabs-set-icons t)
+  (setq centaur-tabs-gray-out-icons t)
+  (setq centaur-tabs-set-bar 'under)
+  (setq centaur-tabs-set-bar nil)
+  (setq centaur-tabs-show-navigation-buttons t)
+  (setq centaur-tabs-show-new-tab-button t)
+  (setq centaur-tabs-height 20)
+  (setq centaur-tabs-bar-height 20)
+  (setq centaur-tabs-enable-ido-completion nil)
+  (setq centaur-tabs-cycle-scope 'tabs)
+  (setq centaur-tabs-plain-icons nil)
+  (setq centaur-tabs-label-fixed-length 15)
+  (setq uniquify-separator "/")
   (centaur-tabs-mode +1))
 
 ;;;; lg-centaur-tabs : further configuration for centaur-tabs
@@ -377,9 +396,11 @@ settings applied to them."
 ;;; Scrolling performances
 ;;;; fast-scroll
 (use-package fast-scroll
-  :disabled t
   :straight t
-  :config (fast-scroll-mode +1))
+  :diminish fast-scroll-mode
+  :config
+  (fast-scroll-config)
+  (fast-scroll-mode +1))
 
 ;;;; scroll-on-jump
 (use-package scroll-on-jump
@@ -409,11 +430,10 @@ settings applied to them."
   :custom
   (scroll-on-jump-smooth t)
   (scroll-on-jump-use-curve t)
-  (scroll-on-jump-duration 0.15))
+  (scroll-on-jump-duration 0.2))
 
 ;;;; good-scroll
 (use-package good-scroll
-  :disabled t
   :straight t
   :config
   (good-scroll-mode +1))
@@ -436,5 +456,24 @@ settings applied to them."
   :straight t
   :config
   (global-git-gutter-mode +1))
+
+;;; visual-fill-column
+(use-package visual-fill-column
+  :defer t
+  :straight t
+  :custom
+  (visual-fill-column-width 110)
+  (visual-fill-column-center-text t)
+  :init
+  (defun lg/activate-visual-fill-center ()
+    (visual-fill-column-mode +1))
+  (defun lg/deactivate-visual-fill-center ()
+    (visual-fill-column-mode -1))
+  (defun lg/toggle-visual-fill-center ()
+    (interactive)
+    (if visual-fill-column-mode
+	(visual-fill-column-mode -1)
+      (visual-fill-column-mode +1)))
+  :hook (org-mode . lg/activate-visual-fill-center))
 
 (provide 'lg-ui)
