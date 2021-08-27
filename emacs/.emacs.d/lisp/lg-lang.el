@@ -30,3 +30,12 @@
 ;;; Graphviz
 (use-package graphviz-dot-mode :straight t)
 (use-package company-graphviz-dot)
+
+;;; Yaml
+(use-package yaml
+  :straight t)
+
+;;;; Yaml-mode
+(use-package yaml-mode
+  :straight t
+  :mode ("\\.yml\\'" . yaml-mode))
