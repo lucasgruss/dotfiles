@@ -71,16 +71,21 @@
 
 ;;; Transient
 (use-package transient
+  :straight t
+  :after all-the-icons
   :config
   (define-transient-command lg/transient-root ()
     "Main transient, accessed through SPC"
     [["Quick access"
-      ("SPC" "M-x" execute-extended-command)]
+      ("SPC" "M-x" execute-extended-command)
+      ("S-SPC" "M-X : buffer" execute-extended-command-for-buffer)
+      ("x" "Org capture" org-capture)]
      ["Dispatch"
-      ("b" "Buffers" lg/transient-b)
+      ("b" "Buffers/Bookmarks" lg/transient-b)
       ("e" "Emms" lg/transient-e)
       ("f" "Files" lg/transient-f)
       ("h" "Help" lg/transient-h)
+      ("m" "Manage" lg/transient-m)
       ("o" "Open/Org" lg/transient-o)
       ("q" "Quit" lg/transient-q)
       ("s" "Search/Sidebar" lg/transient-s)]]
@@ -152,6 +157,14 @@
       ("R" "Profiler report" profiler-report)]]
     [:hide (lambda () t)])
 
+  (define-transient-command lg/transient-m ()
+    "Manage"
+    [["System packages"
+      ("i" "Install package" system-packages-install)
+      ("s" "Search packages" system-packages-search)
+      ("u" "Update packages" system-packages-update)]]
+    [:hide (lambda () t)])
+
   (define-transient-command lg/transient-o ()
     "Open/Org"
     [["Open"
@@ -168,9 +181,12 @@
       ("t" "Terminal" vterm)
       ("u" "Disk-usage" disk-usage)
       ;;("s" "Smudge" lg/transient-smudge)
-      ("w" "Eww" eww)]
+      ("w" "Eww" eww)
+      ("W" " Weather (wttrin)" wttrin)]
      ["Org"
-      ("A" "Agenda" org-agenda)]]
+      ("A" "Agenda" org-agenda)
+      ("i" "Clock in" org-clock-in)
+      ("o" "Clock out" org-clock-out)]]
     [:hide (lambda () t)])
 
   (define-transient-command lg/transient-q ()
