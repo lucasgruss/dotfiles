@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; lg-completion: completion configuration
 ;; Author: Lucas Gruss
 
@@ -60,16 +61,14 @@
 ;;; Consult
 (use-package consult
   :straight t
+  :bind ("s-\'" . consult-buffer)
   :init
   (defun lg/consult-use-package ()
     "Consult the use-package forms in the configuration."
     (interactive)
-    (consult-ripgrep "~/.emacs.d/lisp" "\\(use-package "))
-  :general
-  (general-def
-    "s-\'" 'consult-buffer)
-  :config
-  (setq consult-preview-key nil))
+    (consult-ripgrep "~/.emacs.d/lisp" "(use-package "))
+  :custom
+  (consult-preview-key nil))
 
 ;;;; espotify-consult
 (use-package consult-spotify
@@ -82,6 +81,7 @@
 ;;; Embark
 (use-package embark
   :straight t
+  :commands embark-act
   :bind ("s-;" . embark-act)
   :config
   ;; https://github.com/oantolin/embark/wiki/Additional-Configuration
@@ -106,12 +106,17 @@
 
   (add-hook 'embark-collect-mode-hook #'shrink-selectrum))
 
+;;; embark-consult
+(use-package embark-consult
+  :straight t
+  :after embark)
+
 ;;; Company
 (use-package company
-  :diminish company-mode
   :straight t
-  :config
-  (global-company-mode +1))
+  :diminish company-mode
+  :defer 10
+  :config (global-company-mode +1))
 
 ;;; Company-box
 (use-package company-box
@@ -126,5 +131,13 @@
   :after company
   :config
   (company-prescient-mode +1))
+
+;;; Company-ledger
+(use-package company-ledger
+  :straight t
+  ;:disabled t
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-ledger))
 
 (provide 'lg-completion)

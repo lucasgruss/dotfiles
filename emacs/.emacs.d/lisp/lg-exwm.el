@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; lg-exwm.el : my configuration for exwm
 ;; Author: Lucas Gruss
 
@@ -104,7 +105,7 @@ buffer (=minimizing in other WM/DE)"
   (defun lg/exwm-init-hook ()
     (interactive)
     (efs/run-in-background "setxkbmap gb -variant extd -option ctrl:nocaps")
-    (efs/run-in-background "xset r rate 300 40")
+    (efs/run-in-background "xset r rate 200 60")
     (efs/run-in-background "killall pasystray")
     (efs/run-in-background "killall blueman-applet")
     (efs/run-in-background "killall nm-applet")
@@ -144,6 +145,11 @@ buffer (=minimizing in other WM/DE)"
      ([?\s-b] . bury-buffer)
      ([s-f2]  . lg/lock-screen)
      ([?\s-d] . app-launcher-run-app)
+     ([XF86MonBrightnessUp] . desktop-environment-brightness-increment)
+     ([XF86MonBrightnessUp] . desktop-environment-brightness-increment)
+     ([XF86AudioLowerVolume] . desktop-environment-volume-decrement)
+     ([XF86AudioRaiseVolume] . desktop-environment-volume-decrement)
+     ([XF86AudioMute] . desktop-environment-toggle-mute)
      ;; ([?\s-d] . (lambda (command)
      ;;                (interactive (list (read-shell-command "$ ")))
      ;;                (start-process-shell-command command nil command)))
@@ -376,36 +382,6 @@ Argument hide is t if minibuffer should be hidden, true if shown."
   (defun lg/exwm-outer-gaps-hide-minibuffer-exit-hook ()
     (when (not lg/exwm-outer-gaps--is-minibuffer-shown)
       (lg/exwm-outer-gaps-hide-show-minibuffer t)))
-
-  ;; (map! (:map exwm-outer-gaps-keymap
-  ;;        :desc "Decrease left" "h" (lambda () (interactive) (exwm-outer-gaps-decrement 0))
-  ;;        :desc "Increase left" "H" (lambda () (interactive) (exwm-outer-gaps-increment 0))
-  ;;        :desc "Decrease right" "l" (lambda () (interactive) (exwm-outer-gaps-decrement 1))
-  ;;        :desc "Increase right" "L" (lambda () (interactive) (exwm-outer-gaps-increment 1))
-  ;;        :desc "Decrease top" "k" (lambda () (interactive) (exwm-outer-gaps-decrement 2))
-  ;;        :desc "Increase top" "K" (lambda () (interactive) (exwm-outer-gaps-increment 2))
-  ;;        :desc "Decrease bottom" "j" (lambda () (interactive) (exwm-outer-gaps-decrement 3))
-  ;;        :desc "Increase bottom" "J" (lambda () (interactive) (exwm-outer-gaps-increment 3))
-  ;;        :desc "Shift frame left" "y" (lambda () (interactive)
-  ;;                                       (exwm-outer-gaps-increment 1)
-  ;;                                       (exwm-outer-gaps-decrement 0))
-  ;;        :desc "Shift frame right" "o" (lambda () (interactive)
-  ;;                                        (exwm-outer-gaps-increment 0)
-  ;;                                        (exwm-outer-gaps-decrement 1))
-  ;;        :desc "Shift frame down" "u" (lambda () (interactive)
-  ;;                                       (exwm-outer-gaps-increment 2)
-  ;;                                       (exwm-outer-gaps-decrement 3))
-  ;;        :desc "Shift frame up" "i" (lambda () (interactive)
-  ;;                                     (exwm-outer-gaps-increment 3)
-  ;;                                     (exwm-outer-gaps-decrement 2))))
-
-  ;; (defun lg/exwm-outer-gaps-hercules ()
-  ;;   (interactive))
-
-  ;; (hercules-def
-  ;;  :toggle-funs #'lg/exwm-outer-gaps-hercules
-  ;;  :keymap 'exwm-outer-gaps-keymap
-  ;;  :transient t)
 
   (defun lg/exwm-outer-gaps-setenv-and-polybar ()
     "Set environment variables that are used by polybar to overlay

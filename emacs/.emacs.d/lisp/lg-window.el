@@ -1,15 +1,26 @@
+;; -*- lexical-binding: t; -*-
 ;;; lg-window.el : window (as in "emacs window") management configuration 
 
 ;;; Emacs settings
 (use-package emacs
   :straight nil
+  :bind
+  (("s-v" . split-window-right)
+   ("s-z" . split-window-below)
+   ("s-q" . delete-window))
   :init
   (setq display-buffer-alist
 	`(("\\*\\(helpful\\|Help\\).*\\*"
 	   (display-buffer-in-side-window)
 	   (window-width . ,(+ 3 fill-column))
 	   (side . right)
-	   (slot . -2)))))
+	   (slot . -2))
+	  ("\\*\\(Ledger Report\\).*\\*"
+	   (display-buffer-in-side-window)
+	   (window-width . ,(+ 3 fill-column))
+	   (side . right)
+	   (slot . -2))
+	  )))
 
 ;;; Windmove
 (use-package windmove
@@ -18,9 +29,9 @@
    ("s-j" . windmove-down)
    ("s-k" . windmove-up)
    ("s-l" . windmove-right))
-  :config
-  (setq windmove-wrap-around nil)
-  (setq windmove-window-distance-delta 1))
+  :custom
+  (windmove-wrap-around nil)
+  (windmove-window-distance-delta 1))
 
 ;;; Windower
 (use-package windower
@@ -44,7 +55,14 @@
 ;;; Framemove
 (use-package framemove
   :load-path "~/.emacs.d/lisp/site-packages"
+  :demand t
   :config
   (setq framemove-hook-into-windmove t))
+
+(use-package emacs
+  :config
+  (defun lg/toggle-all-frames-fullscreen ()
+    (interactive)
+    (lambda () (mapc 'toggle-frame-fullscreen (frame-list)))))
 
 (provide 'lg-window)

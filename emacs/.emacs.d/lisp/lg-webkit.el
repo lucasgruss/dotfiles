@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; lg-webkit: configuration for the emacs-webkit web browser
 ;; Author: Lucas Gruss
 

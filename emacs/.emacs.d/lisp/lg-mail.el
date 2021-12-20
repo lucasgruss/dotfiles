@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; lg-mail: configuration for mail
 ;; Author: Lucas Gruss
 

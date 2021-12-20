@@ -4,7 +4,7 @@
 ;;; Transient
 (use-package transient
   :straight t
-  :after all-the-icons
+  :demand t
   :config
   (my-leader-def :keymaps 'override "" 'lg/transient-root)
 
@@ -13,6 +13,7 @@
     [["Quick access"
       ("SPC" "M-x" execute-extended-command)
       ;("S-SPC" "M-X : buffer" execute-extended-command-for-buffer)
+      ("j" "Avy" avy-goto-char-timer)
       ("m" "Local leader" evil-send-localleader)
       ("x" "Org capture" org-capture)]
      ["Dispatch"
@@ -47,7 +48,9 @@
     [["Consult"
       ("r" "Consult ripgrep" consult-ripgrep)]
      ["Code"
-      ("c" "Comment region" comment-region)]]
+      ("c" "Comment region" comment-region)]
+     ["Checking spelling"
+      ("f" "flyspell" flyspell-correct-wrapper)]]
     [:hide (lambda () t)])
 
   (define-transient-command lg/transient-e ()
@@ -73,7 +76,7 @@
       ("r" "Recent" consult-recent-file)
       ("s" "Save" save-buffer)]
      ["Configuration files"
-      ("d" "dotfiles" (lambda () (interactive) (dired "~/dotfiles")))
+      ("d" "dotfiles" (lambda () (interactive) (dired "~/dotfiles/")))
       ("e" ".emacs.d" lg/visit-configuration)
       ("p" "Package" lg/consult-use-package)]]
     [:hide (lambda () t)])
@@ -121,11 +124,13 @@
       ("C" "Calc" calc)
       ("d" "Dired" dired)
       ("D" "Disk usage" disk-usage)
+      ("C-d" "Disk usage" disk-usage)
       ("f" "Elfeed" elfeed)
       ("g" "Magit" magit-status)
       ("p" "Pass" pass)
       ("P" "Proced" proced)
       ("r" "Ripgrep" rg)
+      ("s" "Smudge" smudge-my-playlists)
       ("t" "Terminal" vterm)
       ("u" "Disk-usage" disk-usage)
       ;;("s" "Smudge" lg/transient-smudge)
@@ -134,7 +139,9 @@
      ["Org"
       ("A" "Agenda" org-agenda)
       ("i" "Clock in" org-clock-in)
+      ("j" "Org journal" org-journal-new-entry)
       ("k" "Capture" org-capture)
+      ("n" "Org-noter session" org-noter)
       ("o" "Clock out" org-clock-out)]]
     [:hide (lambda () t)])
 
@@ -148,6 +155,7 @@
   (define-transient-command lg/transient-s ()
     "Search/sidebars"
     [["Search"
+      ("O" "Occur" occur)
       ("s" "Consult line" consult-line)
       ("r" "Ripgrep" rg)]
      ["Sidebars"
@@ -155,7 +163,9 @@
       ("d" "Dired-sidebar" dired-sidebar-toggle-sidebar)
       ("m" "Emms-sidebar" lg/find-music-directory)
       ("o" "Org-sidebar" org-sidebar-toggle)
-      ("p" "Emms-playlist-sidebar" lg/emms-go-playlist)]]
+      ("p" "Emms-playlist-sidebar" lg/emms-go-playlist)]
+     ["Snippets"
+      ("i" "Insert snippet" consult-yasnippet)]]
     [:hide (lambda () t)])
   
   (define-transient-command lg/transient-t ()
@@ -194,13 +204,26 @@
 
   (define-transient-command lg/transient-org ()
     "Org mode"
-    [["Export"
-      ("e" "Export" org-export-dispatch)]
-     ["Narrowing"
-      ("n" "Narrow subtree" org-toggle-narrow-to-subtree)]
+    [["Misc"
+      ("a" "Agenda" org-agenda)
+      ("A" "Archive" org-archive-subtree)
+      ("c" "Cite" org-cite-insert)
+      ("e" "Export" org-export-dispatch)
+      ("E" "Export" org-set-effort)
+      ("n" "Narrow subtree" org-toggle-narrow-to-subtree)
+      ("P" "Set property" org-set-property)
+      ("t" "Tangle file (babel)" org-babel-tangle)
+      ("T" "Set tag" org-set-tags-command)]
      ["Clocking"
       ("i" "Clock in" org-clock-in)
-      ("o" "Clock out" org-clock-out)]]
+      ("o" "Clock out" org-clock-out)
+      ("p" "Pomodoro" org-pomodoro)]
+     ["Todo"
+      ("m" "Change todo state" org-todo)
+      ("k" "Increase priority" org-priority-up)
+      ("j" "Increase priority" org-priority-down)
+      ("s" "Schedule task" org-schedule)
+      ("d" "Set a deadline on task" org-deadline)]]
     [:hide (lambda () t)]))
 
 (provide 'lg-transient)

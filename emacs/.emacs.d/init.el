@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; init.el : where all the magic starts
 
 ;;; Add the modules to the load-path
@@ -10,12 +11,15 @@
     "private"
     "lg-ui"
     "lg-keybindings"
+    "lg-transient"
     "lg-window"
     "lg-completion"
     "lg-tools"
+    "lg-lang"
     "lg-mail"
     "lg-org"
-    "lg-exwm")
+    ;; "lg-exwm"
+    )
   "List of enabled modules in my configuration.")
 
 (defun lg/require (package)

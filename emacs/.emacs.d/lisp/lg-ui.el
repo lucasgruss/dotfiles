@@ -1,11 +1,12 @@
+;; -*- lexical-binding: t; -*-
 ;;; lg-ui: Configuration for the UI of Emacs
 ;; Author: Lucas Gruss
 
 ;;; Emacs settings
 (use-package emacs
   :init
-  ;; (display-battery-mode -1)
-  ;; (display-time-mode -1)
+  (display-battery-mode +1)
+  (display-time-mode +1)
   :custom
   (display-time-format "%H:%M")
   (scroll-step 1)
@@ -13,15 +14,23 @@
   :config
   (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
-  (set-face-attribute 'variable-pitch nil :family "Roboto Mono" :height 110 :width 'normal))
+  (set-face-attribute 'variable-pitch nil :family "Roboto" :weight 'semi-light :height 110 :width 'normal))
 
 ;;;; Syncing system themes with emacs theme
 (use-package emacs
   ;:hook (after-init . lg/load-theme)
   :init
+  ;; https://github.com/ema2159/centaur-tabs/issues/157
+  (defvar after-load-theme-hook nil
+    "Hook run after a color theme is loaded using `load-theme'.")
+  (defadvice load-theme (after run-after-load-theme-hook activate)
+    "Run `after-load-theme-hook'."
+    (run-hooks 'after-load-theme-hook))
+
   (defvar lg/light-themes
     '(modus-operandi
-      doom-solarized-light)
+      doom-solarized-light
+      spacemacs-light)
     "List of light themes.")
 
   (defvar lg/dark-themes
@@ -30,16 +39,33 @@
       doom-dark+
       doom-xcode
       doom-badger
-      doom-1337)
+      doom-1337
+      spacemacs-dark)
     "List of dark themes.")
 
   (defvar lg/theme 'modus-operandi)
 
-  (defvar lg/dark-background "~/Images/Wallpaper_bis/space3.jpg"
-    "A background to be used when theme is dark.")
+  (defvar lg/background)
+  (defvar lg/gtk-theme)
+  (defvar lg/icon-theme)
 
-  (defvar lg/light-background "~/Images/Wallpaper/moutain.jpg"
-    "A background to be used when theme is light.")
+  (defvar lg/light-background "/home/lucas/Images/Wallpaper/moutain.png" "A background to be used when theme is light.")
+  (defvar lg/light-gtk-theme "Adwaita" "Light gtk-theme to apply.")
+  (defvar lg/light-icon-theme "Papirus-Light" "Light icon-theme to apply.")
+  (defvar lg/dark-background "/home/lucas/Images/Wallpaper_bis/space3.png" "A background to be used when theme is dark.")
+  (defvar lg/dark-gtk-theme "Adwaita-dark" "Dark gtk-theme to apply.")
+  (defvar lg/dark-icon-theme "Papirus-Dark" "Dark icon-theme to apply.")
+
+  (defun lg/theme-apply (gtk-theme icon-theme background-img)
+    "Apply GTK-THEME and ICON-THEME to the system."
+    (setq lg/background background-img)
+    (setq lg/gtk-theme gtk-theme)
+    (setq lg/icon-theme icon-theme)
+    (efs/run-in-background (format "xfconf-query -c xfce4-desktop -p  /backdrop/screen0/monitoreDP-1/workspace0/last-image -s %s" background-img))
+    (efs/run-in-background (format "xfconf-query -c xsettings -p /Net/ThemeName -s %s" gtk-theme))
+    (efs/run-in-background (format "xfconf-query -c xsettings -p /Net/IconThemeName -s %s" icon-theme))
+    (shell-command (format "sed -i 's/ThemeName.*/ThemeName \"%s\"/g' ~/.xsettingsd" gtk-theme))
+    (shell-command (format "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd" icon-theme)))
 
   (defun lg/theme-propagate (theme &rest args)
     "Apply system wide settings that are consistent with the emacs
@@ -49,13 +75,9 @@ are changed in the Xresources file.
 This function is to be used with xsettingsd, but the same can be
 applied to gnome-settings or xfce-conf."
     (when (member theme lg/light-themes)
-      (shell-command (format "feh --bg-fill %s" lg/light-background))
-      (shell-command "sed -i 's/ThemeName.*/ThemeName \"Adwaita\"/g' ~/.xsettingsd")
-      (shell-command "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd"))
+      (lg/theme-apply lg/light-gtk-theme lg/light-icon-theme lg/light-background))
     (when (member theme lg/dark-themes)
-      (shell-command (format "feh --bg-fill %s" lg/dark-background))
-      (shell-command "sed -i 's/ThemeName.*/ThemeName \"Adwaita-dark\"/g' ~/.xsettingsd")
-      (shell-command "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Dark\"/g' ~/.xsettingsd"))
+      (lg/theme-apply lg/dark-gtk-theme lg/dark-icon-theme lg/dark-background))
     (shell-command (format "sed -i 's/background =.*/background = \"%s\"/g' ~/.config/dunst/dunstrc" (face-foreground 'default)))
     (shell-command (format "sed -i 's/foreground =.*/foreground = \"%s\"/g' ~/.config/dunst/dunstrc" (face-background 'default)))
     (efs/run-in-background "killall dunst")
@@ -119,22 +141,20 @@ applied to gnome-settings or xfce-conf."
     (when (< 100 lg/transparency-alpha) (setq lg/transparency-alpha 100))
     (when (> 0 lg/transparency-alpha) (setq lg/transparency-alpha 0))
     (set-frame-parameter
-     nil 'alpha lg/transparency-alpha)))
+     nil 'alpha lg/transparency-alpha))
+
+  (lg/toggle-transparency))
 
 ;;; Modeline
 ;;;; Moody
 (use-package moody
   :straight t
   :demand t
-  :hook (after-init . lg/force-moody)
+  :custom
+  (moody-mode-line-height 20)
+  (x-underline-at-descent-line t)
   :config
-  (setq moody-mode-line-height 20)
-  (setq x-underline-at-descent-line t)
-  ;; modeline
-  ;; https://emacs.stackexchange.com/questions/5529/how-to-right-align-some-items-in-the-modeline
-  ;; write a function to do the spacing
-
-  (defvar mode-line-format-left
+  (setq-default mode-line-format
     '("%e"
       mode-line-front-space
       mode-line-mule-info
@@ -146,45 +166,10 @@ applied to gnome-settings or xfce-conf."
       "   "
       mode-line-position
       evil-mode-line-tag
-      (vc-mode moody-vc-mode))
-    "Content of the left of the modeline")
-
-  (defvar mode-line-format-right
-    '("%e"
-      mode-line-modes)
-     ; mode-line-misc-info)
-     ; mode-line-end-spaces)
-    "Content of the right of the modeline")
-
-  (defun simple-mode-line-render (left right)
-    "Return a string of `window-width' length containing LEFT, and RIGHT
- aligned respectively."
-    (let* ((available-width (- (window-width) (length left) 2)))
-      (format (format " %%s %%%ds " available-width) left right)))
-
-  (defun lg/force-moody ()
-    "Redisplay moody after loading emacs."
-    (setq-default mode-line-format
-	  '((:eval (simple-mode-line-render
-		    (format-mode-line mode-line-format-left)
-		    (format-mode-line mode-line-format-right))))))
-  (lg/force-moody))
+      (vc-mode moody-vc-mode)
+      mode-line-modes)))
 					;(moody-replace-mode-line-buffer-identification)
 					;(moody-replace-vc-mode))
-
-;;; Dashboard
-(use-package dashboard
-  :straight t
-  :demand t
-  :custom
-  (dashboard-set-init-info nil)
-  (dashboard-center-content t)
-  (dashboard-startup-banner 'logo)
-  (dashboard-set-heading-icons t)
-  (dashboard-set-file-icons t)
-  (dashboard-set-navigator t)
-  :config
-  (dashboard-setup-startup-hook))
 
 ;;; Helpful
 (use-package helpful
@@ -205,13 +190,14 @@ applied to gnome-settings or xfce-conf."
 
 ;;; Outline
 (use-package outline
-  :diminish outline-mode
+  :diminish outline-minor-mode
   :defer t)
 
 ;;; Icons
 ;;;; all-the-icons
 (use-package all-the-icons
   :straight t
+  :defer t
   :custom
   (all-the-icons-scale-factor 1.0)
   :config
@@ -310,43 +296,61 @@ settings applied to them."
   :commands load-theme
   :straight t)
 
+;;;; spacemacs themes
+(use-package spacemacs-theme
+  :commands load-theme
+  :straight t)
+
 ;;;; Circadian
 (use-package circadian
   :straight t
+  :demand t
   :custom
   (calendar-latitude 48.856613)
   (calendar-longitude 2.352222)
   (circadian-themes '((:sunrise . modus-operandi)
 		      (:sunset . modus-vivendi)))
   :config
-  ;; (defun circadian-enable-theme (theme)
-  ;;   "Clear previous `custom-enabled-themes' and load THEME."
-  ;;   (unless (equal (list theme) custom-enabled-themes)
-  ;;     ;; Only load the argument theme, when `custom-enabled-themes'
-  ;;     ;; does not contain it.
-  ;;     (mapc #'disable-theme custom-enabled-themes)
-  ;;     (condition-case nil
-  ;; 	  (progn
-  ;; 	    (run-hook-with-args 'circadian-before-load-theme-hook theme)
-  ;; 	    (load-theme theme) ;; (load-theme theme t)
-  ;; 	    (message "circadian.el — enabled %s" theme)
-  ;; 	    (run-hook-with-args 'circadian-after-load-theme-hook theme))
-  ;; 	(error "Problem loading theme %s" theme))))
   (circadian-setup))
+
+
+;;; Dashboard
+(use-package dashboard
+  :straight t
+  :after circadian
+  ;:demand t
+  :custom
+  (dashboard-set-init-info nil)
+  (dashboard-center-content t)
+  (dashboard-startup-banner 'logo)
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+  (dashboard-set-navigator t)
+  (dashboard-items '((recents . 5)
+		     (bookmarks . 5)))
+  :config
+  (dashboard-setup-startup-hook))
 
 ;;; Tabs
 ;;;; tab-bar
 (use-package tab-bar
+  :bind ("s-?" . tab-bar-mode)
+  :custom (tab-bar-format '(tab-bar-format-history
+			    tab-bar-format-tabs-groups
+			    tab-bar-separator
+			    tab-bar-format-add-tab
+			    tab-bar-format-align-right
+			    tab-bar-format-global))
   :config
-  (setq tab-bar-format '(;; tab-bar-format-tabs
-			 tab-bar-format-align-right
-			 tab-bar-format-global))
   (tab-bar-mode -1))
 
 ;;;; centaur-tabs
 (use-package centaur-tabs
-  :demand t
   :straight t
+  :bind ("s-/" . centaur-tabs-mode)
+  :bind (:map evil-normal-state-map
+	 ("gt" . centaur-tabs-forward)
+	 ("gT" . centaur-tabs-backward))
   :general
   (general-def :states 'normal "C-t" 'centaur-tabs--create-new-tab)
   :hook
@@ -357,32 +361,35 @@ settings applied to them."
     ibuffer-sidebar-mode
     ibuffer-mode
     dired-sidebar-mode
-    dired-mode
     pdf-outline-buffer-mode
     exwm-floating-setup
     calc-mode
     calc-trail-mode) . centaur-tabs-local-mode)
+  (after-load-theme . centaur-tabs-display-update)
+  (after-load-theme . centaur-tabs-headline-match)
+  :custom
+  (centaur-tabs-style "slant")
+  (centaur-tabs-set-modified-marker t)
+  (centaur-tabs-set-icons t)
+  (centaur-tabs-gray-out-icons t)
+  (centaur-tabs-set-bar 'under)
+  (centaur-tabs-set-bar nil)
+  (centaur-tabs-show-navigation-buttons t)
+  (centaur-tabs-show-new-tab-button t)
+  (centaur-tabs-height 20)
+  (centaur-tabs-bar-height 20)
+  (centaur-tabs-enable-ido-completion nil)
+  (centaur-tabs-cycle-scope 'tabs)
+  (centaur-tabs-plain-icons nil)
+  (centaur-tabs-label-fixed-length 15)
+  (uniquify-separator "/")
   :config
-  (setq centaur-tabs-style "bar")
-  (setq centaur-tabs-set-modified-marker t)
-  (setq centaur-tabs-set-icons t)
-  (setq centaur-tabs-gray-out-icons t)
-  (setq centaur-tabs-set-bar 'under)
-  (setq centaur-tabs-set-bar nil)
-  (setq centaur-tabs-show-navigation-buttons t)
-  (setq centaur-tabs-show-new-tab-button t)
-  (setq centaur-tabs-height 20)
-  (setq centaur-tabs-bar-height 20)
-  (setq centaur-tabs-enable-ido-completion nil)
-  (setq centaur-tabs-cycle-scope 'tabs)
-  (setq centaur-tabs-plain-icons nil)
-  (setq centaur-tabs-label-fixed-length 15)
-  (setq uniquify-separator "/")
   (centaur-tabs-mode +1))
 
 ;;;; lg-centaur-tabs : further configuration for centaur-tabs
 (use-package lg-centaur-tabs
-  :load-path "~/.emacs.d/lisp/site-packages/")
+  :load-path "~/.emacs.d/lisp/site-packages/"
+  :after centaur-tabs)
 
 ;;; display-line-numbers
 (use-package display-line-numbers
@@ -434,9 +441,15 @@ settings applied to them."
 
 ;;;; good-scroll
 (use-package good-scroll
+  :disabled t
   :straight t
   :config
   (good-scroll-mode +1))
+
+;;;; pixel scroll mode
+(use-package pixel-scroll
+  :straight nil
+  :config (pixel-scroll-mode +1))
 
 ;;; hl-line
 (use-package hl-line
@@ -462,7 +475,7 @@ settings applied to them."
   :defer t
   :straight t
   :custom
-  (visual-fill-column-width 110)
+  (visual-fill-column-width 130)
   (visual-fill-column-center-text t)
   :init
   (defun lg/activate-visual-fill-center ()
@@ -474,6 +487,25 @@ settings applied to them."
     (if visual-fill-column-mode
 	(visual-fill-column-mode -1)
       (visual-fill-column-mode +1)))
-  :hook (org-mode . lg/activate-visual-fill-center))
+  :hook
+  (Info-mode . lg/activate-visual-fill-center)
+  (org-mode . lg/activate-visual-fill-center)
+  (minibuffer-mode . lg/activate-visual-fill-center))
+
+;;; page-break-lines
+(use-package page-break-lines
+  :straight t
+  :diminish page-break-lines-mode
+  :config
+  (global-page-break-lines-mode +1))
+
+;;; Eros : Evaluation Result Overlays 
+(use-package eros
+  :straight t
+  :config (eros-mode +1))
+
+;;; Sublimity
+(use-package sublimity
+  :straight t)
 
 (provide 'lg-ui)

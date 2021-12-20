@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; lg-keybindings: basic configuration needed for the keybindings
 ;; Author: Lucas Gruss
 
@@ -7,11 +8,10 @@
   :init
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
+  (setq evil-want-Y-yank-to-eol t)
   (setq evil-undo-system 'undo-redo)
-  :config
-  (my-leader-def :keymaps 'override "" 'lg/transient-root)
-  ;; activate evil-mode
-  (evil-mode +1))
+  :bind (:map evil-visual-state-map ("gr" . eval-last-sexp))
+  :config (evil-mode +1))
 
 ;;; Evil-collection
 (use-package evil-collection
@@ -38,175 +38,76 @@
 (use-package evil-ledger
   :straight t
   :hook (ledger-mode . evil-ledger-mode)
-  :after ledger-mode)
+  :after ledger-mode
+  :config
+  (when (featurep 'transient)
+    (general-define-key
+     :states 'normal 
+     :keymaps 'evil-ledger-mode-map
+      "<localleader>" 'lg/transient-ledger)))
+
+;;; evil-org
+(use-package evil-org
+  :straight (:type git :host github :repo "Somelauw/evil-org-mode")
+  :hook (org-mode . evil-org-mode)
+  :commands (org-agenda)
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 
 ;;; Evil-anzu
 (use-package evil-anzu
   :straight t
   :diminish anzu-mode
+  :defer t
   :config (global-anzu-mode +1))
 
 ;;; Evil-escape
+;; see for improvement: https://blog.d46.us/advanced-emacs-startup/
 (use-package evil-escape
   :straight t
   :diminish evil-escape-mode
+  :commands (evil-escape-pre-command-hook)
+  :hook (pre-command . evil-escape-pre-command-hook)
   :custom
   (evil-escape-key-sequence "jk")
   (evil-escape-excluded-major-modes '(magit-status-mode))
+  :config (evil-escape-mode +1))
+
+(use-package evil-goggles
+  :straight t
+  :diminish evil-goggles-mode
+  :after evil
+  :hook (prog-mode . evil-goggles-mode)
+  :custom
+  (evil-goggles-enable-surround t)
+  (evil-goggles-duration 0.3))
+
+;; evil-surround
+(use-package evil-surround
+  :straight t
+  :after evil
+  :config (global-evil-surround-mode +1))
+
+;; evil-numbers
+(use-package evil-numbers
+  :straight t
+  :after evil
   :config
-  (evil-escape-mode +1))
+  (evil-define-key '(normal visual) 'global (kbd "g +") 'evil-numbers/inc-at-pt)
+  (evil-define-key '(normal visual) 'global (kbd "g -") 'evil-numbers/dec-at-pt)
+  (evil-define-key '(normal visual) 'global (kbd "g C-+") 'evil-numbers/inc-at-pt-incremental)
+  (evil-define-key '(normal visual) 'global (kbd "g C--") 'evil-numbers/dec-at-pt-incremental))
 
 ;;; Which-key
 (use-package which-key
   :diminish which-key-mode
   :straight t
-  :custom
-  (which-key-idle-delay 0.7)
-  :config
-  (which-key-mode +1))
+  :custom (which-key-idle-delay 0.7)
+  :config (which-key-mode +1))
 
 ;;; Hercules
 (use-package hercules
   :straight t)
-
-;;; Transient
-(use-package transient
-  :straight t
-  :after all-the-icons
-  :config
-  (define-transient-command lg/transient-root ()
-    "Main transient, accessed through SPC"
-    [["Quick access"
-      ("SPC" "M-x" execute-extended-command)
-      ("S-SPC" "M-X : buffer" execute-extended-command-for-buffer)
-      ("x" "Org capture" org-capture)]
-     ["Dispatch"
-      ("b" "Buffers/Bookmarks" lg/transient-b)
-      ("e" "Emms" lg/transient-e)
-      ("f" "Files" lg/transient-f)
-      ("h" "Help" lg/transient-h)
-      ("m" "Manage" lg/transient-m)
-      ("o" "Open/Org" lg/transient-o)
-      ("q" "Quit" lg/transient-q)
-      ("s" "Search/Sidebar" lg/transient-s)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-b ()
-    "Buffers"
-    [["Buffers"
-      ("b" "Switch to buffer" switch-to-buffer)
-      ("i" "iBuffer" ibuffer)
-      ("o" "Switch to buffer in other window" switch-to-buffer-other-window)]
-     ["Bookmarks"
-      ("j" "Save" bookmark-jump)
-      ("s" "Save" bookmark-save)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-c ()
-    "Completion"
-    [["Consult"
-      ("r" ("Consult ripgrep") consult-ripgrep)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-e ()
-    "Emms"
-    [["Emms"
-      ("a" "Show all" emms-show-all)
-      ("b" "Music library (sidebar)" lg/find-music-directory)
-      ("e" "Pause" emms-pause)
-      ("j" "Next" emms-next)
-      ("k" "Previous" emms-previous)
-      ("p" "Playlist (sidebar)" lg/emms-go-playlist)
-      ("r" "Radios" emms-streams)
-      ("s" "Stop" emms-stop)
-      ("S" "Shuffle" emms-shuffle)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-f ()
-    "Files"
-    [["Files"
-      ("f" "Open file" find-file)
-      ("o" "Find in other window" find-file-other-window)
-      ("r" "Recent" consult-recent-file)
-      ("s" "Save" save-buffer)]
-     ["Configuration files"
-      ("d" "dotfiles" (lambda () (interactive) (dired "~/dotfiles")))
-      ("e" ".emacs.d" lg/visit-configuration)
-      ("p" "Package" lg/consult-use-package)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-h ()
-    "Help"
-    [["Help and documentation"
-      ("c" "Command (helpful)" helpful-command)
-      ("f" "Functions (helpful)" helpful-callable)
-      ("h" "Thing at point (helpful)" helpful-at-point)
-      ("i" "Info" info)
-      ("k" "Key (helpful)" helpful-key)
-      ("m" "Mode" describe-mode)
-      ("o" "Symbol (helpful)" helpful-symbol)
-      ("p" "Package" describe-package)
-      ("v" "Variable (helpful)" helpful-variable)]
-     ["Helper functions"
-      ("r" "Reload configuration" lg/reload-configuration)
-      ("t" "Change theme" load-theme)]
-     ["Profiling"
-      ("s" "Start up profiler (esup)" esup)
-      ("P" "Start profiler" profiler-start)
-      ("S" "Stop profiler" profiler-stop)
-      ("R" "Profiler report" profiler-report)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-m ()
-    "Manage"
-    [["System packages"
-      ("i" "Install package" system-packages-install)
-      ("s" "Search packages" system-packages-search)
-      ("u" "Update packages" system-packages-update)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-o ()
-    "Open/Org"
-    [["Open"
-      ("a" "Application" app-launcher-run-app)
-      ("b" "Bluetooth" bluetooth-list-devices)
-      ("c" "Calendar" calendar)
-      ("C" "Calc" calc)
-      ("d" "Dired" dired)
-      ("f" "Elfeed" elfeed)
-      ("g" "Magit" magit-status)
-      ("p" "Pass" pass)
-      ("P" "Proced" proced)
-      ("r" "Ripgrep" rg)
-      ("t" "Terminal" vterm)
-      ("u" "Disk-usage" disk-usage)
-      ;;("s" "Smudge" lg/transient-smudge)
-      ("w" "Eww" eww)
-      ("W" " Weather (wttrin)" wttrin)]
-     ["Org"
-      ("A" "Agenda" org-agenda)
-      ("i" "Clock in" org-clock-in)
-      ("o" "Clock out" org-clock-out)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-q ()
-    "Quit"
-    [["Quit"
-      ("e" "Exit emacs" (lambda () (interactive) (when (y-or-n-p "Really exit emacs ?") (kill-emacs))))
-      ("q" "Turn computer off" lg/poweroff-computer)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-s ()
-    "Search/sidebars"
-    [["Search"
-      ("s" "Consult line" consult-line)
-      ("r" "Ripgrep" rg)]
-     ["Sidebars"
-      ("b" "iBuffer-sidebar" ibuffer-sidebar-toggle-sidebar)
-      ("d" "Dired-sidebar" dired-sidebar-toggle-sidebar)
-      ("m" "Emms-sidebar" lg/find-music-directory)
-      ("o" "Org-sidebar" org-sidebar-toggle)
-      ("p" "Emms-sidebar" lg/emms-go-playlist)]]
-    [:hide (lambda () t)]))
 
 (provide 'lg-keybindings)

@@ -1,6 +1,5 @@
+;; -*- lexical-binding: t; -*-
 ;;; core.el : core packages needed for my configuration
-
-(server-start)
 
 (setq native-comp-async-report-warnings-errors nil)
 (setq native-comp-async-jobs-number 4)
@@ -25,10 +24,15 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; USE-PACKAGE
+(setq straight-disable-native-compile nil)
+(setq straight-disable-native-compilation nil)
+(setq straight-disable-byte-compilation nil)
+(setq straight-disable-compile nil)
+
+;;; use-package
 (straight-use-package 'use-package)
 (use-package bind-key :straight t) ;; needed for the :bind keyword
-(use-package use-package-ensure-system-package :straight t) ;; needed for the :ensure-system-package keyword
+(use-package use-package-ensure-system-package :straight t :defer t) ;; needed for the :ensure-system-package keyword
 (use-package diminish :straight t)  ;; needed for the :diminish keyword
 
 (use-package general ;; needed for the :general keyword
@@ -55,26 +59,51 @@
 ;; built-in package manager
 (use-package package
   :straight nil
-  :defer 5
+  :defer t
   :commands (describe-package)
-  :config (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")))
+  :config
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")))
 
+;;; Super save mode
+(use-package super-save
+  :straight t
+  :diminish super-save-mode
+  :config (super-save-mode +1))
+
+;;; Emacs
 (use-package emacs
   :straight nil
+  :defer 5
+  :diminish (auto-revert-mode eldoc-mode)
+  :bind
+  ("s-<escape>" . 'lg/kill-this-buffer)
+  ("s-b" . 'bury-buffer)
+  :general
+  (general-def :states 'normal :keymaps 'Info-mode-map
+    "RET" 'Info-follow-nearest-node)
+  (general-def :states '(normal visual) :keymaps 'eww-mode-map
+    "i" 'evil-insert)
+  :custom
+  (idle-update-delay 0.3)
+  (comp-async-report-warnings-errors nil)
+  (make-backup-files nil)
+  (ring-bell-function 'ignore)
+  (x-select-enable-primary t)
+  (select-enable-clipboard t)
+  (inhibit-startup-screen t)
+  (y-or-n-p-use-read-key t)
+  (x-select-enable-clipboard-manager t)
+  (recentf-max-saved-items 100)
   :config
+  (server-start)
+  (recentf-mode +1)
+  (show-paren-mode +1)
+  (auto-revert-mode +1)
+  (global-eldoc-mode +1)
   (fset 'yes-or-no-p 'y-or-n-p)
-  (setq idle-update-delay 0.3)
-  (setq comp-async-report-warnings-errors nil)
-  (setq make-backup-files nil)
-  (setq ring-bell-function 'ignore)
-  (setq x-select-enable-primary t)
-  (setq select-enable-clipboard t)
-  (setq inhibit-startup-screen t)
-  (setq y-or-n-p-use-read-key t)
-  (setq x-select-enable-clipboard-manager t)
-  (setq recentf-max-saved-items 100)
-  (setq custom-file "~/.emacs.d/lisp/custom.el")
-  (load-file custom-file)
+  (load (setq custom-file "~/.emacs.d/lisp/custom.el"))
+  (setq-default fill-column 80)
+  ;; (set-frame-name "GNU Emacs at debian")
 
   (defun lg/visit-configuration ()
     "Prompt to get the configuration directory"
@@ -105,11 +134,8 @@
     (let ((command-parts (split-string command "[ ]+")))
       (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
-  (recentf-mode +1)
-  (show-paren-mode +1)
-  :bind ("s-<escape>" . 'lg/kill-this-buffer)
-  :general
-  (general-def :states 'normal :keymaps 'Info-mode-map
-    "RET" 'Info-follow-nearest-node))
+  (defun lg/swap-caps-control ()
+    (interactive)
+    (efs/run-in-background "setxkbmap gb -variant extd -option ctrl:nocaps")))
 
 (provide 'core)

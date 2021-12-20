@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; lg-tools: tools for emacs, to do everything in emacs
 ;; Author: Lucas Gruss
 
@@ -23,6 +24,7 @@
   :straight t
   :after dired
   :commands (dired-sidebar-find-file dired-sidebar-toggle)
+  :bind (:map dired-sidebar-mode-map ("<localleader>m" . emms-play-dired))
   :general
   (general-def :keymaps 'dired-sidebar-mode-map :states 'normal
     "h" #'dired-sidebar-up-directory
@@ -43,24 +45,20 @@
 (use-package elfeed
   :straight t
   :commands (elfeed elfeed-update)
+  :custom
+  (elfeed-feeds
+   '(("https://xkcd.com/atom.xml" comic)
+     ("https://protesilaos.com/codelog.xml" code)
+     ("https://blog.tecosaur.com/tmio/rss.xml" org)
+     ("https://www.youtube.com/feeds/videos.xml?channel_id=UC0uTPqBCFIpZxlz_Lv1tk_g" protesilaos)
+     ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL0H7ONNEUnnt59niYAZ07dFTi99u2L2n_" ouvrez_les_guillements usul)
+     ("https://www.youtube.com/feeds/videos.xml?channel_id=UCKH_iLhhkTyt8Dk4dmeCQ9w" science)
+     ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL43OynbWaTMLEbdAWr-DnAfveOonmhlT1" france_inter)
+     "https://api.lemediatv.fr/rss.xml"))
   :config
   (use-package lg-elfeed
-    :load-path "~/.emacs.d/lisp/site-packages")
-  (setq elfeed-feeds
-	'(("https://xkcd.com/atom.xml" comic)
-	  ("https://protesilaos.com/codelog.xml" code)
-	  ("https://blog.tecosaur.com/tmio/rss.xml" org)
-	  ("https://www.youtube.com/feeds/videos.xml?channel_id=UC0uTPqBCFIpZxlz_Lv1tk_g" protesilaos)
-	  ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL0H7ONNEUnnt59niYAZ07dFTi99u2L2n_" ouvrez_les_guillements usul)
-	  ("https://www.youtube.com/feeds/videos.xml?channel_id=UCKH_iLhhkTyt8Dk4dmeCQ9w" science)
-	  ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL43OynbWaTMLEbdAWr-DnAfveOonmhlT1" france_inter)
-	  "https://api.lemediatv.fr/rss.xml")))
-  ;; :bind ((:map elfeed-search-mode-map
-  ;;         ("v" . #'elfeed-view-mpv)
-  ;;         ("a" . #'elfeed-listen-mpv))
-  ;;        (:map elfeed-show-mode-map
-  ;;         ("v" . #'elfeed-view-mpv)
-  ;;         ("a" . #'elfeed-listen-mpv)))
+    :load-path "~/.emacs.d/lisp/site-packages"
+    :after elfeed))
 
 ;;; Elfeed-org
 (use-package elfeed-org
@@ -78,7 +76,7 @@
 			  (mp3info . mp3info)
 			  (mpv . mpv)
 			  (mplayer . mplayer))
-  :defer 5
+  :defer t
   :custom
   (emms-source-file-default-directory "~/Audio/Musique/")
   (emms-streams-file "~/.config/doom/emms/streams.emms")
@@ -95,11 +93,22 @@
     ;;(find-file "~/Audio/Musique")
     (let ((default-directory "~/Audio/Musique"))
       (dired-sidebar-toggle-sidebar)))
+
+  (defun lg/emms-go-playlist ()
+    "Go to the playlist buffer. This function exist for the sake of
+the display-buffer-alist variable and enable the display of the
+playlist in a side-window"
+    (interactive)
+    (display-buffer-in-side-window (get-buffer-create "*Music*")
+				   lg/emms-sidebar-display-alist)
+    (let ((window (get-buffer-window (get-buffer "*Music*"))))
+      (when emms-sidebar-no-delete-other-windows
+	(set-window-parameter window 'no-delete-other-windows t))
+      (set-window-dedicated-p window t)
+      (with-selected-window window
+	(let ((window-size-fixed))
+	  (dired-sidebar-set-width dired-sidebar-width)))))
   :general
-  (my-local-leader-def
-    :keymaps 'dired-sidebar-mode-map
-    "" nil
-    "m" #'emms-play-dired)
   (general-def :states 'normal :keymaps 'emms-playlist-mode-map
     "q" #'emms-playlist-mode-bury-buffer)
 
@@ -116,21 +125,6 @@
   (defcustom lg/emms-sidebar-display-alist '((side . left)
 					     (slot . -2))
     "Parameters for the display of the emms-sidebar.")
-
-  (defun lg/emms-go-playlist ()
-    "Go to the playlist buffer. This function exist for the sake of
-the display-buffer-alist variable and enable the display of the
-playlist in a side-window"
-    (interactive)
-    (display-buffer-in-side-window (get-buffer-create "*Music*")
-				   lg/emms-sidebar-display-alist)
-    (let ((window (get-buffer-window (get-buffer "*Music*"))))
-      (when emms-sidebar-no-delete-other-windows
-	(set-window-parameter window 'no-delete-other-windows t))
-      (set-window-dedicated-p window t)
-      (with-selected-window window
-	(let ((window-size-fixed))
-	  (dired-sidebar-set-width dired-sidebar-width)))))
 
   (add-hook 'emms-player-stopped-hook #'lg/emms-kill-mpv))
 
@@ -149,14 +143,16 @@ playlist in a side-window"
 
 ;;;; Espotify
 (use-package espotify
-  :commands (espotify-next espotify-previous espotify-play-pause)
+  :disabled t
+  :custom (espotify-service-name "spotifyd")
   :straight t)
 
 ;;; Pdf-tools
 (use-package pdf-tools
   :straight t
-  :hook (pdf-view-mode . (lambda () (blink-cursor-mode -1)
-			   (setq-local cursor-type nil)))
+  :hook
+  (pdf-view-mode . (lambda () (blink-cursor-mode -1) (setq-local cursor-type nil)))
+  (pdf-view-mode . pdf-isearch-minor-mode)
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
   :config
@@ -188,7 +184,7 @@ playlist in a side-window"
 ;; run-or-raise-or-dismiss for vterm
 (use-package vterm-toggle
   :straight t
-  :after vterm
+  :defer t
   :bind ("s-<return>" . 'vterm-toggle)
   :custom
   (vterm-toggle-fullscreen-p nil))
@@ -216,6 +212,7 @@ playlist in a side-window"
 ;;;; exec-path-from-shell
 (use-package exec-path-from-shell
   :straight t
+  :defer 10
   :config
   (exec-path-from-shell-initialize))
 
@@ -229,13 +226,15 @@ playlist in a side-window"
 ;;;; Magit
 (use-package magit
   :straight t
-  :ensure-system-package git
-  :commands magit-status)
+  :defer t
+  :commands magit-status
+  :ensure-system-package git)
 
 ;;;; Magit-todos
 (use-package magit-todos
   :straight t
-  :after magit
+  :commands magit-status
+  :defer t
   :config
   (magit-todos-mode +1))
 
@@ -243,6 +242,10 @@ playlist in a side-window"
 (use-package bluetooth
   :straight t
   :commands bluetooth-list-devices)
+
+;;;; Pulseaudio
+(use-package pulseaudio-control
+  :straight t)
 
 ;;;; Disk-usage
 (use-package disk-usage
@@ -291,8 +294,30 @@ playlist in a side-window"
 
 ;;; Ledger mode
 (use-package ledger-mode
+  :ensure-system-package ledger
   :straight t
-  :defer t)
+  :defer t
+  :magic ("\\.ledger$" . ledger-mode)
+  :custom
+  (ledger-schedule-file "~/Documents/factures/ledger/schedule.ledger")
+  (ledger-post-amount-alignment-column 65)
+  (ledger-reports 
+   '(("bal" "%(binary) --real -f %(ledger-file) bal")
+     ("reg" "%(binary) -f %(ledger-file) reg")
+     ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")
+     ("account" "%(binary) -f %(ledger-file) reg %(account)")
+     ("budget" "%(binary) --empty -S -T -f %(ledger-file) bal ^Budget:")))
+  :config
+  (add-hook 'ledger-mode-hook
+	    (lambda ()
+	      (setq-local tab-always-indent 'complete)
+	      (setq-local completion-cycle-threshold t)
+	      (setq-local ledger-complete-in-steps t)))
+  (progn
+    ;; org-cycle allows completion to work whereas outline-toggle-children does not
+    (evil-define-key evil-normal-state-map evil-ledger-mode-map (kbd "TAB") #'org-cycle)
+    (add-hook 'ledger-mode-hook #'outline-minor-mode)
+    (font-lock-add-keywords 'ledger-mode outline-font-lock-keywords)))
 
 ;;; Scanner
 (use-package scanner
@@ -305,6 +330,7 @@ playlist in a side-window"
   :straight t)
 
 ;;; Zotero
+;; this is meant to be used with an account, this is a wrapper to the web API
 (use-package zotero
   :disabled t
   :straight t
@@ -313,10 +339,18 @@ playlist in a side-window"
   (zotero-sync)
   (zotero-browser-sync))
 
+;;; Zotxt
+;; the zotxt plugin for zotero has to be installed
+;; https://github.com/egh/zotxt
+(use-package zotxt
+  :straight t
+  :defer t)
+
 ;;; App-launcher
 (use-package app-launcher
   :straight (app-launcher :type git :host github
 			  :repo "SebastienWae/app-launcher")
+  :commands app-launcher-run-app
   :bind ("s-d" . 'app-launcher-run-app))
 
 ;;; wttrin
@@ -340,5 +374,95 @@ playlist in a side-window"
 ;;; Deamons
 (use-package daemons
   :straight t)
+
+;;; finito
+;; (use-package finito
+;;   :straight (finito :type git :repo "LaurenceWarne/finito.el")
+;;   :config
+;;   (finito-download-server-if-not-exists
+;;    ;; Optional, but we can specify a callback to run when the server has
+;;    ;; finished downloading, we choose here to start the server to override
+;;    ;; the default lazy behaviour which starts the server whenever a finito
+;;    ;; command is invoked
+;;    (lambda () (finito-start-server-if-not-already))))
+
+;;; browse-url
+(use-package browse-url
+  :straight nil
+  :commands (browse-url-umpv browse-url-at-point-umpv)
+  :config
+  (defun browse-url-umpv (url &optional single)
+    (start-process "mpv" nil (if single "mpv" "umpv")
+		   (shell-quote-wildcard-pattern url)))
+
+  (defun browse-url-at-point-umpv (&optional single)
+    "Open link in mpv"
+    (interactive "P")
+    (let ((browse-url-browser-function
+	   (if single
+	       (lambda (url &optional _new-window) (browse-url-umpv url t))
+	     #'browse-url-umpv)))
+      (browse-url-at-point))))
+
+;;; Simple-httpd
+(use-package simple-httpd
+  :straight t
+  :defer t)
+
+;;; Avy
+(use-package avy
+  :straight t)
+
+;;; yasnippets
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :straight t
+  :hook
+  (org-mode . yas-minor-mode-on)
+  (prog-mode . yas-minor-mode-on))
+
+;;;; Yasnippet-snippets
+(use-package yasnippet-snippets
+  :straight t
+  :after yasnippet)
+
+;;;; Consult-yasnippet
+(use-package consult-yasnippet
+  :straight t
+  :after yasnippet)
+
+;;; yequake
+(use-package yequake
+  :straight t
+  :defer t
+  :custom
+  (yequake-frames
+   '(("org-capture" 
+      (buffer-fns . (yequake-org-capture))
+      (width . 0.75)
+      (height . 0.5)
+      (alpha . 0.95)
+      (frame-parameters . ((undecorated . t)
+                           (skip-taskbar . t)
+                           (sticky . t))))
+     ("app-launcher"
+      (buffer-fns . (yequake-org-capture))
+      (width . 0.75)
+      (height . 0.5)
+      (alpha . 0.95)
+      (frame-parameters . ((undecorated . t)
+                           (skip-taskbar . t)
+                           (sticky . t)))))))
+
+;;; flyspell
+(use-package flyspell
+  :straight t
+  :hook (org-mode . flyspell-mode))
+
+;;; flyspell-correct
+;; provide interface through completing-read
+(use-package flyspell-correct
+  :straight t
+  :after flyspell)
 
 (provide 'lg-tools)
