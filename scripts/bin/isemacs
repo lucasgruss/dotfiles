@@ -1,0 +1,9 @@
+#!/bin/bash 
+
+CURRENT_PROG=$(xdotool getwindowfocus getwindowclassname)
+# if [[ $CURRENT_PROG == *"GNU Emacs at debian"* ]]; then
+if [[ $CURRENT_PROG == "Emacs" ]]; then
+    exit 
+else
+    exit 1
+fi

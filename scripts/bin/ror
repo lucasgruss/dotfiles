@@ -1,0 +1,15 @@
+#!/bin/bash 
+
+PROG_NAME=$1
+PROG_CMD=$2
+CURRENT_PROG=$(xdotool getwindowfocus getwindowclassname)
+
+echo $CURRENT_PROG
+echo $PROG_NAME
+if [[ $CURRENT_PROG == *"$PROG_NAME"* ]]; then
+    xdotool windowminimize $(xdotool getactivewindow) 
+    exit 1
+else
+    wmctrl -xa $PROG_NAME || $PROG_CMD
+    exit 0
+fi
