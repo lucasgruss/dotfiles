@@ -135,7 +135,7 @@
 ;;; Company-ledger
 (use-package company-ledger
   :straight t
-  ;:disabled t
+  :disabled t
   :after company
   :config
   (add-to-list 'company-backends 'company-ledger))
