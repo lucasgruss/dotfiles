@@ -7,8 +7,16 @@ image-dired/
 straight/
 transient/
 var/
-
+request/
+url/
+webkit/
+projects/
+finito/
+bookmarks/
+.cache/
+lisp/private.el
 custom.el
+.lsp-session*
 recentf
 session.*
 tramp
