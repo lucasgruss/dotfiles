@@ -5,8 +5,10 @@
 ;;; Org
 (use-package org
   ;;:mode ("\\.org\\'" . org-mode)
+  :straight t
   :hook ((org-mode . variable-pitch-mode)
-	 (org-mode . auto-fill-mode))
+	 (org-mode . auto-fill-mode)
+	 (after-save . org-table-recalculate-buffer-tables))
   :init
   (defun org-clocking-buffer () nil) ;; without it, impossible to exit emacs with C-x C-c
   (setq org-directory "~/org/")
@@ -56,6 +58,7 @@
 
 ;;; org-agenda
 (use-package org-agenda
+  :after org
   :config
   ;; Mostly inspired from Protesilaos Stavrou's configuration  
   ;; https://protesilaos.com/codelog/2021-12-09-emacs-org-block-agenda/
@@ -105,6 +108,7 @@
 ;;; org-journal
 (use-package org-journal
   :straight t
+  :commands (org-journal-new-entry)
   :custom
   (org-journal-dir "~/org/journal/")
   (org-journal-file-type 'monthly))
@@ -139,6 +143,7 @@
 
 ;;; Org-sidebar
 (use-package org-sidebar
+  :after org 
   :commands (org-sidebar org-sidebar-toggle)
   :straight t)
 
