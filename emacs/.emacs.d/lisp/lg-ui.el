@@ -221,7 +221,7 @@ applied to gnome-settings or xfce-conf."
   :custom
   (modus-themes-slanted-constructs t)
   (modus-themes-bold-constructs nil)
-  (modus-themes-fringes 'subtle) ; {nil,'subtle,'intense})
+  (modus-themes-fringes nil) ; {nil,'subtle,'intense})
   ;; Options for `modus-themes-lang-checkers': nil,
   ;; 'straight-underline, 'subtle-foreground,
   ;; 'subtle-foreground-straight-underline, 'intense-foreground,
@@ -231,7 +231,7 @@ applied to gnome-settings or xfce-conf."
   ;; Options for `modus-themes-mode-line': nil, '3d, 'moody,
   ;; 'borderless, 'borderless-3d, 'borderless-moody, 'accented,
   ;; 'accented-3d, 'accented-moody
-  (modus-themes-mode-line 'moody)
+  (modus-themes-mode-line 'accented-moody)
 
   ;; Options for `modus-themes-syntax': nil, 'faint,
   ;; 'yellow-comments, 'green-strings,
@@ -263,7 +263,7 @@ applied to gnome-settings or xfce-conf."
 
   ;; Options for `modus-themes-diffs': nil, 'desaturated,
   ;; 'fg-only, 'bg-only, 'deuteranopia,
-  (modus-themes-diffs 'deuteranopia) ;
+  (modus-themes-diffs nil) ;
   (modus-themes-org-blocks 'rainbow) ; {nil,'greyscale,'rainbow}
   (modus-themes-org-habit nil) ; {nil,'simplified,'traffic-light}
   (modus-themes-headings '((t . highlight)))
@@ -274,7 +274,33 @@ applied to gnome-settings or xfce-conf."
   (modus-themes-scale-2 1.15)
   (modus-themes-scale-3 1.21)
   (modus-themes-scale-4 1.27)
-  (modus-themes-scale-5 1.33))
+  (modus-themes-scale-5 1.33)
+
+  :config
+  (defun lg/modus-themes-custom-faces (theme &rest args)
+    (message (stringp theme))
+    (when (member theme '(modus-operandi modus-vivendi)) 
+      (set-face-attribute 'mode-line-inactive nil
+			  :background (modus-themes-color 'bg-main))
+      (set-face-attribute 'mode-line nil
+			  :background (modus-themes-color 'green-refine-bg))
+      ;; tabs
+      ;; (set-face-attribute 'tab-line nil
+      ;; 			  :background (modus-themes-color 'bg-main))
+      ;; (set-face-attribute 'tab-bar nil
+      ;; 			  :background (modus-themes-color 'bg-main))
+      ;; (set-face-attribute 'centaur-tabs-selected nil
+      ;; 			  :background (face-attribute 'mode-line :background)
+      ;; 			  :box nil)
+      ;; (set-face-attribute 'centaur-tabs-default nil
+      ;; 			  :background (face-attribute 'mode-line :background)
+      ;; 			  :box nil)
+      ;; (set-face-attribute 'centaur-tabs-unselected nil
+      ;; 			  :background (modus-themes-color 'bg-alt)
+      ;; 			  :box nil)
+      ))
+
+  (advice-add 'load-theme :after #'lg/modus-themes-custom-faces))
 
 ;;;; modus-themes-exporter
 (use-package modus-themes-exporter
@@ -301,13 +327,17 @@ settings applied to them."
   :commands load-theme
   :straight t)
 
+;;;; solar
+(use-package solar
+  :custom
+  (calendar-latitude 48.856613)
+  (calendar-longitude 2.352222))
+
 ;;;; Circadian
 (use-package circadian
   :straight t
   :demand t
   :custom
-  (calendar-latitude 48.856613)
-  (calendar-longitude 2.352222)
   (circadian-themes '((:sunrise . modus-operandi)
 		      (:sunset . modus-vivendi)))
   :config
@@ -317,7 +347,7 @@ settings applied to them."
 ;;; Dashboard
 (use-package dashboard
   :straight t
-  :after circadian
+;  :after circadian
   ;:demand t
   :custom
   (dashboard-set-init-info nil)
@@ -340,13 +370,19 @@ settings applied to them."
 			    tab-bar-separator
 			    tab-bar-format-add-tab
 			    tab-bar-format-align-right
-			    tab-bar-format-global))
+			    ;tab-bar-format-echo
+			    tab-bar-format-global
+			    ))
   :config
+  (defun tab-bar-format-echo ()
+    `((global menu-item ,(string-trim-right (with-current-buffer (get-buffer " *Echo Area 1*")
+					      (buffer-string))) ignore)))
   (tab-bar-mode -1))
 
 ;;;; centaur-tabs
 (use-package centaur-tabs
   :straight t
+  :after evil
   :bind ("s-/" . centaur-tabs-mode)
   :bind (:map evil-normal-state-map
 	 ("gt" . centaur-tabs-forward)
@@ -360,6 +396,7 @@ settings applied to them."
     calendar-mode
     ibuffer-sidebar-mode
     ibuffer-mode
+    dired-mode
     dired-sidebar-mode
     pdf-outline-buffer-mode
     exwm-floating-setup
@@ -368,7 +405,7 @@ settings applied to them."
   (after-load-theme . centaur-tabs-display-update)
   (after-load-theme . centaur-tabs-headline-match)
   :custom
-  (centaur-tabs-style "slant")
+  (centaur-tabs-style "bar")
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-set-icons t)
   (centaur-tabs-gray-out-icons t)
@@ -382,6 +419,7 @@ settings applied to them."
   (centaur-tabs-cycle-scope 'tabs)
   (centaur-tabs-plain-icons nil)
   (centaur-tabs-label-fixed-length 15)
+  (centaur-tabs-show-count t)
   (uniquify-separator "/")
   :config
   (centaur-tabs-mode +1))
@@ -507,5 +545,10 @@ settings applied to them."
 ;;; Sublimity
 (use-package sublimity
   :straight t)
+
+;;; rainbow mode
+(use-package rainbow-mode
+  :straight t
+  :hook (prog-mode . rainbow-mode))
 
 (provide 'lg-ui)
