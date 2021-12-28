@@ -24,6 +24,7 @@
       ("h" "Help" lg/transient-h)
       ("M" "Manage" lg/transient-M)
       ("o" "Open/Org" lg/transient-o)
+      ("p" "Project" lg/transient-p)
       ("q" "Quit" lg/transient-q)
       ("s" "Search/Sidebar" lg/transient-s)
       ("t" "Toggle" lg/transient-t)
@@ -86,6 +87,7 @@
     [["Help and documentation"
       ("c" "Command (helpful)" helpful-command)
       ("f" "Functions (helpful)" helpful-callable)
+      ("F" "Face" describe-face)
       ("h" "Thing at point (helpful)" helpful-at-point)
       ("i" "Info" info)
       ("k" "Key (helpful)" helpful-key)
@@ -143,6 +145,13 @@
       ("k" "Capture" org-capture)
       ("n" "Org-noter session" org-noter)
       ("o" "Clock out" org-clock-out)]]
+    [:hide (lambda () t)])
+
+  (define-transient-command lg/transient-p ()
+    "Project"
+    [["System packages"
+      ("c" "Compile" project-compile)
+      ("d" "Dired" project-dired)]]
     [:hide (lambda () t)])
 
   (define-transient-command lg/transient-q ()
