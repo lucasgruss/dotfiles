@@ -18,6 +18,7 @@
     "lg-lang"
     "lg-mail"
     "lg-org"
+    "lg-fun"
     ;; "lg-exwm"
     )
   "List of enabled modules in my configuration.")

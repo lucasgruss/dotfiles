@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 ;;; lg-fun --- Fun stuff in emacs 
-
+	
 ;;; Cowsay
 (use-package cowsay
   :straight t
@@ -9,19 +9,18 @@
 
 ;;; Suggest
 (use-package suggest
-  :straight t)
+  :straight t
+  :commands suggest)
 
 ;;; Magic buffer
 (use-package magic-buffer
+  :commands (magic-buffer)
   :straight (magic-buffer :host github :repo "sabof/magic-buffer"))
-
-;;; svg-clock
-(use-package svg-clock
-  :straight (svg-clock :host github :repo "RaminHAL9001/emacs-svg-clock"))
 
 ;;; dank-mode (reddit)
 (use-package dank-mode
   :straight (dank-mode :host github :repo "john2x/dank-mode")
+  :commands (dank-mode)
   :config
   (use-package markdown-mode
     :straight t))
@@ -32,7 +31,8 @@
   
 ;;; snow
 (use-package snow
-  :straight t)
+  :straight t
+  :commands snow)
 
 ;;; bonjour madame
 (use-package bonjourmadame
@@ -44,3 +44,5 @@
 	 "src=\"" (group "https://" (1+ nonl) "tumblr.com" (1+ nonl) "." (or "png" "jpg" "jpeg" "gif")) "\""
 	 (1+ space)
 	 "alt=\"" (group (0+ (not (any "\"")))) "\"")))
+
+(provide 'lg-fun)
