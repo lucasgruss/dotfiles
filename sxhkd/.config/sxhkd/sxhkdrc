@@ -1,0 +1,76 @@
+#
+# wm independent hotkeys
+#
+export PATH
+# terminal emulator
+super + Return
+      	isemacs && xdotool getwindowfocus key super+Return || (emacsclient -n -e '(yequake-toggle "yequake-vterm")')
+
+# (emacsclient -e "(vterm)" && ror Emacs emacs) 
+
+# browser
+super + i
+      	ror Firefox firefox-esr
+
+# browser
+super + s
+      	ror Spotify spotify
+
+# launcher
+super + d
+      	isemacs && xdotool getwindowfocus key super+d || xfce4-popup-whiskermenu
+
+# org capture
+super + c
+      	isemacs && xdotool getwindowfocus key super+c || (emacsclient -n -e '(yequake-toggle "org-capture")')
+
+# Emacs
+super + e
+      	ror "Emacs" emacs
+
+# thunderbird
+super + t
+      	ror thunderbird thunderbird
+
+# program launcher
+super + @space
+	dmenu_run
+
+# kill program / delete buffer
+super + Escape
+      isemacs && xdotool getwindowfocus key super+Escape || xdotool getwindowfocus key control+w
+
+#isemacs && xdotool getwindowfocus key super+Escape || xdotool getwindowfocus windowkill
+
+# make sxhkd reload its configuration files:
+super + z
+	notify-send "Restarting sxhkd" ; pkill -USR1 -x sxhkd
+	
+#
+# Emacs integration
+# 
+
+super + h
+      isemacs && xdotool getwindowfocus key super+h || notify-send h
+
+super + j
+      isemacs && xdotool getwindowfocus key super+j || notify-send j
+
+super + k
+      isemacs && xdotool getwindowfocus key super+k || notify-send k
+
+super + l
+      isemacs && xdotool getwindowfocus key super+l || notify-send l
+
+#
+# Key remapping
+#
+
+control + h
+	isemacs && xdotool getwindowfocus key control+h || xdotool getwindowfocus key Left 
+control + j
+	isemacs && xdotool getwindowfocus key control+j || xdotool getwindowfocus key Down
+control + k
+	isemacs && xdotool getwindowfocus key control+k || xdotool getwindowfocus key Up
+control + l
+	isemacs && xdotool getwindowfocus key control+l || xdotool getwindowfocus key Right
