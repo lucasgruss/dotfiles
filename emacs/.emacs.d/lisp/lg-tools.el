@@ -2,10 +2,20 @@
 ;;; lg-tools: tools for emacs, to do everything in emacs
 ;; Author: Lucas Gruss
 
+;;; alert
+(use-package alert
+  :straight t
+  :defer t
+  :custom
+  (alert-default-style 'notifications))
+
 ;;; Dired
 (use-package dired
-  :hook (dired-mode . dired-hide-details-mode)
+  :hook
+  (dired-mode . dired-hide-details-mode)
   :custom
+  (dired-kill-when-opening-new-dired-buffer t)
+  (dired-clean-confirm-killing-deleted-buffers nil)
   (dired-listing-switches "-al --group-directories-first")
   :config
   (setq dired-compress-directory-default-suffix ".zip")
@@ -77,6 +87,7 @@
 			  (mpv . mpv)
 			  (mplayer . mplayer))
   :defer t
+  :commands (emms-play-dired)
   :custom
   (emms-source-file-default-directory "~/Audio/Musique/")
   (emms-streams-file "~/.config/doom/emms/streams.emms")
@@ -184,10 +195,16 @@ playlist in a side-window"
 ;; run-or-raise-or-dismiss for vterm
 (use-package vterm-toggle
   :straight t
-  :defer t
-  :bind ("s-<return>" . 'vterm-toggle)
+  :bind ("s-<return>" . 'lg/vterm-toggle)
+  :commands (vterm-toggle)
   :custom
-  (vterm-toggle-fullscreen-p nil))
+  (vterm-toggle-fullscreen-p nil)
+  :init
+  (defun lg/vterm-toggle ()
+    (interactive)
+    (if (string= (frame-parameter nil 'name) "yequake-vterm")
+	(delete-frame (select-frame-by-name "yequake-vterm"))
+      (vterm-toggle))))
 
 ;;; ibuffer
 (use-package ibuffer
@@ -415,8 +432,8 @@ playlist in a side-window"
 
 ;;; yasnippets
 (use-package yasnippet
-  :diminish yas-minor-mode
   :straight t
+  :diminish yas-minor-mode
   :hook
   (org-mode . yas-minor-mode-on)
   (prog-mode . yas-minor-mode-on))
@@ -435,6 +452,16 @@ playlist in a side-window"
 (use-package yequake
   :straight t
   :defer t
+  :init
+  (defun lg/yequake-delete-run-app-frame ()
+    (delete-frame (select-frame-by-name "yequake-run-app")))
+
+  (defun yequake-run-app (&optional goto keys)
+    (let* ((remove-hook-fn (lambda ()
+			     (remove-hook 'minibuffer-exit-hook #'lg/yequake-delete-run-app-frame))))
+      (add-hook 'minibuffer-exit-hook remove-hook-fn)
+      (add-hook 'minibuffer-exit-hook #'lg/yequake-delete-run-app-frame)
+      (app-launcher-run-app)))
   :custom
   (yequake-frames
    '(("org-capture" 
@@ -445,14 +472,25 @@ playlist in a side-window"
       (frame-parameters . ((undecorated . t)
                            (skip-taskbar . t)
                            (sticky . t))))
-     ("app-launcher"
-      (buffer-fns . (yequake-org-capture))
+     ("yequake-vterm"
+      (buffer-fns . (vterm
+		     evil-insert-state))
       (width . 0.75)
       (height . 0.5)
-      (alpha . 0.95)
+      (top . 200)
       (frame-parameters . ((undecorated . t)
                            (skip-taskbar . t)
-                           (sticky . t)))))))
+                           (sticky . t))))
+     ("yequake-run-app"
+      (buffer-fns . (app-launcher-run-app))
+      (width . 0.75)
+      (height . 0.5)
+      (top . 200)
+      (frame-parameters . ((undecorated . nil)
+                           (skip-taskbar . t)
+			   (minibuffer . only)
+                           (sticky . t))))
+     )))
 
 ;;; flyspell
 (use-package flyspell
@@ -464,5 +502,46 @@ playlist in a side-window"
 (use-package flyspell-correct
   :straight t
   :after flyspell)
+
+;;; openwith
+(use-package openwith
+  :straight t
+  :config
+  (openwith-mode +1)
+  (setq openwith-associations
+   (list
+    (list (openwith-make-extension-regexp
+           '("m4a" "mpg" "mpeg" "mp3" "mp4"
+             "avi" "wmv" "wav" "mov" "flv"
+             "ogm" "ogg" "mkv"))
+          "mpv"
+          '(file))
+    (list (openwith-make-extension-regexp
+           '("doc" "xls" "ppt" "odt" "ods" "odg" "odp"))
+          "libreoffice"
+          '(file)))))
+
+;;; dirvish
+(use-package dirvish
+  :straight t
+  :ensure-system-package (exa)
+  :commands (dirvish)
+  :hook
+  (dirvish-mode . (lambda () (all-the-icons-dired-mode -1))))
+
+;;; vc
+(use-package vc
+  :custom
+  (vc-follow-symlinks t))
+
+;;; browse-url
+(use-package browse-url
+  :defer t
+  :custom
+  (browse-url-handlers
+   '(("\\`mailto:" . browse-url--mailto)
+    ("\\www\.youtube\.com" . browse-url-umpv)
+    ("\\`man:" . browse-url--man)
+    (browse-url--non-html-file-url-p . browse-url-emacs))))
 
 (provide 'lg-tools)
