@@ -59,7 +59,7 @@
 (use-package evil-anzu
   :straight t
   :diminish anzu-mode
-  :defer t
+  :commands (evil-search-forward evil-search-backward)
   :config (global-anzu-mode +1))
 
 ;;; Evil-escape
