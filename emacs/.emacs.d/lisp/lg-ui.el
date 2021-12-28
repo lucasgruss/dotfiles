@@ -10,11 +10,11 @@
   :custom
   (display-time-format "%H:%M")
   (scroll-step 1)
-  (scroll-conservatively 10000)
-  :config
-  (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
-  (set-face-attribute 'variable-pitch nil :family "Roboto" :weight 'semi-light :height 110 :width 'normal))
+  (scroll-conservatively 10000))
+  ;; :config
+  ;; (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
+  ;; (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
+  ;; (set-face-attribute 'variable-pitch nil :family "Roboto" :weight 'semi-light :height 110 :width 'normal))
 
 ;;;; Syncing system themes with emacs theme
 (use-package emacs

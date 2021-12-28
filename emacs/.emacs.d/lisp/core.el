@@ -95,7 +95,7 @@
   (x-select-enable-clipboard-manager t)
   (recentf-max-saved-items 100)
   :config
-  (server-start)
+  ;;(server-start)
   (recentf-mode +1)
   (show-paren-mode +1)
   (auto-revert-mode +1)
