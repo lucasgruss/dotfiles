@@ -19,6 +19,7 @@
     "lg-mail"
     "lg-org"
     "lg-fun"
+    "lg-dired"
     ;; "lg-exwm"
     )
   "List of enabled modules in my configuration.")
