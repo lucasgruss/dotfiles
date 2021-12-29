@@ -7,14 +7,24 @@
   :commands (erc erc-tls)
   :init
   (defalias 'erc 'erc-tls)
+  (defun lg/connect-irc ()
+    (interactive)
+    (erc-tls
+     :server "irc.libera.chat"
+     :port 6697
+     :nick "poinkalu"
+     ;; This is using password-store.el.  Not needed if you use auth-source!
+     :password (password-store-get "libera-chat")))
+
   :custom
-  (erc-server "irc.libera.chat"
-	      erc-nick "poinkalu"   
-	      erc-user-full-name "Lucas Gruss"
-	      erc-track-shorten-start 8
-	      ;; erc-autojoin-channels-alist '(("irc.libera.chat" "#systemcrafters" "#emacs"))
-	      erc-kill-buffer-on-part t
-	      erc-auto-query 'bury))
+  (erc-prompt-for-password nil)
+  (erc-server "irc.libera.chat")
+  (erc-nick "poinkalu")
+  (erc-user-full-name "Lucas Gruss")
+  (erc-track-shorten-start 8)
+  ;; (erc-autojoin-channels-alist '(("irc.libera.chat" "#systemcrafters" "#emacs")))
+  (erc-kill-buffer-on-part t)
+  (erc-auto-query 'bury))
 
 ;;; erc-images
 (use-package erc-image

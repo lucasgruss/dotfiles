@@ -127,6 +127,7 @@
       ("d" "Dired" dired)
       ("D" "Disk usage" disk-usage)
       ("C-d" "Disk usage" disk-usage)
+      ("e" "ERC" lg/connect-irc)
       ("f" "Elfeed" elfeed)
       ("g" "Magit" magit-status)
       ("p" "Pass" pass)
