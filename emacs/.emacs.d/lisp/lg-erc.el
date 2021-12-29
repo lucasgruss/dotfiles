@@ -12,13 +12,13 @@
 	      erc-nick "poinkalu"   
 	      erc-user-full-name "Lucas Gruss"
 	      erc-track-shorten-start 8
-	      #erc-autojoin-channels-alist '(("irc.libera.chat" "#systemcrafters" "#emacs"))
+	      ;; erc-autojoin-channels-alist '(("irc.libera.chat" "#systemcrafters" "#emacs"))
 	      erc-kill-buffer-on-part t
 	      erc-auto-query 'bury))
 
 ;;; erc-images
 (use-package erc-image
-  :ensure t
+  :straight t
   :after erc
   :custom
   (erc-image-inline-rescale 300)
