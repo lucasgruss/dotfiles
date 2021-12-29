@@ -8,19 +8,24 @@
   (("s-v" . split-window-right)
    ("s-z" . split-window-below)
    ("s-q" . delete-window))
-  :init
-  (setq display-buffer-alist
-	`(("\\*\\(helpful\\|Help\\).*\\*"
-	   (display-buffer-in-side-window)
-	   (window-width . ,(+ 3 fill-column))
-	   (side . right)
-	   (slot . -2))
-	  ("\\*\\(Ledger Report\\).*\\*"
-	   (display-buffer-in-side-window)
-	   (window-width . ,(+ 3 fill-column))
-	   (side . right)
-	   (slot . -2))
-	  )))
+  :custom
+  (display-buffer-alist
+   `(("\\*\\(helpful\\|Help\\).*\\*"
+      (display-buffer-in-side-window)
+      (window-width . ,(+ 3 fill-column))
+      (side . right)
+      (slot . -2))
+     ("\\*\\(Ledger Report\\).*\\*"
+      (display-buffer-in-side-window)
+      (window-width . ,(+ 3 fill-column))
+      (side . right)
+      (slot . -2))
+     ("\\*\\(system-packages\\).*\\*"
+      (display-buffer-in-side-window)
+      (window-width . ,(+ 3 fill-column))
+      (side . right)
+      (slot . -2))
+     )))
 
 ;;; Windmove
 (use-package windmove
@@ -56,8 +61,8 @@
 (use-package framemove
   :load-path "~/.emacs.d/lisp/site-packages"
   :demand t
-  :config
-  (setq framemove-hook-into-windmove t))
+  :custom
+  (framemove-hook-into-windmove t))
 
 (use-package emacs
   :config
