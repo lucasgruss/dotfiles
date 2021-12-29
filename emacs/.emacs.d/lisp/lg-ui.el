@@ -553,7 +553,7 @@ settings applied to them."
 
 ;;; emojify
 (use-package emojify
-  :ensure t
+  :straight t
   :hook (erc-mode . emojify-mode)
   :commands emojify-mode)
 
