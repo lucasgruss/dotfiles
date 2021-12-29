@@ -551,4 +551,10 @@ settings applied to them."
   :straight t
   :hook (prog-mode . rainbow-mode))
 
+;;; emojify
+(use-package emojify
+  :ensure t
+  :hook (erc-mode . emojify-mode)
+  :commands emojify-mode)
+
 (provide 'lg-ui)
