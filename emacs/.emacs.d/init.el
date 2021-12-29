@@ -20,6 +20,7 @@
     "lg-org"
     "lg-fun"
     "lg-dired"
+    "lg-erc"
     ;; "lg-exwm"
     )
   "List of enabled modules in my configuration.")
