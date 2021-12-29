@@ -135,6 +135,11 @@ playlist in a side-window"
 
   (advice-add 'load-theme :after #'lg/pdf-tools-midnight-colors-with-theme))
 
+;;; pdfgrep
+(use-package pdfgrep
+  :straight t
+  :ensure-system-package pdfgrep)
+
 ;;; Vterm
 (use-package vterm
   ;; :ensure-system-package (libvterm . libvterm-dev)
