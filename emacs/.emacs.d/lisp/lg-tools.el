@@ -9,7 +9,6 @@
   :custom
   (alert-default-style 'notifications))
 
-
 ;;; Elfeed
 (use-package elfeed
   :straight t
@@ -140,36 +139,6 @@ playlist in a side-window"
   :straight t
   :ensure-system-package pdfgrep)
 
-;;; Vterm
-(use-package vterm
-  ;; :ensure-system-package (libvterm . libvterm-dev)
-  :straight (vterm :type git :repo "akermu/emacs-libvterm")
-  :commands vterm
-  :custom
-  (vterm-shell "bash")
-  (vterm-always-compile-module t)
-  (vterm-module-cmake-args "-DUSE_SYSTEM_VTERM=YES"))
-
-;;; Multi-vterm
-(use-package multi-vterm
-  :straight t
-  :after vterm)
-
-;;; Vterm-toggle
-;; run-or-raise-or-dismiss for vterm
-(use-package vterm-toggle
-  :straight t
-  :bind ("s-<return>" . 'lg/vterm-toggle)
-  :commands (vterm-toggle)
-  :custom
-  (vterm-toggle-fullscreen-p nil)
-  :init
-  (defun lg/vterm-toggle ()
-    (interactive)
-    (if (string= (frame-parameter nil 'name) "yequake-vterm")
-	(delete-frame (select-frame-by-name "yequake-vterm"))
-      (vterm-toggle))))
-
 ;;; ibuffer
 (use-package ibuffer
   :commands ibuffer
@@ -264,14 +233,6 @@ playlist in a side-window"
   (advice-add 'eww-forward-url :after #'prot-eww--rename-buffer)
   (use-package lg-eww
     :load-path "lisp/site-packages"))
-
-;;; Eshell
-(use-package eshell-info-banner
-  :commands eshell
-  :straight (eshell-info-banner :type git
-                                :host github
-                                :repo "phundrak/eshell-info-banner.el")
-  :hook (eshell-banner-load . eshell-info-banner-update-banner))
 
 ;;; Ledger mode
 (use-package ledger-mode

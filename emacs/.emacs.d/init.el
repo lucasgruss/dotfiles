@@ -15,6 +15,7 @@
     "lg-window"
     "lg-completion"
     "lg-tools"
+    "lg-shell"
     "lg-lang"
     "lg-mail"
     "lg-org"
