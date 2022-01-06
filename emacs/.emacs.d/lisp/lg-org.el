@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-org: configuration for org
+;;; lg-org --- configuration for org -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
 ;;; Org

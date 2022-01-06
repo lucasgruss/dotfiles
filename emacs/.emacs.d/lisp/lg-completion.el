@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-completion: completion configuration
+;;; lg-completion --- completion configuration -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
 ;;; Selectrum

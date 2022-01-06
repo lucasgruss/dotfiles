@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-transient --- Global menu with transient.el
+;;; lg-transient --- Global menu with transient.el -*- lexical-binding: t; -*-
 
 ;;; Transient
 (use-package transient

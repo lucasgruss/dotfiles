@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-lang.el : configuration for programming language
+;;; lg-lang.el --- configuration for programming language -*- lexical-binding: t; -*-
 
 ;;; LSP mode
 (use-package lsp-mode

@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-ui: Configuration for the UI of Emacs
+;;; lg-ui --- Configuration for the UI of Emacs -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
 ;;; Emacs settings

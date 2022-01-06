@@ -1,9 +1,9 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-fun --- Fun stuff in emacs 
+;;; lg-fun --- Fun stuff in emacs -*- lexical-binding: t; -*-
 	
 ;;; Cowsay
 (use-package cowsay
   :straight t
+  :commands cowsay-string
   :config
   (cowsay-load-cows-directory "~/.emacs.d/straight/repos/emacs-cowsay/cows"))
 

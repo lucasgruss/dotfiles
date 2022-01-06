@@ -1,4 +1,4 @@
-;;; lg-dired: configuration for the directory editor  -*- lexical-binding: t; -*- 
+;;; lg-dired --- configuration for the directory editor -*- lexical-binding: t; -*-
 
 ;;; Dired
 (use-package dired

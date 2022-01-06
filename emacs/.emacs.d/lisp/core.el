@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; core.el : core packages needed for my configuration
+;;; core.el --- core packages needed for my configuration -*- lexical-binding: t; -*-
 
 (setq native-comp-async-report-warnings-errors nil)
 (setq native-comp-async-jobs-number 4)

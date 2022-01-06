@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-tools: tools for emacs, to do everything in emacs
+;;; lg-tools --- tools for emacs, to do everything in emacs -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
 ;;; alert

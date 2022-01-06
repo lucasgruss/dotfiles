@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-exwm.el : my configuration for exwm
+;;; lg-exwm.el : my configuration for exwm -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
 ;;; Desktop-environment
