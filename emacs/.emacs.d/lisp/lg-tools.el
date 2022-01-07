@@ -502,4 +502,9 @@ playlist in a side-window"
   :ensure-system-package (youtube-dl . "pip3 install youtube-dl")
   :commands ytdl-download)
 
+;;; devdocs-browser
+(use-package devdocs-browser
+  :straight t
+  :defer t)
+
 (provide 'lg-tools)
