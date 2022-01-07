@@ -1,4 +1,4 @@
-;;; lg-shell : configuration for multiple shells -*- lexical-binding: t; -*-  
+;;; lg-shell --- configuration for multiple shells -*- lexical-binding: t; -*-
 
 ;;; Vterm
 (use-package vterm
@@ -31,6 +31,15 @@
       (vterm-toggle))))
 
 ;;; Eshell
+;;;; eshell-toggle 
+(use-package eshell-toggle
+  :straight t
+  :custom
+  (eshell-toggle-window-side 'right)
+  (eshell-toggle-size-fraction 2)
+  :bind ("s-<return>" . eshell-toggle))
+
+;;;; eshell-info-banner
 (use-package eshell-info-banner
   :commands eshell
   :straight (eshell-info-banner :type git
@@ -38,11 +47,17 @@
                                 :repo "phundrak/eshell-info-banner.el")
   :hook (eshell-banner-load . eshell-info-banner-update-banner))
 
-;;; eshell-vterm
+;;;; eshell-vterm
 (use-package eshell-vterm
+  :straight t
+  :commands eshell
+  :config (eshell-vterm-mode +1))
+
+;;;; eshell-git-prompt
+(use-package eshell-git-prompt
   :straight t
   :after eshell
   :config
-  (eshell-vterm-mode +1))
+  (eshell-git-prompt-use-theme 'powerline))
 
 (provide 'lg-shell)
