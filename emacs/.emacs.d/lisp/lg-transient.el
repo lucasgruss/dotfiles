@@ -129,6 +129,7 @@
       ("e" "ERC" lg/connect-irc)
       ("f" "Elfeed" elfeed)
       ("g" "Magit" magit-status)
+      ("N" "Enwc (Network manager)" enwc)
       ("p" "Pass" pass)
       ("P" "Proced" proced)
       ("r" "Ripgrep" rg)
@@ -149,7 +150,7 @@
 
   (define-transient-command lg/transient-p ()
     "Project"
-    [["System packages"
+    [["Project"
       ("c" "Compile" project-compile)
       ("d" "Dired" project-dired)]]
     [:hide (lambda () t)])
