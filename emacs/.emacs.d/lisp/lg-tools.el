@@ -43,7 +43,7 @@
 			  (mp3info . mp3info)
 			  (mpv . mpv)
 			  (mplayer . mplayer))
-  :defer t
+  ;:defer t
   :commands (emms-play-dired)
   :custom
   (emms-source-file-default-directory "~/Audio/Musique/")
@@ -104,10 +104,28 @@ playlist in a side-window"
   (smudge-my-playlists
    smudge-track-search
    smudge-playlist-search)
+  :init
+  (shell-command "pgrep spotifyd || spotifyd")
   :custom
   (httpd-port 8081)
   (smudge-oauth2-callback-port "8081")
-  (smudge-transport 'connect))
+  (smudge-transport 'connect)
+  :config
+  (when (featurep 'transient)
+    ;; define a nice transient interface
+    (define-transient-command lg/transient-smudge ()
+      "Buffers"
+      [["Smudge"
+	("m" "Play/Pause" smudge-controller-toggle-play)
+	("s" "Search" smudge-track-search)]]
+      [:hide (lambda () t)])
+
+    ;; bind it
+    (general-define-key
+     :states 'normal
+     :keymaps '(smudge-mode-map smudge-playlist-search-mode-map smudge-track-search-mode-map)
+     "<localleader>" 'lg/transient-smudge))
+  )
 
 ;;;; Espotify
 (use-package espotify
@@ -136,7 +154,8 @@ playlist in a side-window"
 ;;; pdfgrep
 (use-package pdfgrep
   :straight t
-  :ensure-system-package pdfgrep)
+  :ensure-system-package pdfgrep
+  :commands pdfgrep)
 
 ;;; ibuffer
 (use-package ibuffer
@@ -183,7 +202,6 @@ playlist in a side-window"
 (use-package magit-todos
   :straight t
   :commands magit-status
-  :defer t
   :config
   (magit-todos-mode +1))
 
@@ -314,7 +332,8 @@ playlist in a side-window"
 
 ;;; Deamons
 (use-package daemons
-  :straight t)
+  :straight t
+  :commands (daemons daemons-start daemons-stop))
 
 ;;; finito
 ;; (use-package finito
@@ -330,8 +349,15 @@ playlist in a side-window"
 ;;; browse-url
 (use-package browse-url
   :straight nil
-  :commands (browse-url-umpv browse-url-at-point-umpv)
-  :config
+  :defer t
+  :custom
+  (browse-url-handlers
+   '(("\\`mailto:" . browse-url--mailto)
+    ("\\www\.youtube\.com" . browse-url-umpv)
+    ("\\`man:" . browse-url--man)
+    (browse-url--non-html-file-url-p . browse-url-emacs)))
+
+  :init
   (defun browse-url-umpv (url &optional single)
     (start-process "mpv" nil (if single "mpv" "umpv")
 		   (shell-quote-wildcard-pattern url)))
@@ -352,7 +378,12 @@ playlist in a side-window"
 
 ;;; Avy
 (use-package avy
-  :straight t)
+  :straight t
+  :defer t
+  :bind (:map evil-visual-state-map
+	      ("f" . avy-goto-char-timer)
+	      :map evil-normal-state-map
+	      ("f" . avy-goto-char-timer)))
 
 ;;; yasnippets
 (use-package yasnippet
@@ -397,7 +428,7 @@ playlist in a side-window"
                            (skip-taskbar . t)
                            (sticky . t))))
      ("yequake-vterm"
-      (buffer-fns . (vterm
+      (buffer-fns . (eshell
 		     evil-insert-state))
       (width . 0.75)
       (height . 0.5)
@@ -455,17 +486,20 @@ playlist in a side-window"
 
 ;;; vc
 (use-package vc
+  :defer t
   :custom
   (vc-follow-symlinks t))
 
-;;; browse-url
-(use-package browse-url
-  :defer t
-  :custom
-  (browse-url-handlers
-   '(("\\`mailto:" . browse-url--mailto)
-    ("\\www\.youtube\.com" . browse-url-umpv)
-    ("\\`man:" . browse-url--man)
-    (browse-url--non-html-file-url-p . browse-url-emacs))))
+;;; enwc
+(use-package enwc
+  :straight t
+  :custom (enwc-default-backend 'nm)
+  :commands enwc)
+
+;;; ytdl
+(use-package ytdl
+  :straight t
+  :ensure-system-package (youtube-dl . "pip3 install youtube-dl")
+  :commands ytdl-download)
 
 (provide 'lg-tools)
