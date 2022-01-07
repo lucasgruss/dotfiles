@@ -104,13 +104,12 @@ playlist in a side-window"
   (smudge-my-playlists
    smudge-track-search
    smudge-playlist-search)
-  :init
-  (shell-command "pgrep spotifyd || spotifyd")
   :custom
   (httpd-port 8081)
   (smudge-oauth2-callback-port "8081")
   (smudge-transport 'connect)
   :config
+  (shell-command "pgrep spotifyd || spotifyd")
   (when (featurep 'transient)
     ;; define a nice transient interface
     (define-transient-command lg/transient-smudge ()
