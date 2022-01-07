@@ -50,9 +50,10 @@
   :config
   (gcmh-mode +1))
 
-;;;; Esup : emacs statup time profiler
+;;;; Esup : emacs startup time profiler
 (use-package esup
-  :straight t)
+  :straight t
+  :commands esup)
 
 ;;; Package.el
 ;; built-in package manager
@@ -72,7 +73,6 @@
 ;;; Emacs
 (use-package emacs
   :straight nil
-  :defer 5
   :diminish (auto-revert-mode eldoc-mode)
   :bind
   ("s-<escape>" . 'lg/kill-this-buffer)
@@ -102,7 +102,6 @@
   (fset 'yes-or-no-p 'y-or-n-p)
   (load (setq custom-file "~/.emacs.d/lisp/custom.el"))
   (setq-default fill-column 80)
-  ;; (set-frame-name "GNU Emacs at debian")
 
   (defun lg/visit-configuration ()
     "Prompt to get the configuration directory"

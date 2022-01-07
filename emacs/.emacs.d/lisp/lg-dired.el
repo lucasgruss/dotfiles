@@ -5,9 +5,10 @@
   :hook
   (dired-mode . dired-hide-details-mode)
   :custom
-  (dired-kill-when-opening-new-dired-buffer t)
+  (dired-kill-when-opening-new-dired-buffer nil)
   (dired-clean-confirm-killing-deleted-buffers nil)
   (dired-listing-switches "-al --group-directories-first")
+  (dired-dwim-target t)
   :config
   (setq dired-compress-directory-default-suffix ".zip")
   (general-def :keymaps 'dired-mode-map :states 'normal
@@ -23,7 +24,6 @@
 ;;; Dired-sidebar
 (use-package dired-sidebar
   :straight t
-  :after dired
   :commands (dired-sidebar-find-file dired-sidebar-toggle)
   :bind (:map dired-sidebar-mode-map ("<localleader>m" . emms-play-dired))
   :general

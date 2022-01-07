@@ -45,17 +45,18 @@
   ;;:disabled t
   :straight t
   :after (selectrum prescient)
+  :custom
+  (selectrum-prescient-enable-filtering nil)
   :config
-  (setq selectrum-prescient-enable-filtering nil)
   (selectrum-prescient-mode +1))
 
 ;;; Marginalia
 (use-package marginalia
   :straight t
-  :init
-  (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light))
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light))
   :config
-  (marginalia-mode))
+  (marginalia-mode +1))
 
 ;;; Consult
 (use-package consult
