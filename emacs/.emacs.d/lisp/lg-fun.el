@@ -34,15 +34,4 @@
   :straight t
   :commands snow)
 
-;;; bonjour madame
-(use-package bonjourmadame
-  :straight t
-  :config
-  (setq bonjourmadame--regexp
-	(rx
-	 "<img" (1+ space)
-	 "src=\"" (group "https://" (1+ nonl) "tumblr.com" (1+ nonl) "." (or "png" "jpg" "jpeg" "gif")) "\""
-	 (1+ space)
-	 "alt=\"" (group (0+ (not (any "\"")))) "\"")))
-
 (provide 'lg-fun)
