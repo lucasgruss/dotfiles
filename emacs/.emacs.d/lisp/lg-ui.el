@@ -342,7 +342,6 @@ settings applied to them."
   :config
   (circadian-setup))
 
-
 ;;; Dashboard
 (use-package dashboard
   :straight t
@@ -493,6 +492,12 @@ settings applied to them."
   :straight nil
   :config
   (global-hl-line-mode +1))
+
+;;; LIN
+(use-package lin
+  :straight (:host gitlab :repo "protesilaos/lin")
+  :commands lin-mode
+  :config (lin-add-to-many-modes))
   
 ;;; hl-todo
 (use-package hl-todo
@@ -525,9 +530,9 @@ settings applied to them."
 	(visual-fill-column-mode -1)
       (visual-fill-column-mode +1)))
   :hook
-  (Info-mode . lg/activate-visual-fill-center)
-  (org-mode . lg/activate-visual-fill-center)
-  (minibuffer-mode . lg/activate-visual-fill-center))
+  ((Info-mode
+    org-mode
+    minibuffer-mode) . lg/activate-visual-fill-center))
 
 ;;; page-break-lines
 (use-package page-break-lines
@@ -548,6 +553,7 @@ settings applied to them."
 ;;; rainbow mode
 (use-package rainbow-mode
   :straight t
+  :diminish rainbow-mode
   :hook (prog-mode . rainbow-mode))
 
 ;;; emojify
@@ -555,5 +561,18 @@ settings applied to them."
   :straight t
   :hook (erc-mode . emojify-mode)
   :commands emojify-mode)
+
+;;; beacon
+(use-package beacon
+  :straight t
+  :diminish beacon-mode
+  :custom
+  (beacon-blink-when-point-moves-vertically 1)
+  (beacon-blink-when-buffer-changes t)
+  (beacon-blink-when-window-changes t)
+  (beacon-blink-when-window-scrolls t)
+  (beacon-blink-when-focused t)
+  :config
+  (beacon-mode +1))
 
 (provide 'lg-ui)
