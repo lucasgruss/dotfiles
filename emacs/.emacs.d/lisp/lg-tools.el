@@ -260,22 +260,21 @@ playlist in a side-window"
   (ledger-schedule-file "~/Documents/factures/ledger/schedule.ledger")
   (ledger-post-amount-alignment-column 65)
   (ledger-reports 
-   '(("bal" "%(binary) --real -f %(ledger-file) bal")
+   '(("bal" "%(binary) --real -f main.ledger bal")
      ("reg" "%(binary) -f %(ledger-file) reg")
      ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")
      ("account" "%(binary) -f %(ledger-file) reg %(account)")
-     ("budget" "%(binary) --empty -S -T -f %(ledger-file) bal ^Budget:")))
+     ("budget" "%(binary) --empty -S -T -f main.ledger bal ^Budget:")))
   :config
   (add-hook 'ledger-mode-hook
 	    (lambda ()
 	      (setq-local tab-always-indent 'complete)
 	      (setq-local completion-cycle-threshold t)
 	      (setq-local ledger-complete-in-steps t)))
-  (progn
-    ;; org-cycle allows completion to work whereas outline-toggle-children does not
-    (evil-define-key evil-normal-state-map evil-ledger-mode-map (kbd "TAB") #'org-cycle)
-    (add-hook 'ledger-mode-hook #'outline-minor-mode)
-    (font-lock-add-keywords 'ledger-mode outline-font-lock-keywords)))
+  ;; org-cycle allows completion to work whereas outline-toggle-children does not
+  (evil-define-key evil-normal-state-map evil-ledger-mode-map (kbd "TAB") #'org-cycle)
+  (add-hook 'ledger-mode-hook #'outline-minor-mode)
+  (font-lock-add-keywords 'ledger-mode outline-font-lock-keywords))
 
 ;;; Scanner
 (use-package scanner
