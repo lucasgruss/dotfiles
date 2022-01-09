@@ -1,7 +1,7 @@
 ;;; lg-completion --- completion configuration -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
-;;; Selectrum
+;;;Selectrum
 (use-package selectrum
   :straight t
   :defer nil
@@ -24,31 +24,63 @@
   (setq selectrum-display-action nil)
   (setq selectrum-refine-candidates-function #'orderless-filter)
   (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
-  (selectrum-mode +1))
+  (selectrum-mode -1))
 
 ;;; Prescient
 (use-package prescient
   :straight t
-  :after selectrum
   :config
   (prescient-persist-mode +1))
 
-;;; Orderless
-(use-package orderless
-  :straight t
-  :config
-  (setq orderless-skip-highlighting (lambda () selectrum-is-active))
-  (setq completion-styles '(orderless)))
-
 ;;; selectrum-prescient
 (use-package selectrum-prescient
-  ;;:disabled t
   :straight t
   :after (selectrum prescient)
   :custom
   (selectrum-prescient-enable-filtering nil)
   :config
-  (selectrum-prescient-mode +1))
+  (when (featurep 'selectrum)
+    (selectrum-prescient-mode +1)))
+
+;;; vertico
+(use-package vertico
+  :straight '(vertico :files (:defaults "extensions/*")
+		      :includes (vertico-buffer
+				 vertico-directory
+				 vertico-flat
+				 vertico-indexed
+				 vertico-mouse
+				 vertico-quick
+				 vertico-repeat
+				 vertico-reverse))
+  :bind (:map vertico-map
+	      ("C-h" . vertico-directory-delete-word)
+	      ("C-j" . vertico-next)
+	      ("C-k" . vertico-previous)
+	      ("C-l" . vertico-insert))
+  :demand t
+  :config
+  (vertico-mode +1))
+
+;;; vertico-mouse
+(use-package vertico-mouse
+  :straight nil
+  :after vertico
+  :config (vertico-mouse-mode +1))
+
+;;; vertico-reverse
+(use-package vertico-reverse
+  :straight nil
+  :after vertico
+  :config (vertico-reverse-mode -1))
+
+;;; Orderless
+(use-package orderless
+  :straight t
+  :config
+  (when (featurep 'selectrum)
+    (setq orderless-skip-highlighting (lambda () selectrum-is-active)))
+  (setq completion-styles '(orderless)))
 
 ;;; Marginalia
 (use-package marginalia
@@ -76,7 +108,7 @@
   :after espotify)
 
 ;;; Consult-selectrum
-(use-package consult-selectrum :after consult)
+(use-package consult-selectrum :after (selectrum consult))
 
 ;;; Embark
 (use-package embark
@@ -91,20 +123,21 @@
 	  #'which-key--hide-popup-ignore-command)
 	embark-become-indicator embark-action-indicator)
 
-  (defun refresh-selectrum ()
-    (setq selectrum--previous-input-string nil))
+  (when (featurep 'selectrum)
+    (defun refresh-selectrum ()
+      (setq selectrum--previous-input-string nil))
 
-  (add-hook 'embark-pre-action-hook #'refresh-selectrum) 
+    (add-hook 'embark-pre-action-hook #'refresh-selectrum) 
 
-  (defun shrink-selectrum ()
-    (when (eq embark-collect--kind :live)
-      (with-selected-window (active-minibuffer-window)
-	(setq-local selectrum-num-candidates-displayed 1)
-	(setq-local selectrum-display-style
-		    '(horizontal :before-candidates "[" :after-candidates "]"
-				 :more-candidates "" :candidates-separator "")))))
+    (defun shrink-selectrum ()
+      (when (eq embark-collect--kind :live)
+	(with-selected-window (active-minibuffer-window)
+	  (setq-local selectrum-num-candidates-displayed 1)
+	  (setq-local selectrum-display-style
+		      '(horizontal :before-candidates "[" :after-candidates "]"
+				   :more-candidates "" :candidates-separator "")))))
 
-  (add-hook 'embark-collect-mode-hook #'shrink-selectrum))
+    (add-hook 'embark-collect-mode-hook #'shrink-selectrum)))
 
 ;;; embark-consult
 (use-package embark-consult
