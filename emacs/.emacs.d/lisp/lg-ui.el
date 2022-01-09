@@ -575,4 +575,10 @@ settings applied to them."
   :config
   (beacon-mode +1))
 
+;;; all-the-icons-completion
+(use-package all-the-icons-completion
+  :straight t
+  :after all-the-icons
+  :config (all-the-icons-completion-mode +1))
+
 (provide 'lg-ui)
