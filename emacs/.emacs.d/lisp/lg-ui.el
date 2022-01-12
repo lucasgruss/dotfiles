@@ -213,6 +213,17 @@ applied to gnome-settings or xfce-conf."
   :diminish all-the-icons-dired-mode
   :hook (dired-mode . all-the-icons-dired-mode))
 
+;;;; all-the-icons-completion
+(use-package all-the-icons-completion
+  :straight t
+  :after all-the-icons
+  :config (all-the-icons-completion-mode +1))
+
+;;;; all-the-icons-ibuffer
+(use-package all-the-icons-ibuffer
+  :straight t
+  :config (all-the-icons-ibuffer-mode +1))
+
 ;;; Themes 
 ;;;; modus-themes
 (use-package modus-themes
@@ -574,11 +585,5 @@ settings applied to them."
   (beacon-blink-when-focused t)
   :config
   (beacon-mode +1))
-
-;;; all-the-icons-completion
-(use-package all-the-icons-completion
-  :straight t
-  :after all-the-icons
-  :config (all-the-icons-completion-mode +1))
 
 (provide 'lg-ui)
