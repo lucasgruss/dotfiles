@@ -5,13 +5,42 @@
 (use-package org
   ;;:mode ("\\.org\\'" . org-mode)
   :straight t
-  :hook ((org-mode . variable-pitch-mode)
-	 (org-mode . auto-fill-mode)
-	 (after-save . org-table-recalculate-buffer-tables))
+  :hook ((org-mode . auto-fill-mode)
+	 (before-save . org-table-recalculate-buffer-tables))
   :init
+  (when (featurep 'transient)
+    (define-transient-command lg/transient-org ()
+      "Org mode"
+      [["Misc"
+	("a" "Agenda" org-agenda)
+	("A" "Archive" org-archive-subtree)
+	("c" "Cite" org-cite-insert)
+	("e" "Export" org-export-dispatch)
+	("E" "Export" org-set-effort)
+	("l" "Link" org-insert-link)
+	("n" "Narrow subtree" org-toggle-narrow-to-subtree)
+	("P" "Set property" org-set-property)
+	("t" "Tangle file (babel)" org-babel-tangle)
+	("T" "Set tag" org-set-tags-command)]
+       ["Clocking"
+	("i" "Clock in" org-clock-in)
+	("o" "Clock out" org-clock-out)
+	("p" "Pomodoro" org-pomodoro)]
+       ["Todo"
+	("m" "Change todo state" org-todo)
+	("k" "Increase priority" org-priority-up)
+	("j" "Increase priority" org-priority-down)
+	("s" "Schedule task" org-schedule)
+	("d" "Set a deadline on task" org-deadline)]]
+      [:hide (lambda () t)])
+
+    (general-define-key
+     :states 'normal 
+     :keymaps 'org-mode-map
+     "<localleader>" 'lg/transient-org))
   (defun org-clocking-buffer () nil) ;; without it, impossible to exit emacs with C-x C-c
   (setq org-directory "~/org/")
-  (setq org-agenda-files '("~/org/todo.org" "~/org/contacts.org"))
+  (setq org-agenda-files '("~/org/todo.org")); "~/org/contacts.org"))
   (setq org-default-notes-file "~/org/todo.org")
   (setq org-fontify-quote-and-verse-blocks nil)
   (setq org-fontify-whole-heading-line nil)
@@ -48,12 +77,8 @@
      ("conf" modus-themes-nuanced-cyan)
      ("docker" modus-themes-nuanced-cyan)))
   :config 
-  (plist-put org-format-latex-options :scale 1.5)
-  (when (featurep 'transient)
-    (general-define-key
-     :states 'normal 
-     :keymaps 'org-mode-map
-      "<localleader>" 'lg/transient-org)))
+  (push 'org-habit org-modules)
+  (plist-put org-format-latex-options :scale 1.5))
 
 ;;; org-agenda
 (use-package org-agenda

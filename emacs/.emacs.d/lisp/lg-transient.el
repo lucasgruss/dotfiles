@@ -71,7 +71,7 @@
     "Files"
     [["Files"
       ("f" "Open file" find-file)
-      ("l" "Ledger file" (lambda () (interactive) (find-file "~/Documents/factures/ledger")))
+      ("l" "Ledger file" (lambda () (interactive) (find-file "~/Documents/factures/ledger/2022/depenses.ledger")))
       ("o" "Find in other window" find-file-other-window)
       ("r" "Recent" consult-recent-file)
       ("s" "Save" save-buffer)]
@@ -203,37 +203,6 @@
       ("l" "Focus right window" windmove-right)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-ledger ()
-    "Buffers"
-    [["Ledger"
-      ("a" "New transaction" ledger-add-transaction)
-      ("o" "Ledger occur / narrow" ledger-occur)
-      ("r" "Report" ledger-report)
-      ("s" "Sort" ledger-sort-buffer)]]
-    [:hide (lambda () t)])
-
-  (define-transient-command lg/transient-org ()
-    "Org mode"
-    [["Misc"
-      ("a" "Agenda" org-agenda)
-      ("A" "Archive" org-archive-subtree)
-      ("c" "Cite" org-cite-insert)
-      ("e" "Export" org-export-dispatch)
-      ("E" "Export" org-set-effort)
-      ("n" "Narrow subtree" org-toggle-narrow-to-subtree)
-      ("P" "Set property" org-set-property)
-      ("t" "Tangle file (babel)" org-babel-tangle)
-      ("T" "Set tag" org-set-tags-command)]
-     ["Clocking"
-      ("i" "Clock in" org-clock-in)
-      ("o" "Clock out" org-clock-out)
-      ("p" "Pomodoro" org-pomodoro)]
-     ["Todo"
-      ("m" "Change todo state" org-todo)
-      ("k" "Increase priority" org-priority-up)
-      ("j" "Increase priority" org-priority-down)
-      ("s" "Schedule task" org-schedule)
-      ("d" "Set a deadline on task" org-deadline)]]
-    [:hide (lambda () t)]))
+  )
 
 (provide 'lg-transient)

@@ -39,16 +39,25 @@
   :straight t
   :hook (ledger-mode . evil-ledger-mode)
   :after ledger-mode
-  :config
+  :init
   (when (featurep 'transient)
+    (define-transient-command lg/transient-ledger ()
+      "Buffers"
+      [["Ledger"
+	("a" "New transaction" ledger-add-transaction)
+	("o" "Ledger occur / narrow" ledger-occur)
+	("r" "Report" ledger-report)
+	("s" "Sort" ledger-sort-buffer)]]
+      [:hide (lambda () t)])
     (general-define-key
-     :states 'normal 
-     :keymaps 'evil-ledger-mode-map
-      "<localleader>" 'lg/transient-ledger)))
+     :states '(normal motion)
+     :keymaps '(evil-ledger-mode-map ledger-report-mode-map)
+     "<localleader>" 'lg/transient-ledger)))
 
 ;;; evil-org
 (use-package evil-org
   :straight (:type git :host github :repo "Somelauw/evil-org-mode")
+  :diminish 'evil-org-mode
   :hook (org-mode . evil-org-mode)
   :commands (org-agenda)
   :config
