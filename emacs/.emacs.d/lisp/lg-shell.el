@@ -60,4 +60,27 @@
   :config
   (eshell-git-prompt-use-theme 'powerline))
 
+;;; Dtache
+(use-package dtache
+  :straight (:host gitlab :repo "niklaseklund/dtache")
+  :ensure-system-package dtach
+  :hook (after-init . dtache-setup)
+  :bind (([remap async-shell-command] . dtache-shell-command)
+	 :map dtache-shell-mode-map
+	 ("C-c C-q" . dtache-detach-dwim))) 
+
+;;;; dtach-eshell
+(use-package dtache-eshell
+  :after dtache
+  :hook (after-init . dtache-eshell-setup)
+  :bind (:map dtache-eshell-mode-map
+	      (("<S-return>" . dtache-eshell-send-input)
+	       ("<C-return>" . dtache-eshell-attach)
+	       ("C-c C-q" . dtache-detach-dwim)))) 
+
+;;;; dtach-consult
+(use-package dtache-consult
+  :after dtache
+  :bind ([remap dtache-open-session] . dtache-consult-session))
+
 (provide 'lg-shell)
