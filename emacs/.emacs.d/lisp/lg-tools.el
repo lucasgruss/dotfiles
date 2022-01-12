@@ -179,7 +179,7 @@ playlist in a side-window"
 ;;;; exec-path-from-shell
 (use-package exec-path-from-shell
   :straight t
-  :defer 10
+  :demand t
   :config
   (exec-path-from-shell-initialize))
 
