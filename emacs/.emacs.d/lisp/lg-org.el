@@ -129,6 +129,16 @@
 	`(("A" "Daily agenda and top priority tasks"
 	   ,lg/org-custom-daily-agenda))))
 
+;;; org-habit
+(use-package org-habit
+  :straight nil
+  :after org
+  :custom
+  (org-habit-show-habits-only-for-today t)
+  (org-habit-following-days 7)
+  (org-habit-preceding-days 14)
+  (org-habit-graph-column 40))
+
 ;;; org-journal
 (use-package org-journal
   :straight t
@@ -163,6 +173,7 @@
 ;;; org-indent
 (use-package org-indent
   :after org
+  :diminish org-indent-mode
   :hook (org-mode . org-indent-mode))
 
 ;;; Org-sidebar
@@ -439,6 +450,7 @@ Format is a string matching the following format specification:
 
 ;;; org-variable-pitch
 (use-package org-variable-pitch
+  :disabled t
   :straight t
   :hook (org-mode . org-variable-pitch-minor-mode))
 
