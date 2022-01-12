@@ -60,19 +60,9 @@
 	      ("C-l" . vertico-insert))
   :demand t
   :config
-  (vertico-mode +1))
-
-;;; vertico-mouse
-(use-package vertico-mouse
-  :straight nil
-  :after vertico
-  :config (vertico-mouse-mode +1))
-
-;;; vertico-reverse
-(use-package vertico-reverse
-  :straight nil
-  :after vertico
-  :config (vertico-reverse-mode -1))
+  (vertico-mode +1)
+  ;; extensions
+  (vertico-mouse-mode +1))
 
 ;;; Orderless
 (use-package orderless
