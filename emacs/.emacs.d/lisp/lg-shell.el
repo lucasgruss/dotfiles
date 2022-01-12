@@ -50,7 +50,7 @@
 ;;;; eshell-vterm
 (use-package eshell-vterm
   :straight t
-  :commands eshell
+  :after eshell
   :config (eshell-vterm-mode +1))
 
 ;;;; eshell-git-prompt
