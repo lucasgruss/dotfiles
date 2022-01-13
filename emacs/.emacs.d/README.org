@@ -1,15 +1,31 @@
 #+TITLE: My emacs configuration
 
+* A vanilla GNU Emacs configuration
+
+The configuration that you can find in this repository is my current one. I
+find tweaking my configuration to be a fun and relaxing activity and I have come
+to accept it as a hobby of its own, as weird as one might find it. As some have
+said before me, it's almost a zen garden.
+
+I build GNU Emacs from source on the master branch, which I recompile every
+other month or so to get the newest features and improvements. One important
+feature is the native compilation, which has made GNU Emacs several times faster
+for me. As such this configuration is suitable for GNU Emacs 28+ but I give no
+guaranty that it will work or run for anybody else. Clone it at your own risk
+(this warning applies to me as well).
+
 * Core concepts
 
-  Here are the handful of concepts that I try to apply in configuring emacs:
-   - modularity : splitting the configuration in small modules that can easily
-     be selected.
-   - no literate configuration : configurations in org look very nice and are
-     nice projects, but I feel like it's a lot of work to maintain and I don't
-     really want to document everything in my configuration, but rather
-     highlight the important pieces.
-   - use built-in packages as much as possible to promote integration.
+Here are the handful of concepts that I try to apply when configuring emacs:
+- modularity : splitting the configuration in small modules that can easily
+  be selected for debugging/testing/tweaking purposes. Also legibility.
+- no literate configuration : other people's configurations in org look very
+  nice and are nice projects, but I feel like it's a lot of work to maintain
+  them. I don't really want to document everything in my configuration
+  anyway, but rather highlight the important pieces. Comments works just
+  fine.
+- use built-in packages as much as possible to promote integration of
+  packages.
 
 * Components
 
@@ -20,83 +36,94 @@
   - use-package :: configure packages in an elegant manner. I try to keep all
     the configuration in ~use-package~ forms, which keeps configuration of
     packages all in the same place, self-contained, and provides useful features
-    (~ensure-system-package~ for instance, which will pull dependencies from
-    your OS package manager).
+    (~ensure-system-package~ for instance, which you can use to install relevant
+    packages from your OS package manager).
+    
+  - straight.el :: a fast and flexible package manager for emacs. You can
+    specify recipes for packages not contained in popular package repositories
+    like GNU Elpa or Melpa which is the main advantage over package.el. I still
+    use package.el to quickly look for packages and check their description,
+    just not for installation.
 
-  - EXWM :: emacs is also my window manager, which is the biggest step towards
-    living in emacs (even when using other software). The WM and editor have
-    unified keybindings (through simulation keys), and I can have another level
-    of integration between my tools. For instance, I use the ~no-tabs~ extension
-    in firefox that makes all the new tabs open in their own X-window. They are
-    each managed by emacs, and therefore I can use the completion framework to
-    select my tabs or use a filter to delete some of them. I can also unify the
-    look of tabs, because they are displayed through centaur-tabs, which means
-    that my tabs look the same everywhere : editor, browser, terminal, etc.
-
-  - vterm :: use emacs as terminal emulator through vterm.
+  - vterm :: use emacs as terminal emulator through vterm. I alternate between
+    eshell and vterm. I find eshell to be excellent, but vterm can handle visual
+    commands. Lately, =eshell-vterm= was able to make both work for me.
 
   - org-mode :: org is its own beast, and there are extensions for a lot of use
     cases. My use case is mainly using it as a markup language and some light
-    planning tool.
+    planning tool. Most of what I write is in org-mode for easy multi-format
+    export and for the simplicity of plain text.
 
   - evil-mode :: I am not a vim user, but I do like the modal approach. I
     sometimes feel sore in my wrists and hands : at the ripe age of 24, it would
     be a little early for my taste to develop RSI. I am not trying to argue
     whether or not emacs-style keybindings cause RSI, but in my case I believe
     to have had less issues after switching to evil-mode.
+    
+  - +EXWM+ :: emacs +is also+ used to be my window manager, which is the biggest
+    step towards living in emacs (even when using other software). The WM and
+    editor have unified keybindings (through simulation keys), and I can have
+    another level of integration between my tools. For instance, I use the
+    ~no-tabs~ extension in firefox that makes all the new tabs open in their own
+    X-window. They are each managed by emacs, and therefore I can use the
+    completion framework to select my tabs or use a filter to delete some of
+    them. I can also unify the look of tabs, because they are displayed through
+    centaur-tabs, which means that my tabs look the same everywhere : editor,
+    browser, terminal, etc. *This is not the case anymore, I have gone back to
+    using XFCE with some tweaks to integrate Emacs with it*.
 
   The following snippet of code can be used to graph a mapping of all the
-  dependencies between the packages.
+  dependencies between the packages I use.
 
   #+begin_src emacs-lisp
-  (write-region
-   (let ((graph-description "digraph packageDependencies {\n")
-	 (packages (straight--dependencies)))
-     (dolist (package packages)
-       (dolist (dependent (delete-dups (flatten-tree (straight-dependents package))))
-	 (setq graph-description
-	       (concat graph-description
-		       (format " \"%s\" -> \"%s\"; \n" dependent package)))))
-     (concat graph-description "}"))
-   nil
-   "~/.emacs.d/img/graph.dot")
+    (write-region
+     (let ((graph-description "digraph packageDependencies {\n")
+           (packages (straight--dependencies)))
+       (dolist (package packages)
+         (dolist (dependent (delete-dups (flatten-tree (straight-dependents package))))
+           (setq graph-description
+                 (concat graph-description
+                         (format " \"%s\" -> \"%s\"; \n" dependent package)))))
+       (concat graph-description "}"))
+     nil
+     "~/.emacs.d/img/graph.dot")
 
-  (shell-command "dot -Tsvg ~/.emacs.d/img/graph.dot > ./img/dependencyGraph.svg")
+    (shell-command "dot -Tsvg ~/.emacs.d/img/graph.dot > ./img/dependencyGraph.svg")
   #+end_src
 
-* Some context 
+* Former configuration attempts
 ** First configuration
 
    I started using emacs in late 2018, and used to have a literate org
    configuration file. This first configuration attempt was pretty poor, as I
-   did not know any elisp, and was stealing pieces of code left and right on the
+   did not know much elisp, and was stealing pieces of code left and right on the
    internet. Performances were really bad (both startup and actual use) to the
    point were I could not bear it anymore.
 
    I eventually declared init bankrupcy and gave Doom Emacs a spin sometime
    in 2020.
 
-   [[./img/bankrupcy.jpeg]]
+[[https://github.com/lucasgruss/dotfiles/blob/main/emacs/.emacs.d/img/bankrupcy.jpeg]]
 
 ** Doom Emacs
 
-   I want to say that Doom is a great distribution of Emacs. It's fast, the
-   community is great, the Doom API is really useful and a lot of integration is
-   provided between packages.
+   Doom is a great distribution of Emacs. It's fast, the community is great, the
+   Doom API is really useful and a lot of integration is provided between
+   packages.
 
    However at some point, I got frustrated with it. Someday a Doom update failed
    for some reason (not the first time I experienced it) and something was
    broken which would have ended up with me reinstalling Doom. This is common:
    things break in the software world and we always have to repair something at
-   some point. Reinstallation is often the easiest fix, but I decided that a
-   configuration framework just means more surface area for failure, and I felt
-   ready to do my own configuration again.
+   some point. Reinstallation is often the easiest fix (the lazy way out), but I
+   decided that a configuration framework just means more surface area for
+   failure, and I felt ready to do my own configuration again.
 
    Having things configured for you is nice at first, but it can get in your way
    after a while. Reconfiguring Doom gets messy as you have settings for the
    same package split into different locations (=.emacs.d=, =.doom.d=,
-   =.doom.d/modules=, ...), which was not something I felt at ease with.  If I
-   am going to reset most variables set by Doom Emacs, I might as well go
-   vanilla.
+   =.doom.d/modules=, ...), which was not something I felt at ease with.  If I am
+   going to fight Doom Emacs, I figured I might as well go vanilla.
 
+   Remains of my doom configuration still live in my github repositories.
      
