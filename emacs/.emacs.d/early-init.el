@@ -1,6 +1,7 @@
 ;;; early-init.el : Expensive stuff early on
 
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(add-to-list 'initial-frame-alist '(undecorated . t))
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
