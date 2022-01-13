@@ -39,6 +39,7 @@
       doom-xcode
       doom-badger
       doom-1337
+      doom-dracula
       spacemacs-dark)
     "List of dark themes.")
 
