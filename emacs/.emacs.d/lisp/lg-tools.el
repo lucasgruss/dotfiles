@@ -99,7 +99,7 @@ playlist in a side-window"
 ;;;; Smudge (spotify)
 (use-package smudge
   :ensure-system-package curl
-  :straight (smudge :host github :repo "danielfm/smudge")
+  :straight t
   :commands
   (smudge-my-playlists
    smudge-track-search
@@ -109,7 +109,7 @@ playlist in a side-window"
   (smudge-oauth2-callback-port "8081")
   (smudge-transport 'connect)
   :config
-  (shell-command "pgrep spotifyd || spotifyd")
+  ;;(shell-command "pgrep spotifyd || spotifyd")
   (when (featurep 'transient)
     ;; define a nice transient interface
     (define-transient-command lg/transient-smudge ()
@@ -118,13 +118,11 @@ playlist in a side-window"
 	("m" "Play/Pause" smudge-controller-toggle-play)
 	("s" "Search" smudge-track-search)]]
       [:hide (lambda () t)])
-
     ;; bind it
     (general-define-key
      :states 'normal
      :keymaps '(smudge-mode-map smudge-playlist-search-mode-map smudge-track-search-mode-map)
-     "<localleader>" 'lg/transient-smudge))
-  )
+     "<localleader>" 'lg/transient-smudge)))
 
 ;;;; Espotify
 (use-package espotify
