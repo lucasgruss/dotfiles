@@ -62,7 +62,8 @@
   :defer t
   :commands (describe-package)
   :config
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")))
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")
+  (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
 ;;; Super save mode
 (use-package super-save
