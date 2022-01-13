@@ -44,7 +44,7 @@
     (define-transient-command lg/transient-ledger ()
       "Buffers"
       [["Ledger"
-	("a" "New transaction" ledger-add-transaction)
+	("a" "New transaction" lg/insert-transaction)
 	("o" "Ledger occur / narrow" ledger-occur)
 	("r" "Report" ledger-report)
 	("s" "Sort" ledger-sort-buffer)]]
@@ -52,7 +52,8 @@
     (general-define-key
      :states '(normal motion)
      :keymaps '(evil-ledger-mode-map ledger-report-mode-map)
-     "<localleader>" 'lg/transient-ledger)))
+     "<localleader>" 'lg/transient-ledger
+     "I" 'lg/insert-transaction)))
 
 ;;; evil-org
 (use-package evil-org
