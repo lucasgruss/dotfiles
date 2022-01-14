@@ -34,4 +34,9 @@
   :straight t
   :commands snow)
 
+;;; typit
+(use-package typit
+  :straight t
+  :custom (typit-dict "french.txt"))
+
 (provide 'lg-fun)
