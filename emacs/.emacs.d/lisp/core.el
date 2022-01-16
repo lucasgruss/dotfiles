@@ -34,6 +34,11 @@
 (use-package use-package-ensure-system-package :straight t :defer t) ;; needed for the :ensure-system-package keyword
 (use-package diminish :straight t)  ;; needed for the :diminish keyword
 
+;;; straight-x
+(use-package straight-x
+  :straight nil)
+
+;;; general
 (use-package general ;; needed for the :general keyword
   :straight t
   :config
