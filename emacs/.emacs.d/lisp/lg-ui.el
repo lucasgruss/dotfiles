@@ -29,17 +29,32 @@
   (defvar lg/light-themes
     '(modus-operandi
       doom-solarized-light
+      doom-plain
+      doom-one-light
+
       spacemacs-light)
     "List of light themes.")
 
   (defvar lg/dark-themes
     '(modus-vivendi
       doom-one
+      doom-vibrant
+      doom-solarized-dark
+      doom-solarized-dark-high-contrast
+      doom-plain-dark
       doom-dark+
       doom-xcode
       doom-badger
       doom-1337
+      doom-Iosvkem
       doom-dracula
+      doom-moonlight
+      doom-monokai-pro
+      doom-monokai-classic
+      doom-monokai-machine
+      doom-monokai-octagon
+      doom-monokai-spectrum
+      doom-monokai-ristretto
       spacemacs-dark)
     "List of dark themes.")
 
@@ -168,8 +183,6 @@ applied to gnome-settings or xfce-conf."
       evil-mode-line-tag
       (vc-mode moody-vc-mode)
       mode-line-modes)))
-					;(moody-replace-mode-line-buffer-identification)
-					;(moody-replace-vc-mode))
 
 ;;; Helpful
 (use-package helpful
@@ -184,8 +197,11 @@ applied to gnome-settings or xfce-conf."
   :hook (emacs-lisp-mode . outshine-mode)
   :diminish outshine-mode
   :general
-  (general-def :keymaps 'outshine-mode-map :states 'normal
-    [S-?\t] #'outshine-cycle)
+  (general-def
+    :keymaps 'outshine-mode-map
+    :states 'normal
+    [S-?\t] #'outshine-cycle
+    [?\t] #'outshine-cycle)
   :straight t)
 
 ;;; Outline
@@ -289,27 +305,17 @@ applied to gnome-settings or xfce-conf."
 
   :config
   (defun lg/modus-themes-custom-faces (theme &rest args)
-    (message (stringp theme))
     (when (member theme '(modus-operandi modus-vivendi)) 
       (set-face-attribute 'mode-line-inactive nil
 			  :background (modus-themes-color 'bg-main))
       (set-face-attribute 'mode-line nil
 			  :background (modus-themes-color 'green-refine-bg))
-      ;; tabs
-      ;; (set-face-attribute 'tab-line nil
-      ;; 			  :background (modus-themes-color 'bg-main))
-      ;; (set-face-attribute 'tab-bar nil
-      ;; 			  :background (modus-themes-color 'bg-main))
-      ;; (set-face-attribute 'centaur-tabs-selected nil
-      ;; 			  :background (face-attribute 'mode-line :background)
-      ;; 			  :box nil)
-      ;; (set-face-attribute 'centaur-tabs-default nil
-      ;; 			  :background (face-attribute 'mode-line :background)
-      ;; 			  :box nil)
-      ;; (set-face-attribute 'centaur-tabs-unselected nil
-      ;; 			  :background (modus-themes-color 'bg-alt)
-      ;; 			  :box nil)
-      ))
+      (set-face-attribute 'typit-wrong-char nil
+			  :foreground (modus-themes-color 'red))
+      (set-face-attribute 'typit-correct-char nil
+			  :foreground (modus-themes-color 'green))
+      (set-face-attribute 'typit-current-word nil
+			  :background (modus-themes-color 'blue-nuanced-bg))))
 
   (advice-add 'load-theme :after #'lg/modus-themes-custom-faces))
 
@@ -338,13 +344,13 @@ settings applied to them."
   :commands load-theme
   :straight t)
 
-;;;; solar
+;;; solar
 (use-package solar
   :custom
   (calendar-latitude 48.856613)
   (calendar-longitude 2.352222))
 
-;;;; Circadian
+;;; Circadian
 (use-package circadian
   :straight t
   :demand t
@@ -441,10 +447,12 @@ settings applied to them."
 
 ;;; display-line-numbers
 (use-package display-line-numbers
-  :hook (prog-mode . lg/display-line-numbers-mode-enable)
+  :hook ((prog-mode
+	  ledger-mode). lg/display-line-numbers-mode-enable)
   :config
   (defun lg/display-line-numbers-mode-enable ()
     "Enable display-line-numbers"
+    (interactive)
     (display-line-numbers-mode +1)
     (setq display-line-numbers 'relative)))
 
@@ -544,7 +552,8 @@ settings applied to them."
   :hook
   ((Info-mode
     org-mode
-    minibuffer-mode) . lg/activate-visual-fill-center))
+    minibuffer-mode
+    ledger-mode) . lg/activate-visual-fill-center))
 
 ;;; page-break-lines
 (use-package page-break-lines
