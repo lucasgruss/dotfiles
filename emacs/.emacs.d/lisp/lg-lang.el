@@ -20,10 +20,10 @@
   :straight (apheleia :host github :repo "raxod502/apheleia")
   :ensure-system-package ((black . "pip3 install black")
 			  (clang-format . "sudo npm install -g clang-format"))
-  :diminish apheleia-mode
+  :diminish 'apheleia-mode
+  :hook (prog-mode . apheleia-mode)
   :init
-  (add-to-list 'exec-path "/home/lucas/.local/bin/")
-  (apheleia-global-mode +1))
+  (add-to-list 'exec-path "/home/lucas/.local/bin/"))
 
 ;;; Emacs lisp
 (use-package eldoc
@@ -47,6 +47,10 @@
 ;;; Matlab
 (use-package matlab-mode
   :disabled t
+  :straight t)
+
+;;; lua
+(use-package lua-mode
   :straight t)
 
 (provide 'lg-lang)
