@@ -31,7 +31,6 @@
       doom-solarized-light
       doom-plain
       doom-one-light
-
       spacemacs-light)
     "List of light themes.")
 
@@ -244,6 +243,7 @@ applied to gnome-settings or xfce-conf."
 ;;;; all-the-icons-ibuffer
 (use-package all-the-icons-ibuffer
   :straight t
+  :after ibuffer
   :config (all-the-icons-ibuffer-mode +1))
 
 ;;; Themes 
@@ -263,7 +263,7 @@ applied to gnome-settings or xfce-conf."
   ;; Options for `modus-themes-mode-line': nil, '3d, 'moody,
   ;; 'borderless, 'borderless-3d, 'borderless-moody, 'accented,
   ;; 'accented-3d, 'accented-moody
-  (modus-themes-mode-line 'accented-moody)
+  (modus-themes-mode-line '(accented-moody))
 
   ;; Options for `modus-themes-syntax': nil, 'faint,
   ;; 'yellow-comments, 'green-strings,
@@ -390,14 +390,11 @@ settings applied to them."
 			    tab-bar-format-tabs-groups
 			    tab-bar-separator
 			    tab-bar-format-add-tab
-			    tab-bar-format-align-right
+			    ;;tab-bar-format-align-right
 			    ;tab-bar-format-echo
-			    tab-bar-format-global
+			   ; tab-bar-format-global
 			    ))
   :config
-  (defun tab-bar-format-echo ()
-    `((global menu-item ,(string-trim-right (with-current-buffer (get-buffer " *Echo Area 1*")
-					      (buffer-string))) ignore)))
   (tab-bar-mode -1))
 
 ;;;; centaur-tabs
