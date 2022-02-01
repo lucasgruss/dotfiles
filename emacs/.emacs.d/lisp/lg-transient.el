@@ -184,7 +184,12 @@
       ("c" "Center" lg/toggle-visual-fill-center)
       ("f" "Fullscreen" toggle-frame-fullscreen)
       ("F" "Fullscreen all frames" lg/toggle-all-frames-fullscreen)
-      ("t" "Transparency" lg/toggle-transparency)]
+      ("m" "Hide modeline" hide-mode-line-mode)
+      ("M" "Hide modeline globally" global-hide-mode-line-mode)
+      ("t" "Transparency" lg/toggle-transparency)
+      ("v" "Visual fill column" visual-fill-column-mode)
+      ("V" "Visual fill column globally" visual-fill-column-mode)
+      ]
      ["Modes"
       ("C-f" "Fringes" fringe-mode)
       ("h" "Hl-line" hl-line-mode)

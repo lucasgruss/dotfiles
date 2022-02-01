@@ -184,6 +184,10 @@ applied to gnome-settings or xfce-conf."
       (vc-mode moody-vc-mode)
       mode-line-modes)))
 
+;;;; hide-mode-line
+(use-package hide-mode-line
+  :straight t)
+
 ;;; Helpful
 (use-package helpful
   :straight t
