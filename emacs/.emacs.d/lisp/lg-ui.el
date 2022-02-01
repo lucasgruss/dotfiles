@@ -77,6 +77,7 @@
     (setq lg/gtk-theme gtk-theme)
     (setq lg/icon-theme icon-theme)
     (efs/run-in-background (format "xfconf-query -c xfce4-desktop -p  /backdrop/screen0/monitoreDP-1/workspace0/last-image -s %s" background-img))
+    (efs/run-in-background (format "xfconf-query -c xfce4-desktop -p  /backdrop/screen0/monitorHDMI-1/workspace0/last-image -s %s" background-img))
     (efs/run-in-background (format "xfconf-query -c xsettings -p /Net/ThemeName -s %s" gtk-theme))
     (efs/run-in-background (format "xfconf-query -c xsettings -p /Net/IconThemeName -s %s" icon-theme))
     (shell-command (format "sed -i 's/ThemeName.*/ThemeName \"%s\"/g' ~/.xsettingsd" gtk-theme))
