@@ -26,7 +26,9 @@
      ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL0H7ONNEUnnt59niYAZ07dFTi99u2L2n_" ouvrez_les_guillements usul)
      ("https://www.youtube.com/feeds/videos.xml?channel_id=UCKH_iLhhkTyt8Dk4dmeCQ9w" science)
      ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL43OynbWaTMLEbdAWr-DnAfveOonmhlT1" france_inter)
+     ("https://www.reddit.com/r/emacs/.rss" emacs reddit)
      "https://api.lemediatv.fr/rss.xml"))
+  (elfeed-search-filter "")
   :config
   (use-package lg-elfeed
     :load-path "~/.emacs.d/lisp/site-packages"
