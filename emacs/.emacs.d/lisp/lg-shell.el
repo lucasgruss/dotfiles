@@ -62,6 +62,7 @@
 
 ;;; Dtache
 (use-package dtache
+  :disabled t
   :straight (:host gitlab :repo "niklaseklund/dtache")
   :ensure-system-package dtach
   :hook (after-init . dtache-setup)
