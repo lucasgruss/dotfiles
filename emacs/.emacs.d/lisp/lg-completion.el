@@ -1,6 +1,27 @@
 ;;; lg-completion --- completion configuration -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
+;;;
+(use-package emacs
+  :init
+  (defun emacs-execute-extended-command ()
+    "Create and select a frame called emacs-run-launcher which
+consists only of a minibuffer and has specific dimensions. Run
+counsel-linux-app on that frame, which is an emacs command that
+prompts you to select an app and open it in a dmenu like
+behaviour. Delete the frame after that command has exited"
+    (interactive)
+    (with-selected-frame (make-frame '((name . "emacs-run-launcher")
+				       (minibuffer . only)
+				       (undecorated . t)
+				       (width . 0.4)
+				       (height . 11)
+				       (top . 0.5)
+				       (left . 0.5)))
+      (unwind-protect
+	  (execute-extended-command nil)
+	(delete-frame)))))
+
 ;;;Selectrum
 (use-package selectrum
   :straight t
