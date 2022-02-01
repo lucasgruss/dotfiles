@@ -55,6 +55,10 @@
   :config
   (gcmh-mode +1))
 
+;;; no-littering
+(use-package no-littering
+  :straight t)
+
 ;;;; Esup : emacs startup time profiler
 (use-package esup
   :straight t
@@ -75,6 +79,15 @@
   :straight t
   :diminish super-save-mode
   :config (super-save-mode +1))
+
+;;; recentf-mode
+(use-package recentf
+  :custom (recentf-max-saved-items 100)
+  :config
+  (when (featurep 'no-littering)
+    (add-to-list 'recentf-exclude no-littering-var-directory)
+    (add-to-list 'recentf-exclude no-littering-etc-directory))
+  (recentf-mode +1))
 
 ;;; Emacs
 (use-package emacs
@@ -98,10 +111,8 @@
   (inhibit-startup-screen t)
   (y-or-n-p-use-read-key t)
   (x-select-enable-clipboard-manager t)
-  (recentf-max-saved-items 100)
   :config
   ;;(server-start)
-  (recentf-mode +1)
   (show-paren-mode +1)
   (auto-revert-mode +1)
   (global-eldoc-mode +1)
