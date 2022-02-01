@@ -37,6 +37,21 @@
 ;;; typit
 (use-package typit
   :straight t
+  :commands (typit-test
+	     typit-basic-test
+	     typit-advanced-test)
   :custom (typit-dict "french.txt"))
+
+;;; wordel
+(use-package wordel
+  :straight (:host github :repo "progfolio/wordel" :files (:defaults "words.txt")))
+
+
+;;; enime : watch anime
+(use-package esxml
+  :straight t)
+(use-package enime
+  :straight (:host github :repo "xl666/enime" :files (:defaults "video_scrapping.sh"))
+  :commands (enime-main-transient))
 
 (provide 'lg-fun)
