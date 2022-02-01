@@ -224,7 +224,25 @@ playlist in a side-window"
 ;;;; Password-store: integration of pass into emacs
 (use-package password-store
   :straight t
-  :commands (password-store-copy password-store-insert))
+  :commands (password-store-copy password-store-insert)
+  :init
+  (defun emacs-password-copy ()
+    "Create and select a frame called emacs-run-launcher which
+consists only of a minibuffer and has specific dimensions. Run
+counsel-linux-app on that frame, which is an emacs command that
+prompts you to select an app and open it in a dmenu like
+behaviour. Delete the frame after that command has exited"
+    (interactive)
+    (with-selected-frame (make-frame '((name . "emacs-run-launcher")
+				       (minibuffer . only)
+				       (undecorated . t)
+				       (width . 0.4)
+				       (height . 11)
+				       (top . 0.5)
+				       (left . 0.5)))
+      (unwind-protect
+	  (call-interactively #'password-store-copy)
+	(delete-frame)))))
 
 ;;;; Pass: frontend to pass in Emacs
 (use-package pass
@@ -324,7 +342,27 @@ playlist in a side-window"
   :straight (app-launcher :type git :host github
 			  :repo "SebastienWae/app-launcher")
   :commands app-launcher-run-app
-  :bind ("s-d" . 'app-launcher-run-app))
+  :bind ("s-d" . 'app-launcher-run-app)
+  :config
+  ;; stolen from https://www.reddit.com/r/emacs/comments/s7pei3/using_emacs_as_your_app_launcher_crosspost_from/
+  ;; and adapted to app-launcher instead of counsel
+  (defun emacs-run-launcher ()
+    "Create and select a frame called emacs-run-launcher which
+consists only of a minibuffer and has specific dimensions. Run
+counsel-linux-app on that frame, which is an emacs command that
+prompts you to select an app and open it in a dmenu like
+behaviour. Delete the frame after that command has exited"
+    (interactive)
+    (with-selected-frame (make-frame '((name . "emacs-run-launcher")
+				       (minibuffer . only)
+				       (undecorated . t)
+				       (width . 0.4)
+				       (height . 11)
+				       (top . 0.5)
+				       (left . 0.5)))
+      (unwind-protect
+	  (app-launcher-run-app)
+	(delete-frame)))))
 
 ;;; wttrin
 (use-package wttrin
