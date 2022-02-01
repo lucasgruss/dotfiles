@@ -3,7 +3,6 @@
 
 ;;; Org
 (use-package org
-  ;;:mode ("\\.org\\'" . org-mode)
   :straight t
   :hook ((org-mode . auto-fill-mode)
 	 (before-save . org-table-recalculate-buffer-tables))
@@ -16,12 +15,14 @@
 	("A" "Archive" org-archive-subtree)
 	("c" "Cite" org-cite-insert)
 	("e" "Export" org-export-dispatch)
-	("E" "Export" org-set-effort)
+	("E" "Effort" org-set-effort)
 	("l" "Link" org-insert-link)
 	("n" "Narrow subtree" org-toggle-narrow-to-subtree)
 	("P" "Set property" org-set-property)
 	("t" "Tangle file (babel)" org-babel-tangle)
-	("T" "Set tag" org-set-tags-command)]
+	("T" "Set tag" org-set-tags-command)
+	("w" "Refile" org-refile)
+	("w" "Refile" org-refile-copy)]
        ["Clocking"
 	("i" "Clock in" org-clock-in)
 	("o" "Clock out" org-clock-out)
@@ -39,21 +40,17 @@
      :keymaps 'org-mode-map
      "<localleader>" 'lg/transient-org))
   (defun org-clocking-buffer () nil) ;; without it, impossible to exit emacs with C-x C-c
-  (setq org-directory "~/org/")
-  (setq org-agenda-files '("~/org/todo.org")); "~/org/contacts.org"))
-  (setq org-default-notes-file "~/org/todo.org")
-  (setq org-fontify-quote-and-verse-blocks nil)
-  (setq org-fontify-whole-heading-line nil)
-  (setq org-agenda-include-diary t)
-  (setq org-startup-with-latex-preview nil)
-  (setq org-hide-leading-stars nil)
-  (setq org-startup-indented nil)
-  (setq org-archive-location "archive/%s_archive::")
-  ;; this is better handled by calling ob-`lang` for the required languages
-  ;; (setq org-babel-load-languages
-  ;; 	'((emacs-lisp . t)
-  ;; 	  (dot . t)))
   :custom
+  (org-directory "~/org/")
+  (org-agenda-files '("~/org/todo.org")); "~/org/contacts.org"))
+  (org-default-notes-file "~/org/todo.org")
+  (org-fontify-quote-and-verse-blocks t "Setting this variable to t makes it consistent with src blocks.")
+  (org-fontify-whole-heading-line nil)
+  (org-agenda-include-diary t)
+  (org-startup-with-latex-preview nil "Avoid eager evaluation of the latex code.")
+  (org-hide-leading-stars t "We can't count too many stars anyway")
+  (org-startup-indented t "Indent-mode o")
+  (org-archive-location "archive/%s_archive::")
   (org-hide-emphasis-markers t)
   (org-src-block-faces
    `(("emacs-lisp" modus-themes-nuanced-magenta)
@@ -170,12 +167,6 @@
   :defer t
   :after org)
 
-;;; org-indent
-(use-package org-indent
-  :after org
-  :diminish org-indent-mode
-  :hook (org-mode . org-indent-mode))
-
 ;;; Org-sidebar
 (use-package org-sidebar
   :after org 
@@ -186,52 +177,42 @@
 (use-package org-tree-slide
   :straight t
   :after org
-  :commands prot/org-presentation-mode
-  :init
-  (my-leader-def :states 'normal :keymaps 'org-mode-map
-    "tP" #'prot/org-presentation-mode)
-  :config
-  (setq org-tree-slide-breadcrumbs nil)
-  (setq org-tree-slide-header nil)
-  (setq org-tree-slide-slide-in-effect nil)
-  (setq org-tree-slide-heading-emphasis nil)
-  (setq org-tree-slide-cursor-init t)
-  (setq org-tree-slide-modeline-display nil)
-  (setq org-tree-slide-skip-done nil)
-  (setq org-tree-slide-skip-comments t)
-  (setq org-tree-slide-fold-subtrees-skipped t)
-  (setq org-tree-slide-skip-outline-level 2)
-  (setq org-tree-slide-never-touch-face t)
-  (setq org-tree-slide-activate-message
-        (propertize "Presentation mode ON" 'face 'success))
-  (setq org-tree-slide-deactivate-message
+  :custom
+  (org-tree-slide-breadcrumbs nil)
+  (org-tree-slide-header nil)
+  (org-tree-slide-slide-in-effect nil)
+  (org-tree-slide-heading-emphasis nil)
+  (org-tree-slide-cursor-init t)
+  (org-tree-slide-modeline-display nil)
+  (org-tree-slide-skip-done nil)
+  (org-tree-slide-skip-comments t)
+  (org-tree-slide-fold-subtrees-skipped t)
+  (org-tree-slide-skip-outline-level 2)
+  (org-tree-slide-never-touch-face t)
+  (org-tree-slide-activate-message
+   (propertize "Presentation mode ON" 'face 'success))
+  (org-tree-slide-deactivate-message
         (propertize "Presentation mode OFF" 'face 'error))
-
-  (define-minor-mode prot/org-presentation-mode
+  :config
+  ;; inspired by protesilaos' configuration
+  (define-minor-mode lg/org-presentation-mode
     "Parameters for plain text presentations with `org-mode'."
     :init-value nil
     :global nil
-    (if prot/org-presentation-mode
+    (if lg/org-presentation-mode
         (progn
           (unless (eq major-mode 'org-mode)
             (user-error "Not in an Org buffer"))
           (org-tree-slide-mode 1)
-          (writeroom-mode 1)
-          (org-superstar-mode 1)
-          (setq-local display-line-numbers nil)
-          (org-indent-mode 1))
-      (org-tree-slide-mode -1)
-      (writeroom-mode -1)
-      (org-superstar-mode -1)
-      (setq-local display-line-numbers 'relative)
-      (org-indent-mode -1)))
-
-  :bind (("C-c P" . prot/org-presentation-mode)
-	 :map org-tree-slide-mode-map
-	 ("C-h" . org-tree-slide-display-header-toggle)
-	 ("C-l" . org-tree-slide-display-header-toggle)
-	 ("C-j" . org-tree-slide-move-next-tree)
-	 ("C-k" . org-tree-slide-move-previous-tree)))
+          (setq-local display-line-numbers nil))
+      (org-tree-slide-mode -1)))
+  (general-define-key
+   :states '(normal)
+   :keymaps 'org-tree-slide-mode-map
+   "C-h" #'org-tree-slide-display-header-toggle
+   "C-l" #'org-tree-slide-display-header-toggle
+   "C-j" #'org-tree-slide-move-next-tree
+   "C-k" #'org-tree-slide-move-previous-tree))
 
 ;;; Org-noter
 (use-package org-noter
@@ -263,22 +244,6 @@
 (use-package org-noter-pdftools
   :after org-noter
   :straight t)
-
-;;; Citar
-(use-package citar
-  :straight t
-  :commands (citar-open citar-open-notes citar-open-entry)
-  :custom
-  (citar-bibliography "~/bib/references.bib")
-  (citar-file-extensions '("pdf" "org" "tex"))
-  (citar-notes-paths '("~/org/notes/"))
-  :config
-  (citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook)))
-
-;;;; citar-org
-(use-package citar-org
-  :after citar)
-
 
 ;;; Ox-report
 (use-package ox-report
@@ -370,29 +335,15 @@ Format is a string matching the following format specification:
   :bind ("s-c" . org-capture)
   :custom
   (org-capture-templates
-   '(("t" "Personal todo" entry
+   '(("b" "Books" entry
+      (file+headline "~/org/lecture.org" "Inbox")
+      "* %?
+%^{AUTEUR}p
+%^{DATE_LECTURE}p "
+      )
+     ("t" "Todo" entry
       (file+headline org-default-notes-file "Inbox")
       "* %?\n%i\n" :prepend t)
-     ("n" "Personal notes" entry
-      (file+headline +org-capture-notes-file "Inbox")
-      "* %u %?\n%i\n%a" :prepend t)
-     ("j" "Journal" entry
-      (file+olp+datetree +org-capture-journal-file)
-      "* %U %?\n%i\n%a" :prepend t)
-     ("p" "Templates for projects")
-     ("pt" "Project-local todo" entry
-      (file+headline +org-capture-project-todo-file "Inbox")
-      "* TODO %?\n%i\n%a" :prepend t)
-     ("pn" "Project-local notes" entry
-      (file+headline +org-capture-project-notes-file "Inbox")
-      "* %U %?\n%i\n%a" :prepend t)
-     ("pc" "Project-local changelog" entry
-      (file+headline +org-capture-project-changelog-file "Unreleased")
-      "* %U %?\n%i\n%a" :prepend t)
-     ("o" "Centralized templates for projects")
-     ("ot" "Project todo" entry #'+org-capture-central-project-todo-file "* TODO %?\n %i\n %a" :heading "Tasks" :prepend nil)
-     ("on" "Project notes" entry #'+org-capture-central-project-notes-file "* %U %?\n %i\n %a" :heading "Notes" :prepend t)
-     ("oc" "Project changelog" entry #'+org-capture-central-project-changelog-file "* %U %?\n %i\n %a" :heading "Changelog" :prepend t)
      ("l" "Link" entry (file+headline "~/org/links.org" "Links")
       "* %a %^g\n %?\n %T\n %i"))))
 
@@ -454,13 +405,13 @@ Format is a string matching the following format specification:
   :straight t
   :hook (org-mode . org-variable-pitch-minor-mode))
 
-;;; deft
-(use-package deft
+;;; org-preview-html
+(use-package org-preview-html
   :straight t
-  :commands deft
+  :defer t
   :custom
-  (deft-extensions '("txt" "tex" "org"))
-  (deft-directory "~/org"))
+  (org-preview-html-viewer 'xwidget)
+  (org-preview-html-refresh-configuration 'save))
 
 ;;; org-cite
 (use-package oc
@@ -473,6 +424,29 @@ Format is a string matching the following format specification:
 				(latex csl)
 				(html csl)
 				(t basic))))
+
+;;; deft
+(use-package deft
+  :straight t
+  :commands deft
+  :custom
+  (deft-extensions '("txt" "tex" "org"))
+  (deft-directory "~/org"))
+
+;;; Citar
+(use-package citar
+  :straight t
+  :commands (citar-open citar-open-notes citar-open-entry)
+  :custom
+  (citar-bibliography "~/bib/references.bib")
+  (citar-file-extensions '("pdf" "org" "tex"))
+  (citar-notes-paths '("~/org/notes/"))
+  :config
+  (citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook)))
+
+;;;; citar-org
+(use-package citar-org
+  :after citar)
 
 ;;;; export processors
 (use-package oc-basic :after org)
