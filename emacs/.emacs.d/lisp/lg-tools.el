@@ -8,6 +8,11 @@
   :custom
   (alert-default-style 'notifications))
 
+;;; sudo
+(use-package sudo-edit
+  :straight t
+  :defer t)
+
 ;;; Elfeed
 (use-package elfeed
   :straight t
@@ -513,6 +518,11 @@ playlist in a side-window"
 
 ;;; devdocs-browser
 (use-package devdocs-browser
+  :straight t
+  :defer t)
+
+;;; mpv.el:  control mpv through emacs
+(use-package mpv
   :straight t
   :defer t)
 
