@@ -256,78 +256,49 @@ applied to gnome-settings or xfce-conf."
 (use-package modus-themes
   :straight t
   :custom
-  (modus-themes-slanted-constructs t)
+  (modus-themes-italic-constructs t)
   (modus-themes-bold-constructs nil)
-  (modus-themes-fringes nil) ; {nil,'subtle,'intense})
-  ;; Options for `modus-themes-lang-checkers': nil,
-  ;; 'straight-underline, 'subtle-foreground,
-  ;; 'subtle-foreground-straight-underline, 'intense-foreground,
-  ;; 'intense-foreground-straight-underline, 'colored-background
-  (modus-themes-lang-checkers 'straight-underline)
-
-  ;; Options for `modus-themes-mode-line': nil, '3d, 'moody,
-  ;; 'borderless, 'borderless-3d, 'borderless-moody, 'accented,
-  ;; 'accented-3d, 'accented-moody
-  (modus-themes-mode-line '(accented-moody))
-
-  ;; Options for `modus-themes-syntax': nil, 'faint,
-  ;; 'yellow-comments, 'green-strings,
-  ;; 'yellow-comments-green-strings, 'alt-syntax,
-  ;; 'alt-syntax-yellow-comments, 'faint-yellow-comments
-  (modus-themes-syntax nil)
-
-  ;; Options for `modus-themes-hl-line': nil, 'intense-background,
-  ;; 'accented-background, 'underline-neutral,
-  ;; 'underline-accented, 'underline-only-neutral,
-  ;; 'underline-only-accented
-  (modus-themes-intense-hl-line 'accented-background)
+  (modus-themes-fringes nil) ; {nil,'subtle,'intense}
+  (modus-themes-lang-checkers nil) ; '(straight-underline text-also background intense faint)
+  (modus-themes-mode-line '(moody)) ; list '(3d moody borderless accented)
+  (modus-themes-syntax nil) ; list '(faint yellow-comments green-strings alt-syntax)
+  (modus-themes-hl-line '(accented)) ; list '(accented underline intense)
   (modus-themes-subtle-line-numbers nil)
   (modus-themes-paren-match '(intense bold)) ; {nil,'subtle-bold,'intense,'intense-bold}
-
-  ;; Options for `modus-themes-links': nil, 'faint,
-  ;; 'neutral-underline, 'faint-neutral-underline, 'no-underline,
-  ;; 'underline-only, 'neutral-underline-only
-  (modus-themes-links 'neutral-underline)
-
-  ;; Options for `modus-themes-prompts': nil, 'subtle-accented,
-  ;; 'intense-accented, 'subtle-gray, 'intense-gray
-  (modus-themes-prompts 'intense-gray)
+  (modus-themes-links '(neutral-underline))
+  (modus-themes-prompts '(intense gray)) ; '(intense background gray italic bold)
   (modus-themes-completions 'moderate) ; {nil,'moderate,'opinionated})
-
-  ;; Options for `modus-themes-region': nil, 'no-extend, 'bg-only,
-  ;; 'bg-only-no-extend, 'accent, 'accent-no-extend
-  (modus-themes-region 'accent)
-
-  ;; Options for `modus-themes-diffs': nil, 'desaturated,
-  ;; 'fg-only, 'bg-only, 'deuteranopia,
-  (modus-themes-diffs nil) ;
-  (modus-themes-org-blocks 'rainbow) ; {nil,'greyscale,'rainbow}
-  (modus-themes-org-habit nil) ; {nil,'simplified,'traffic-light}
-  (modus-themes-headings '((t . highlight)))
+  (modus-themes-region '(accent)) ; '(accented bg-only no-extend)
+  (modus-themes-diffs nil) ; {nil, 'desaturated, 'bg-only}
+  (modus-themes-org-blocks 'tinted-background) ; {nil,'gray-background,'tinted-background}
   (modus-themes-variable-pitch-ui nil)
-  (modus-themes-variable-pitch-headings t)
-  (modus-themes-scale-headings t)
-  (modus-themes-scale-1 1.1)
-  (modus-themes-scale-2 1.15)
-  (modus-themes-scale-3 1.21)
-  (modus-themes-scale-4 1.27)
-  (modus-themes-scale-5 1.33)
-
+  (modus-themes-headings
+   '((1 . (rainbow 1.1))
+     (2 . (rainbow 1.1))
+     (3 . (rainbow 1.1))
+     (4 . (rainbow 1.1))
+     (5 . (rainbow 1.1))
+     (6 . (rainbow 1.1))
+     (7 . (rainbow 1.1))
+     (8 . (rainbow 1.1))
+     (t . (rainbow))))
   :config
-  (defun lg/modus-themes-custom-faces (theme &rest args)
-    (when (member theme '(modus-operandi modus-vivendi)) 
-      (set-face-attribute 'mode-line-inactive nil
-			  :background (modus-themes-color 'bg-main))
-      (set-face-attribute 'mode-line nil
-			  :background (modus-themes-color 'green-refine-bg))
-      (set-face-attribute 'typit-wrong-char nil
-			  :foreground (modus-themes-color 'red))
-      (set-face-attribute 'typit-correct-char nil
-			  :foreground (modus-themes-color 'green))
-      (set-face-attribute 'typit-current-word nil
-			  :background (modus-themes-color 'blue-nuanced-bg))))
+  ;; (defun lg/modus-themes-custom-faces (theme &rest args)
+  ;;   (when (member theme '(modus-operandi modus-vivendi)) 
+  ;;     (set-face-attribute 'mode-line-inactive nil
+  ;; 			  :background (modus-themes-color 'bg-main))
+  ;;     (set-face-attribute 'mode-line nil
+  ;; 			  :background (modus-themes-color 'green-refine-bg))
+  ;;     (set-face-attribute 'typit-wrong-char nil
+  ;; 			  :foreground (modus-themes-color 'red))
+  ;;     (set-face-attribute 'typit-correct-char nil
+  ;; 			  :foreground (modus-themes-color 'green))
+  ;;     (set-face-attribute 'typit-current-word nil
+  ;; 			  :background (modus-themes-color 'blue-nuanced-bg))))
 
-  (advice-add 'load-theme :after #'lg/modus-themes-custom-faces))
+  ;; (advice-add 'load-theme :after #'lg/modus-themes-custom-faces)
+  ;; (advice-remove 'load-theme #'lg/modus-themes-custom-faces)
+  )
 
 ;;;; modus-themes-exporter
 (use-package modus-themes-exporter
