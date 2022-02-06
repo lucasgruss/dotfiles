@@ -126,18 +126,23 @@ applied to gnome-settings or xfce-conf."
   (defun lg/toggle-transparency ()
     "Toggle the transparency of Emacs on and off"
     (interactive)
-    (let ((alpha (frame-parameter nil 'alpha)))
+    (let ((alpha (frame-parameter nil 'alpha-background)))
       (set-frame-parameter
-       nil 'alpha
-       (if (eql (cond ((numberp alpha) alpha)
-		      ((numberp (cdr alpha)) (cdr alpha))
-		      ;; Also handle undocumented (<active> <inactive>) form.
-		      ((numberp (cadr alpha)) (cadr alpha)))
+       nil 'alpha-background
+       (if (eql
+	    alpha
+	    ;; (cond ((numberp alpha) alpha)
+	    ;; 	      ((numberp (cdr alpha)) (cdr alpha))
+	    ;; 	      ;; Also handle undocumented (<active> <inactive>) form.
+	    ;; 	      ((numberp (cadr alpha)) (cadr alpha)))
 		100)
-	   lg/transparency-alpha '(100 . 100)))))
+	   lg/transparency-alpha
+	 ;;'(100 . 100)
+	 100
+	 ))))
 
   (defun lg/transparency-alpha-increase (arg)
-    "Increase transparency of the frame"
+    "Decrease transparency of the frame"
     (interactive "P")
     (let ((inc (if arg arg lg/transparency-default-increment)))
       (setq lg/transparency-alpha (+ lg/transparency-alpha inc)))
@@ -156,7 +161,7 @@ applied to gnome-settings or xfce-conf."
     (when (< 100 lg/transparency-alpha) (setq lg/transparency-alpha 100))
     (when (> 0 lg/transparency-alpha) (setq lg/transparency-alpha 0))
     (set-frame-parameter
-     nil 'alpha lg/transparency-alpha))
+     nil 'alpha-background lg/transparency-alpha))
 
   (lg/toggle-transparency))
 
