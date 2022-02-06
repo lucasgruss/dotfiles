@@ -16,6 +16,10 @@ for me. As such this configuration is suitable for GNU Emacs 28+ but I give no
 guaranty that it will work or run for anybody else. Clone it at your own risk
 (this warning applies to me as well).
 
+#+begin_src shell
+./configure --with-xwidgets  --with-pgtk --with-native-compilation --with-json
+#+end_src
+
 * Core concepts
 
 Here are the handful of concepts that I try to apply when configuring emacs:
@@ -24,7 +28,7 @@ Here are the handful of concepts that I try to apply when configuring emacs:
 - no literate configuration : other people's configurations in org look very
   nice and are nice projects, but I feel like it's a lot of work to maintain
   them. I don't really want to document everything in my configuration
-  anyway, but rather highlight the important pieces. Comments works just
+  anyway, but rather highlight the important pieces. Comments work just
   fine.
 - use built-in packages as much as possible to promote integration of
   packages.
@@ -129,3 +133,11 @@ Here are the handful of concepts that I try to apply when configuring emacs:
 
    Remains of my doom configuration still live in my github repositories.
      
+* Other configurations for Emacs
+
+Here are some cool configurations I came across and took inspiration from. It' s
+nice to look at other people's configurations and discover new packages, new
+ideas and uses for Emacs.
+
+https://gitlab.com/nbarrientos/dotfiles/-/blob/master/.emacs.d/init.el
+https://github.com/isamert/dotfiles/blob/master/emacs/index.org
