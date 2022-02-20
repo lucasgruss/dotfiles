@@ -112,8 +112,10 @@
   (inhibit-startup-screen t)
   (y-or-n-p-use-read-key t)
   (x-select-enable-clipboard-manager t)
+  (mouse-scroll-delay 0.01)
   :config
   ;;(server-start)
+  (context-menu-mode +1)
   (show-paren-mode +1)
   (auto-revert-mode +1)
   (global-eldoc-mode +1)
