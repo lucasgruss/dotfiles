@@ -251,28 +251,6 @@ behaviour. Delete the frame after that command has exited"
   :straight t
   :commands pass)
 
-;;; EWW
-(use-package eww
-  :commands (eww eww-browse-with-history)
-  :hook (eww-after-render . prot-eww--rename-buffer)
-  ;; :init
-  ;; (map! (:leader
-  ;;        :prefix ("o" . "open")
-  ;;        :desc "eww" "w" #'eww-browse-with-history)
-  ;;       (:map eww-link-keymap
-  ;;        ;"v" #'eww-mpv-video-at-point
-  ;;        "a" #'eww-mpv-audio-at-point
-  ;;        "C-j" #'eww-next-url
-  ;;        "C-k" #'eww-previous-url))
-  :custom
-  (eww-download-directory "~/Téléchargements/eww/")
-  (eww-desktop-data-save '(:url :title))
-  :config
-  (advice-add 'eww-back-url :after #'prot-eww--rename-buffer)
-  (advice-add 'eww-forward-url :after #'prot-eww--rename-buffer)
-  (use-package lg-eww
-    :load-path "lisp/site-packages"))
-
 ;;; Ledger mode
 (use-package ledger-mode
   :ensure-system-package ledger
@@ -366,24 +344,6 @@ behaviour. Delete the frame after that command has exited"
 	  (app-launcher-run-app)
 	(delete-frame)))))
 
-;;; wttrin
-(use-package wttrin
-  :straight t
-  :commands wttrin
-  :custom
-  (wttrin-default-cities '("Paris" "Nantes" "Russange" ":help"))
-  :config
-  ;; https://github.com/bcbcarl/emacs-wttrin/issues/16
-  (defun wttrin-fetch-raw-string (query)
-    "Get the weather information based on your QUERY."
-    (let ((url-user-agent "curl"))
-      (add-to-list 'url-request-extra-headers wttrin-default-accept-language)
-      (with-current-buffer
-	  (url-retrieve-synchronously
-	   (concat "http://fr.wttr.in/" query "?A")
-	   (lambda (status) (switch-to-buffer (current-buffer))))
-	(decode-coding-string (buffer-string) 'utf-8)))))
-
 ;;; Deamons
 (use-package daemons
   :straight t
@@ -400,30 +360,6 @@ behaviour. Delete the frame after that command has exited"
 ;;    ;; command is invoked
 ;;    (lambda () (finito-start-server-if-not-already))))
 
-;;; browse-url
-(use-package browse-url
-  :straight nil
-  :defer t
-  :custom
-  (browse-url-handlers
-   '(("\\`mailto:" . browse-url--mailto)
-    ("\\www\.youtube\.com" . browse-url-umpv)
-    ("\\`man:" . browse-url--man)
-    (browse-url--non-html-file-url-p . browse-url-emacs)))
-
-  :init
-  (defun browse-url-umpv (url &optional single)
-    (start-process "mpv" nil (if single "mpv" "umpv")
-		   (shell-quote-wildcard-pattern url)))
-
-  (defun browse-url-at-point-umpv (&optional single)
-    "Open link in mpv"
-    (interactive "P")
-    (let ((browse-url-browser-function
-	   (if single
-	       (lambda (url &optional _new-window) (browse-url-umpv url t))
-	     #'browse-url-umpv)))
-      (browse-url-at-point))))
 
 ;;; Simple-httpd
 (use-package simple-httpd
