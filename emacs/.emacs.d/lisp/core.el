@@ -30,9 +30,22 @@
 
 ;;; use-package
 (straight-use-package 'use-package)
-(use-package bind-key :straight t) ;; needed for the :bind keyword
-(use-package use-package-ensure-system-package :straight t :defer t) ;; needed for the :ensure-system-package keyword
-(use-package diminish :straight t)  ;; needed for the :diminish keyword
+
+;;;; bind-key
+;; needed for the :bind-key keyword
+(use-package bind-key
+  :straight t)
+
+;;;; use-package-ensure-system-package
+;; needed for the :ensure-system-package keyword
+(use-package use-package-ensure-system-package
+  :straight t
+  :defer t)
+
+;;;; diminish
+;; needed for the :diminish keyword
+(use-package diminish
+  :straight t)
 
 ;;; straight-x
 (use-package straight-x
