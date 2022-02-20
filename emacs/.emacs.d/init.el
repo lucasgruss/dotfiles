@@ -11,8 +11,8 @@
 (defvar lg/modules
   '("core"
     "private"
-    "lg-ui"
     "lg-keybindings"
+    "lg-ui"
     "lg-transient"
     "lg-window"
     "lg-completion"
