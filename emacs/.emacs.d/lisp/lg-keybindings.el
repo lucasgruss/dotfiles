@@ -5,6 +5,7 @@
 ;;; Evil-mode
 (use-package evil
   :straight t
+  :demand t
   :init
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
