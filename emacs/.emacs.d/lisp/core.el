@@ -51,13 +51,6 @@
 (use-package straight-x
   :straight nil)
 
-;;; general
-(use-package general ;; needed for the :general keyword
-  :straight t
-  :config
-  (general-create-definer my-leader-def :states '(normal visual motion) :prefix "SPC")
-  (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m"))
-
 ;;; PERFORMANCES (as soon as possible)
 ;; (setq gc-cons-threshold (* 4 100 1024 1024)) ;; try and speed up startup time
 
@@ -103,17 +96,12 @@
   (recentf-mode +1))
 
 ;;; Emacs
-(use-package emacs
+(use-package emacs ;; core
   :straight nil
   :diminish (auto-revert-mode eldoc-mode)
   :bind
   ("s-<escape>" . 'lg/kill-this-buffer)
   ("s-b" . 'bury-buffer)
-  :general
-  (general-def :states 'normal :keymaps 'Info-mode-map
-    "RET" 'Info-follow-nearest-node)
-  (general-def :states '(normal visual) :keymaps 'eww-mode-map
-    "i" 'evil-insert)
   :custom
   (idle-update-delay 0.3)
   (comp-async-report-warnings-errors nil)

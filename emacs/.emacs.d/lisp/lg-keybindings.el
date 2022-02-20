@@ -13,6 +13,17 @@
   :bind (:map evil-visual-state-map ("gr" . eval-last-sexp))
   :config (evil-mode +1))
 
+;;; general
+(use-package general
+  :straight t
+  :config
+  (general-def :states 'normal :keymaps 'Info-mode-map
+    "RET" 'Info-follow-nearest-node)
+  (general-def :states '(normal visual) :keymaps 'eww-mode-map
+    "i" 'evil-insert)
+  (general-create-definer my-leader-def :states '(normal visual motion) :prefix "SPC")
+  (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m"))
+
 ;;; Evil-collection
 (use-package evil-collection
   :diminish evil-collection-unimpaired-mode
