@@ -5,6 +5,7 @@
 (use-package org
   :straight t
   :hook ((org-mode . auto-fill-mode)
+	 ;; (before-save . org-footnote-normalize)
 	 (before-save . org-table-recalculate-buffer-tables))
   :init
   (when (featurep 'transient)
@@ -16,13 +17,15 @@
 	("c" "Cite" org-cite-insert)
 	("e" "Export" org-export-dispatch)
 	("E" "Effort" org-set-effort)
+	("f" "Insert footnote" org-footnote-new)
+	("h" "HTML live preview" org-preview-html-mode)
 	("l" "Link" org-insert-link)
 	("n" "Narrow subtree" org-toggle-narrow-to-subtree)
 	("P" "Set property" org-set-property)
 	("t" "Tangle file (babel)" org-babel-tangle)
 	("T" "Set tag" org-set-tags-command)
 	("w" "Refile" org-refile)
-	("w" "Refile" org-refile-copy)]
+	("W" "Refile" org-refile-copy)]
        ["Clocking"
 	("i" "Clock in" org-clock-in)
 	("o" "Clock out" org-clock-out)
@@ -42,15 +45,14 @@
   (defun org-clocking-buffer () nil) ;; without it, impossible to exit emacs with C-x C-c
   :custom
   (org-directory "~/org/")
-  (org-agenda-files '("~/org/todo.org")); "~/org/contacts.org"))
   (org-default-notes-file "~/org/todo.org")
   (org-fontify-quote-and-verse-blocks t "Setting this variable to t makes it consistent with src blocks.")
   (org-fontify-whole-heading-line nil)
-  (org-agenda-include-diary t)
   (org-startup-with-latex-preview nil "Avoid eager evaluation of the latex code.")
-  (org-hide-leading-stars t "We can't count too many stars anyway")
-  (org-startup-indented t "Indent-mode o")
+  (org-hide-leading-stars t "We can't count too many stars anyway.")
+  (org-startup-indented t "Activate indent-mode.")
   (org-archive-location "archive/%s_archive::")
+  (org-archive-subtree-add-inherited-tags t "Keep tags of from parent heading.")
   (org-hide-emphasis-markers t)
   (org-src-block-faces
    `(("emacs-lisp" modus-themes-nuanced-magenta)
@@ -73,6 +75,8 @@
      ("yaml" modus-themes-nuanced-cyan)
      ("conf" modus-themes-nuanced-cyan)
      ("docker" modus-themes-nuanced-cyan)))
+  (org-export-dispatch-use-expert-ui nil)
+  (org-export-in-background nil)
   :config 
   (push 'org-habit org-modules)
   (plist-put org-format-latex-options :scale 1.5))
@@ -80,7 +84,8 @@
 ;;; org-agenda
 (use-package org-agenda
   :after org
-  :config
+  :defer t
+  :init
   ;; Mostly inspired from Protesilaos Stavrou's configuration  
   ;; https://protesilaos.com/codelog/2021-12-09-emacs-org-block-agenda/
   (defvar lg/org-custom-daily-agenda
@@ -122,7 +127,10 @@
 		  (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n"))))
     "Custom agenda for use in `org-agenda-custom-commands'.")
 
-  (setq org-agenda-custom-commands
+  :custom
+  (org-agenda-files '("~/org/todo.org")); "~/org/contacts.org"))
+  (org-agenda-include-diary t)
+  (org-agenda-custom-commands
 	`(("A" "Daily agenda and top priority tasks"
 	   ,lg/org-custom-daily-agenda))))
 
@@ -364,6 +372,11 @@ Format is a string matching the following format specification:
   (org-pomodoro-long-break-sound "/usr/share/sounds/freedesktop/stereo/complete.oga")
   (org-pomodoro-finished-sound "/usr/share/sounds/freedesktop/stereo/complete.oga"))
 
+;;; org-pomodoro third-time
+(use-package org-pomodoro-third-time
+  :straight (:host github :repo "telotortium/org-pomodoro-third-time")
+  :diminish t
+  :defer t)
 
 ;;; Integration between org and zotero
 ;;;; org-zotxt
@@ -436,7 +449,7 @@ Format is a string matching the following format specification:
 ;;; Citar
 (use-package citar
   :straight t
-  :commands (citar-open citar-open-notes citar-open-entry)
+  :commands (citar-select-ref citar-open citar-open-notes citar-open-entry)
   :custom
   (citar-bibliography "~/bib/references.bib")
   (citar-file-extensions '("pdf" "org" "tex"))
@@ -462,5 +475,45 @@ Format is a string matching the following format specification:
   :custom
   (org-cite-csl-styles-dir "/usr/share/citation-style-language/styles/")
   (org-cite-csl-locales-dir "/usr/share/citation-style-language/locales/"))
+
+;;; Roam
+(use-package org-roam
+  :straight t
+  :after org
+  :defer t
+  :custom
+  (org-roam-directory "~/org/roam")
+  (org-roam-database-connector 'sqlite)
+  :config
+  ;; https://jethrokuan.github.io/org-roam-guide/
+  (defun jethro/org-roam-node-from-cite (keys-entries)
+    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
+    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
+						"${author editor} :: ${title}")))
+      (org-roam-capture- :templates
+			 '(("r" "reference" plain "%?" :if-new
+			    (file+head "reference/${citekey}.org"
+				       ":PROPERTIES:
+:ROAM_REFS: [cite:@${citekey}]
+:END:
+#+title: ${title}\n")
+			    :immediate-finish t
+			    :unnarrowed t))
+			 :info (list :citekey (car keys-entries))
+			 :node (org-roam-node-create :title title)
+			 :props '(:finalize find-file))))
+  (org-roam-db-autosync-mode +1))
+
+;;;; org roam ui
+(use-package org-roam-ui
+  :straight t
+  :after org-roam
+  :diminish org-roam-ui-follow-mode
+  :custom
+  (org-roam-ui-sync-theme t)
+  (org-roam-ui-follow t)
+  (org-roam-ui-update-on-save t)
+  (org-roam-ui-open-on-start t)
+  (org-roam-ui-browser-function #'xwidget-webkit-browse-url))
 
 (provide 'lg-org)
