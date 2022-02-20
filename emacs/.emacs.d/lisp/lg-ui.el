@@ -355,6 +355,48 @@ settings applied to them."
 			    ))
   :config
   (tab-bar-mode -1))
+;;;; tab-line
+(use-package lg-tab-line
+  :bind
+  ("s-/" . global-tab-line-mode)
+  :general
+  (general-def :states 'normal
+    "C-t" 'tab-line-new-tab
+    "gt" 'tab-line-switch-to-next-tab
+    "gT" 'tab-line-switch-to-prev-tab)
+  (general-def :states 'insert
+    "C-t" 'tab-line-new-tab)
+  :custom
+  (tab-line-new-button-show t)
+  (tab-line-new-button "NEW")
+  (tab-line-separator '(propertize " " 'face (face-attribute 'default :foreground)))
+  (tab-line-close-button-show t)
+  (tab-line-switch-cycling t)
+  (tab-line-new-tab-choice #'lg/tab-line-new-tab)
+  (tab-line-tabs-function #'tab-line-tabs-mode-buffers)
+  (tab-line-tab-name-function #'lg/tab-line-name-buffer-padded)
+  (tab-line-tab-name-format-function #'lg/tab-line-tab-name-format)
+  (tab-line-close-tab-function #'lg/tab-line-kill-buffer)
+  :hook
+  ((emms-playlist-mode
+    org-ql-sidebar-buffer-setup
+    dashboard-mode
+    calendar-mode
+    Info-mode
+    ibuffer-sidebar-mode
+    ibuffer-mode
+    dired-mode
+    dired-sidebar-mode
+    pdf-outline-buffer-mode
+    calc-mode
+    calc-trail-mode) . lg/tab-line-local-disable)
+  :config
+  (defun lg/tab-line-local-disable () (interactive) (tab-line-mode -1))
+  (add-hook 'window-configuration-change-hook
+	    #'(lambda ()
+		(dolist (window (window-list))
+		  (set-window-parameter window 'tab-line-cache nil))))
+  (global-tab-line-mode +1))
 
 ;;;; centaur-tabs
 (use-package centaur-tabs
