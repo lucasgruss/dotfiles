@@ -2,7 +2,6 @@
 
 ;;; Transient
 (use-package transient
-  :straight t
   :demand t
   :config
   (my-leader-def :keymaps 'override "" 'lg/transient-root)
@@ -25,7 +24,7 @@
       ("o" "Open/Org" lg/transient-o)
       ("p" "Project" lg/transient-p)
       ("q" "Quit" lg/transient-q)
-      ("s" "Search/Sidebar" lg/transient-s)
+      ("s" "Search/Sidebar/Snippet" lg/transient-s)
       ("t" "Toggle" lg/transient-t)
       ("w" "Window" lg/transient-w)]]
     [:hide (lambda () t)])
@@ -129,7 +128,7 @@
       ("e" "ERC" lg/connect-irc)
       ("f" "Elfeed" elfeed)
       ("g" "Magit" magit-status)
-      ("N" "Enwc (Network manager)" enwc)
+      ;;("N" "Enwc (Network manager)" enwc)
       ("p" "Pass" pass)
       ("P" "Proced" proced)
       ("r" "Ripgrep" rg)
@@ -145,7 +144,8 @@
       ("j" "Org journal" org-journal-new-entry)
       ("k" "Capture" org-capture)
       ("n" "Org-noter session" org-noter)
-      ("o" "Clock out" org-clock-out)]]
+      ("o" "Clock out" org-clock-out)
+      ("R" "Org-Roam" org-roam-ui-open)]]
     [:hide (lambda () t)])
 
   (define-transient-command lg/transient-p ()
@@ -182,6 +182,7 @@
     "Toggle / Activate"
     [["Toggle"
       ("c" "Center" lg/toggle-visual-fill-center)
+      ("d" "Decoration" lg/toggle-frame-decorations)
       ("f" "Fullscreen" toggle-frame-fullscreen)
       ("F" "Fullscreen all frames" lg/toggle-all-frames-fullscreen)
       ("m" "Hide modeline" hide-mode-line-mode)
@@ -207,7 +208,6 @@
       ("k" "Focus top window" windmove-up)
       ("l" "Focus right window" windmove-right)]]
     [:hide (lambda () t)])
-
   )
 
 (provide 'lg-transient)
