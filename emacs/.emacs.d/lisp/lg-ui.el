@@ -16,102 +16,22 @@
   ;; (set-face-attribute 'variable-pitch nil :family "Roboto" :weight 'semi-light :height 110 :width 'normal))
 
 ;;;; Syncing system themes with emacs theme
-(use-package emacs
-  ;:hook (after-init . lg/load-theme)
+(use-package lg-system-theme-sync
+  :load-path "~/.emacs.d/lisp/site-packages/"
+  :custom 
+  (system-theme-sync-default-light-plist '(:background "/home/lucas/Images/Wallpaper/moutain.png"
+					   :gtk-theme "Adwaita"
+					   :icon-theme "Papirus-Light"))
+  (system-theme-sync-default-dark-plist '(:background "/home/lucas/Images/Wallpaper_bis/space3.png"
+					  :gtk-theme "Adwaita-dark"
+				          :icon-theme "Papirus-Dark"))
   :init
-  ;; https://github.com/ema2159/centaur-tabs/issues/157
-  (defvar after-load-theme-hook nil
-    "Hook run after a color theme is loaded using `load-theme'.")
-  (defadvice load-theme (after run-after-load-theme-hook activate)
-    "Run `after-load-theme-hook'."
-    (run-hooks 'after-load-theme-hook))
-
-  (defvar lg/light-themes
-    '(modus-operandi
-      doom-solarized-light
-      doom-plain
-      doom-one-light
-      spacemacs-light)
-    "List of light themes.")
-
-  (defvar lg/dark-themes
-    '(modus-vivendi
-      doom-one
-      doom-vibrant
-      doom-solarized-dark
-      doom-solarized-dark-high-contrast
-      doom-plain-dark
-      doom-dark+
-      doom-xcode
-      doom-badger
-      doom-1337
-      doom-Iosvkem
-      doom-dracula
-      doom-moonlight
-      doom-monokai-pro
-      doom-monokai-classic
-      doom-monokai-machine
-      doom-monokai-octagon
-      doom-monokai-spectrum
-      doom-monokai-ristretto
-      spacemacs-dark)
-    "List of dark themes.")
-
-  (defvar lg/theme 'modus-operandi)
-
-  (defvar lg/background)
-  (defvar lg/gtk-theme)
-  (defvar lg/icon-theme)
-
-  (defvar lg/light-background "/home/lucas/Images/Wallpaper/moutain.png" "A background to be used when theme is light.")
-  (defvar lg/light-gtk-theme "Adwaita" "Light gtk-theme to apply.")
-  (defvar lg/light-icon-theme "Papirus-Light" "Light icon-theme to apply.")
-  (defvar lg/dark-background "/home/lucas/Images/Wallpaper_bis/space3.png" "A background to be used when theme is dark.")
-  (defvar lg/dark-gtk-theme "Adwaita-dark" "Dark gtk-theme to apply.")
-  (defvar lg/dark-icon-theme "Papirus-Dark" "Dark icon-theme to apply.")
-
-  (defun lg/theme-apply (gtk-theme icon-theme background-img)
-    "Apply GTK-THEME and ICON-THEME to the system."
-    (setq lg/background background-img)
-    (setq lg/gtk-theme gtk-theme)
-    (setq lg/icon-theme icon-theme)
-    (efs/run-in-background (format "xfconf-query -c xfce4-desktop -p  /backdrop/screen0/monitoreDP-1/workspace0/last-image -s %s" background-img))
-    (efs/run-in-background (format "xfconf-query -c xfce4-desktop -p  /backdrop/screen0/monitorHDMI-1/workspace0/last-image -s %s" background-img))
-    (efs/run-in-background (format "xfconf-query -c xsettings -p /Net/ThemeName -s %s" gtk-theme))
-    (efs/run-in-background (format "xfconf-query -c xsettings -p /Net/IconThemeName -s %s" icon-theme))
-    (shell-command (format "sed -i 's/ThemeName.*/ThemeName \"%s\"/g' ~/.xsettingsd" gtk-theme))
-    (shell-command (format "sed -i 's/IconThemeName.*/IconThemeName \"Papirus-Light\"/g' ~/.xsettingsd" icon-theme)))
-
-  (defun lg/theme-propagate (theme &rest args)
-    "Apply system wide settings that are consistent with the emacs
-themes. Suitable gtk and icon themes are applied, and some colors
-are changed in the Xresources file.
-
-This function is to be used with xsettingsd, but the same can be
-applied to gnome-settings or xfce-conf."
-    (when (member theme lg/light-themes)
-      (lg/theme-apply lg/light-gtk-theme lg/light-icon-theme lg/light-background))
-    (when (member theme lg/dark-themes)
-      (lg/theme-apply lg/dark-gtk-theme lg/dark-icon-theme lg/dark-background))
-    (shell-command (format "sed -i 's/background =.*/background = \"%s\"/g' ~/.config/dunst/dunstrc" (face-foreground 'default)))
-    (shell-command (format "sed -i 's/foreground =.*/foreground = \"%s\"/g' ~/.config/dunst/dunstrc" (face-background 'default)))
-    (efs/run-in-background "killall dunst")
-    (shell-command (format "sed -i 's/\*background.*/\*background\: %s/g' ~/.Xresources" (face-background 'default)))
-    (shell-command (format "sed -i 's/\*foreground.*/\*foreground\: %s/g' ~/.Xresources" (face-foreground 'default)))
-    (efs/run-in-background "killall -HUP xsettingsd")
-    (shell-command "xrdb ~/.Xresources"))
-
-  (advice-add 'load-theme :after #'lg/theme-propagate '(depth 100))
-
   (defun load-theme--disable-old-theme(theme &rest args)
     "Disable current theme before loading new one."
     (mapcar #'disable-theme custom-enabled-themes))
-
-  (defun lg/load-theme ()
-    "Load the theme defined in lg/theme"
-    (load-theme lg/theme t nil))
-
-  (advice-add 'load-theme :before #'load-theme--disable-old-theme))
+  (advice-add 'load-theme :before #'load-theme--disable-old-theme)
+  :config
+  (system-theme-sync-mode +1))
 
 ;;;; Transparency
 (use-package emacs
