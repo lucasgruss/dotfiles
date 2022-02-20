@@ -1,6 +1,54 @@
 ;;; lg-ui --- Configuration for the UI of Emacs -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
+;;; Icons
+;;;; kind-icons
+(use-package kind-icon
+  :straight t
+  :after corfu
+  :custom
+  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+;;;; all-the-icons
+(use-package all-the-icons
+  :straight t
+  :custom
+  (all-the-icons-scale-factor 0.9)
+  (all-the-icons-default-alltheicon-adjust 0.0)
+  :config
+  (add-to-list 'all-the-icons-mode-icon-alist
+	       '(exwm-mode  all-the-icons-faicon "toggle-on" :height 1.0 :v-adjust -0.2
+			    :face all-the-icons-green))
+  (add-to-list 'all-the-icons-mode-icon-alist
+	       '(ledger-mode all-the-icons-faicon "money" :height 1.0 :v-adjust -0.2
+			    :face all-the-icons-green))
+  (add-to-list 'all-the-icons-icon-alist
+	       '("\\.m$" all-the-icons-fileicon "matlab" :face all-the-icons-orange))
+  (add-to-list 'all-the-icons-icon-alist
+	       '("\\.ledger$" all-the-icons-faicon "money" :face all-the-icons-green))
+  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append))
+
+;;;; all-the-icons-dired
+(use-package all-the-icons-dired
+  :straight t
+  :demand t
+  :diminish all-the-icons-dired-mode
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+;;;; all-the-icons-completion
+(use-package all-the-icons-completion
+  :straight t
+  :defer 5
+  :config (all-the-icons-completion-mode +1))
+
+;;;; all-the-icons-ibuffer
+(use-package all-the-icons-ibuffer
+  :straight t
+  :demand t
+  :config (all-the-icons-ibuffer-mode +1))
+
 ;;; Emacs settings
 (use-package emacs
   :init
@@ -14,6 +62,26 @@
   ;; (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
   ;; (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
   ;; (set-face-attribute 'variable-pitch nil :family "Roboto" :weight 'semi-light :height 110 :width 'normal))
+(use-package time
+  :custom
+  (display-time-format (concat (when (featurep 'all-the-icons)
+				 (all-the-icons-wicon "time-9")) " %H:%M"))
+  (display-time-string-forms
+   '((if
+	 (and
+	  (not display-time-format)
+	  display-time-day-and-date)
+	 (format-time-string "%a %b %e " now)
+       #1="")
+     (propertize
+      (format-time-string
+       (or display-time-format
+	   (if display-time-24hr-format "%H:%M" "%-I:%M%p"))
+       now)
+      'help-echo
+      (format-time-string "%a %b %e, %Y" now))))
+  :config
+  (display-time-mode +1))
 
 ;;;; Syncing system themes with emacs theme
 (use-package lg-system-theme-sync
@@ -86,8 +154,36 @@
   (lg/toggle-transparency))
 
 ;;; Modeline
+(use-package emacs ; modeline
+  :init
+  (when (featurep 'all-the-icons)
+    (defvar lg/mode-line-major-mode '(:eval (all-the-icons-icon-for-buffer) " ")
+      "Display an icon in the modeline")
+    ;; the icons don't show if the variable is not declared risky
+    (put 'lg/mode-line-major-mode 'risky-local-variable t)
+    (setq-default mode-line-format
+		  '("%e"
+		    "    "
+		    mode-line-front-space
+		    mode-line-mule-info
+		    mode-line-client
+		    mode-line-modified
+		    mode-line-remote
+		    mode-line-frame-identification
+		    lg/mode-line-major-mode
+		    " "
+		    mode-line-buffer-identification
+		    "   "
+		    mode-line-position
+		    evil-mode-line-tag
+		    (vc-mode vc-mode)
+		    " "
+		    mode-line-modes
+		    mode-line-misc-info))))
+
 ;;;; Moody
 (use-package moody
+  :disabled
   :straight t
   :demand t
   :custom
@@ -138,38 +234,6 @@
   :diminish outline-minor-mode
   :defer t)
 
-;;; Icons
-;;;; all-the-icons
-(use-package all-the-icons
-  :straight t
-  :defer t
-  :custom
-  (all-the-icons-scale-factor 1.0)
-  :config
-  (add-to-list 'all-the-icons-mode-icon-alist
-               '(exwm-mode  all-the-icons-faicon "toggle-on" :height 1.0 :v-adjust -0.2
-                            :face all-the-icons-green))
-  (add-to-list 'all-the-icons-icon-alist
-               '("\\.m$" all-the-icons-fileicon "matlab" :face all-the-icons-orange)))
-
-;;;; all-the-icons-dired
-(use-package all-the-icons-dired
-  :straight t
-  :after dired
-  :diminish all-the-icons-dired-mode
-  :hook (dired-mode . all-the-icons-dired-mode))
-
-;;;; all-the-icons-completion
-(use-package all-the-icons-completion
-  :straight t
-  :after all-the-icons
-  :config (all-the-icons-completion-mode +1))
-
-;;;; all-the-icons-ibuffer
-(use-package all-the-icons-ibuffer
-  :straight t
-  :after ibuffer
-  :config (all-the-icons-ibuffer-mode +1))
 
 ;;; Themes 
 ;;;; modus-themes
@@ -264,8 +328,7 @@ settings applied to them."
 ;;; Dashboard
 (use-package dashboard
   :straight t
-;  :after circadian
-  ;:demand t
+  :when (featurep 'all-the-icons)
   :custom
   (dashboard-set-init-info nil)
   (dashboard-center-content t)
