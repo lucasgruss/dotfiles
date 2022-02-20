@@ -25,7 +25,14 @@
       (window-width . ,(+ 3 fill-column))
       (side . right)
       (slot . -2))
-     )))
+     ("\\*\\Outline .*\.pdf\\*"
+      (display-buffer-in-direction)
+      (direction . right)
+      (window-width . 0.2))))
+  :config
+  (defun lg/toggle-all-frames-fullscreen ()
+    (interactive)
+    (lambda () (mapc 'toggle-frame-fullscreen (frame-list)))))
 
 ;;; Windmove
 (use-package windmove
@@ -63,11 +70,5 @@
   :demand t
   :custom
   (framemove-hook-into-windmove t))
-
-(use-package emacs
-  :config
-  (defun lg/toggle-all-frames-fullscreen ()
-    (interactive)
-    (lambda () (mapc 'toggle-frame-fullscreen (frame-list)))))
 
 (provide 'lg-window)
