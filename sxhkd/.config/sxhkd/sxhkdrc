@@ -3,10 +3,16 @@
 #
 export PATH
 # terminal emulator
-super + Return
-      	isemacs && xdotool getwindowfocus key super+Return || (emacsclient -n -e '(yequake-toggle "yequake-vterm")')
+# super + Return
+#       	isemacs && xdotool getwindowfocus key super+Return || xfce4-terminal --drop-down
 
+# isemacs && xdotool getwindowfocus key super+Return || (emacsclient -n -e '(yequake-toggle "yequake-vterm")')
 # (emacsclient -e "(vterm)" && ror Emacs emacs) 
+
+super  + Return
+       emacsclient -e "(emacs-run-eshell)"
+
+#xfce4-terminal --drop-down
 
 # browser
 super + i
@@ -18,11 +24,25 @@ super + s
 
 # launcher
 super + d
-      	isemacs && xdotool getwindowfocus key super+d || xfce4-popup-whiskermenu
+      	emacsclient -e "(emacs-run-launcher)"
+
+super + D
+      	xfdashboard
+#isemacs && xdotool getwindowfocus key super+d || (emacsclient -e "(emacs-run-launcher)")
+#isemacs && xdotool getwindowfocus key super+d || xfce4-popup-whiskermenu
+
+# M-x everywhere !
+# alt+x
+#       	isemacs && xdotool getwindowfocus key alt+x || (emacsclient -e "(emacs-execute-extended-command)")
+
+# passwords
+super + p
+      	emacsclient -e "(emacs-password-copy)"
+#isemacs && xdotool getwindowfocus key super+p || (emacsclient -e "(emacs-password-copy)")
 
 # org capture
-super + c
-      	isemacs && xdotool getwindowfocus key super+c || (emacsclient -n -e '(yequake-toggle "org-capture")')
+# super + c
+#       	isemacs && xdotool getwindowfocus key super+c || (emacsclient -n -e '(yequake-toggle "org-capture")')
 
 # Emacs
 super + e
@@ -37,8 +57,8 @@ super + @space
 	dmenu_run
 
 # kill program / delete buffer
-super + Escape
-      isemacs && xdotool getwindowfocus key super+Escape || xdotool getwindowfocus key control+w
+# super + Escape
+#       isemacs && xdotool getwindowfocus key super+Escape || xdotool getwindowfocus key control+w
 
 #isemacs && xdotool getwindowfocus key super+Escape || xdotool getwindowfocus windowkill
 
@@ -50,27 +70,27 @@ super + z
 # Emacs integration
 # 
 
-super + h
-      isemacs && xdotool getwindowfocus key super+h || notify-send h
+# super + h
+#       isemacs && xdotool getwindowfocus key super+h || notify-send h
 
-super + j
-      isemacs && xdotool getwindowfocus key super+j || notify-send j
+# super + j
+#       isemacs && xdotool getwindowfocus key super+j || notify-send j
 
-super + k
-      isemacs && xdotool getwindowfocus key super+k || notify-send k
+# super + k
+#       isemacs && xdotool getwindowfocus key super+k || notify-send k
 
-super + l
-      isemacs && xdotool getwindowfocus key super+l || notify-send l
+# super + l
+#       isemacs && xdotool getwindowfocus key super+l || notify-send l
 
 #
 # Key remapping
 #
 
-control + h
-	isemacs && xdotool getwindowfocus key control+h || xdotool getwindowfocus key Left 
-control + j
-	isemacs && xdotool getwindowfocus key control+j || xdotool getwindowfocus key Down
-control + k
-	isemacs && xdotool getwindowfocus key control+k || xdotool getwindowfocus key Up
-control + l
-	isemacs && xdotool getwindowfocus key control+l || xdotool getwindowfocus key Right
+# control + h
+# 	isemacs && xdotool getwindowfocus key control+h || xdotool getwindowfocus key Left 
+# control + j
+# 	isemacs && xdotool getwindowfocus key control+j || xdotool getwindowfocus key Down
+# control + k
+# 	isemacs && xdotool getwindowfocus key control+k || xdotool getwindowfocus key Up
+# control + l
+# 	isemacs && xdotool getwindowfocus key control+l || xdotool getwindowfocus key Right

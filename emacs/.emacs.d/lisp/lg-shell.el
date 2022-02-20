@@ -31,6 +31,31 @@
       (vterm-toggle))))
 
 ;;; Eshell
+;;;; eshell
+
+(use-package eshell
+  :defer t
+  :init
+  (defun emacs-run-eshell ()
+    (interactive)
+    (if (frame-parameter nil 'kill-me)
+	(delete-frame)
+      (let ((frame (condition-case nil
+		       (select-frame-by-name "eshell/terminal")
+		     (error nil))))
+	(if frame
+	    (select-frame-by-name "eshell/terminal")
+	  (with-selected-frame (make-frame '((name . "eshell/terminal")
+					     (minibuffer . nil)
+					     (undecorated . t)
+					     (width . 0.7)
+					     (height . 0.4)
+					     (top . 0.5)
+					     (display . ":0")
+					     (left . 0.5)
+					     (kill-me . t)))
+	    (unwind-protect (eshell))))))))
+
 ;;;; eshell-toggle 
 (use-package eshell-toggle
   :straight t
@@ -42,9 +67,7 @@
 ;;;; eshell-info-banner
 (use-package eshell-info-banner
   :commands eshell
-  :straight (eshell-info-banner :type git
-                                :host github
-                                :repo "phundrak/eshell-info-banner.el")
+  :straight t
   :hook (eshell-banner-load . eshell-info-banner-update-banner))
 
 ;;;; eshell-vterm
