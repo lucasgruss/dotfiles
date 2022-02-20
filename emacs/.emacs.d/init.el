@@ -1,5 +1,8 @@
 ;;; init.el : where all the magic starts -*- lexical-binding: t; -*-
 
+;;; https://github.com/kiwanami/emacs-epc/issues/35
+(setq byte-compile-warnings '(cl-functions))
+
 ;;; Add the modules to the load-path
 (defvar lg/configuration-path (expand-file-name "lisp" "~/.emacs.d"))
 (add-to-list 'load-path lg/configuration-path)
