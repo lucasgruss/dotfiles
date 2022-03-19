@@ -9,23 +9,23 @@
 
 ;;; Declare the modules to be enabled
 (defvar lg/modules
-  '("core"
-    "private"
-    "lg-keybindings"
-    "lg-ui"
-    "lg-transient"
-    "lg-window"
-    "lg-completion"
-    "lg-tools"
-    "lg-web"
-    "lg-shell"
-    "lg-lang"
-    "lg-mail"
-    "lg-org"
-    "lg-fun"
-    "lg-dired"
-    "lg-erc"
-    ;; "lg-exwm"
+  '(core
+    private
+    lg-keybindings
+    lg-ui
+    lg-transient
+    lg-window
+    lg-completion
+    lg-tools
+    lg-web
+    lg-shell
+    lg-lang
+    lg-mail
+    lg-org
+    lg-fun
+    lg-dired
+    lg-erc
+    ;; lg-exwm
     )
   "List of enabled modules in my configuration.")
 
@@ -42,7 +42,7 @@
 ;;; Require all the modules
 (dolist (module lg/modules)
   (let ((before-load-time (float-time)))
-    (require (intern module))
+    (require module)
     (message "Loaded %s in %s." module
 	     (format "%.2f seconds"
 		     (float-time
