@@ -31,6 +31,12 @@
 ;;; use-package
 (straight-use-package 'use-package)
 
+(use-package use-package
+  :straight t
+  :custom
+  (use-package-compute-statistics t)
+  (use-package-verbose t))
+
 ;;;; bind-key
 ;; needed for the :bind-key keyword
 (use-package bind-key
@@ -45,7 +51,9 @@
 ;;;; diminish
 ;; needed for the :diminish keyword
 (use-package diminish
-  :straight t)
+  :straight t
+  :config
+  (diminish 'auto-fill-function))
 
 ;;; straight-x
 (use-package straight-x
@@ -88,12 +96,17 @@
 
 ;;; recentf-mode
 (use-package recentf
-  :custom (recentf-max-saved-items 100)
+  :custom (recentf-max-saved-items 1000)
   :config
   (when (featurep 'no-littering)
     (add-to-list 'recentf-exclude no-littering-var-directory)
     (add-to-list 'recentf-exclude no-littering-etc-directory))
   (recentf-mode +1))
+
+;;; so-long
+(use-package so-long
+  :config
+  (global-so-long-mode +1))
 
 ;;; Emacs
 (use-package emacs ;; core
@@ -114,11 +127,9 @@
   (x-select-enable-clipboard-manager t)
   (mouse-scroll-delay 0.01)
   :config
-  ;;(server-start)
   (context-menu-mode +1)
   (show-paren-mode +1)
   (auto-revert-mode +1)
-  (global-eldoc-mode +1)
   (fset 'yes-or-no-p 'y-or-n-p)
   (load (setq custom-file "~/.emacs.d/lisp/custom.el"))
   (setq-default fill-column 80)
