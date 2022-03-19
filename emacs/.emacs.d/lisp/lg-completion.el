@@ -65,6 +65,7 @@ behaviour. Delete the frame after that command has exited"
     (selectrum-prescient-mode +1)))
 
 ;;; vertico
+;; Nice config tips : https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
   :straight '(vertico :files (:defaults "extensions/*")
 		      :includes (vertico-buffer
@@ -80,8 +81,19 @@ behaviour. Delete the frame after that command has exited"
 	      ("C-j" . vertico-next)
 	      ("C-k" . vertico-previous)
 	      ("C-l" . vertico-insert))
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy) ; Correct file path when changed
   :demand t
   :config
+  ;; Prefix the current candidate with “» ”. From
+  ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
+  (advice-add #'vertico--format-candidate :around
+	      (lambda (orig cand prefix suffix index _start)
+		(setq cand (funcall orig cand prefix suffix index _start))
+		(concat
+		 (if (= vertico--index index)
+		     (propertize "» " 'face 'vertico-current)
+		   "  ")
+		 cand)))
   (vertico-mode +1)
   ;; extensions
   (vertico-mouse-mode +1))
@@ -100,9 +112,7 @@ behaviour. Delete the frame after that command has exited"
   :custom
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light))
   :config
-  (marginalia-mode +1)
-  (when (featurep 'all-the-icons-completion)
-    (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup)))
+  (marginalia-mode +1))
 
 ;;; Consult
 (use-package consult
@@ -131,11 +141,43 @@ behaviour. Delete the frame after that command has exited"
   :bind ("s-;" . embark-act)
   :config
   ;; https://github.com/oantolin/embark/wiki/Additional-Configuration
-  (setq embark-action-indicator
-	(lambda (map &optional _target)
-	  (which-key--show-keymap "Embark" map nil nil 'no-paging)
-	  #'which-key--hide-popup-ignore-command)
-	embark-become-indicator embark-action-indicator)
+(defun embark-which-key-indicator ()
+  "An embark indicator that displays keymaps using which-key.
+The which-key help message will show the type and value of the
+current target followed by an ellipsis if there are further
+targets."
+  (lambda (&optional keymap targets prefix)
+    (if (null keymap)
+        (which-key--hide-popup-ignore-command)
+      (which-key--show-keymap
+       (if (eq (plist-get (car targets) :type) 'embark-become)
+           "Become"
+         (format "Act on %s '%s'%s"
+                 (plist-get (car targets) :type)
+                 (embark--truncate-target (plist-get (car targets) :target))
+                 (if (cdr targets) "…" "")))
+       (if prefix
+           (pcase (lookup-key keymap prefix 'accept-default)
+             ((and (pred keymapp) km) km)
+             (_ (key-binding prefix 'accept-default)))
+         keymap)
+       nil nil t (lambda (binding)
+                   (not (string-suffix-p "-argument" (cdr binding))))))))
+
+(setq embark-indicators
+  '(embark-which-key-indicator
+    embark-highlight-indicator
+    embark-isearch-highlight-indicator))
+
+(defun embark-hide-which-key-indicator (fn &rest args)
+  "Hide the which-key indicator immediately when using the completing-read prompter."
+  (which-key--hide-popup-ignore-command)
+  (let ((embark-indicators
+         (remq #'embark-which-key-indicator embark-indicators)))
+      (apply fn args)))
+
+(advice-add #'embark-completing-read-prompter
+            :around #'embark-hide-which-key-indicator)
 
   (when (featurep 'selectrum)
     (defun refresh-selectrum ()
@@ -154,9 +196,17 @@ behaviour. Delete the frame after that command has exited"
     (add-hook 'embark-collect-mode-hook #'shrink-selectrum)))
 
 ;;; embark-consult
+;; (use-package embark-consult
+;;   :straight t
+;;   :after embark)
 (use-package embark-consult
   :straight t
-  :after embark)
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
 
 ;;; Company
 ;; (use-package company
@@ -200,7 +250,7 @@ behaviour. Delete the frame after that command has exited"
   (corfu-preview-current t)    ;; Disable current candidate preview
   (corfu-preselect-first nil)    ;; Disable candidate preselection
   (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  (corfu-echo-documentation t) ;; Disable documentation in the echo area
+  (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   (corfu-scroll-margin 5)        ;; Use scroll margin
   :bind (:map corfu-map
 	      ("C-j" . corfu-next)
@@ -217,8 +267,9 @@ behaviour. Delete the frame after that command has exited"
 
 ;;;; corfu-doc
 (use-package corfu-doc
-  :disabled t
   :straight (:host github :type git :repo "galeo/corfu-doc")
+  :bind (:map corfu-map
+	      ("C-h" . #'corfu-doc-toggle))
   :hook
   (corfu-mode . corfu-doc-mode))
 
