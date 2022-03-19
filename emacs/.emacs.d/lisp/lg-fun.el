@@ -44,8 +44,8 @@
 
 ;;; wordel
 (use-package wordel
-  :straight (:host github :repo "progfolio/wordel" :files (:defaults "words.txt")))
-
+  :straight (:host github :repo "progfolio/wordel" :files (:defaults "words.txt"))
+  :defer t)
 
 ;;; enime : watch anime
 (use-package esxml
@@ -53,5 +53,15 @@
 (use-package enime
   :straight (:host github :repo "xl666/enime" :files (:defaults "video_scrapping.sh"))
   :commands (enime-main-transient))
+
+;;; vimgolf
+(use-package vimgolf
+  :defer t
+  :straight t)
+
+;;; dad jokes
+(use-package dad-joke
+  :straight t
+  :defer t)
 
 (provide 'lg-fun)
