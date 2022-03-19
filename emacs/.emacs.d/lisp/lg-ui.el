@@ -6,6 +6,8 @@
 (use-package kind-icon
   :straight t
   :after corfu
+  :hook
+  (system-theme-sync-theme . (lambda () (interactive) (kind-icon-reset-cache)))
   :custom
   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
   :config
@@ -37,31 +39,28 @@
   :diminish all-the-icons-dired-mode
   :hook (dired-mode . all-the-icons-dired-mode))
 
-;;;; all-the-icons-completion
-(use-package all-the-icons-completion
-  :straight t
-  :defer 5
-  :config (all-the-icons-completion-mode +1))
-
 ;;;; all-the-icons-ibuffer
 (use-package all-the-icons-ibuffer
   :straight t
   :demand t
   :config (all-the-icons-ibuffer-mode +1))
 
+;;;; all-the-icons-completion
+(use-package all-the-icons-completion
+  :straight t
+  :demand t
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :config
+  (all-the-icons-completion-mode))
+
 ;;; Emacs settings
-(use-package emacs
+(use-package emacs ; scrolling
   :init
-  (display-battery-mode +1)
-  (display-time-mode +1)
+  (pixel-scroll-precision-mode +1)
   :custom
-  (display-time-format "%H:%M")
   (scroll-step 1)
-  (scroll-conservatively 10000))
-  ;; :config
-  ;; (set-face-attribute 'default nil :family "Iosevka" :weight 'normal :height 110)
-  ;; (set-face-attribute 'fixed-pitch nil :family "Iosevka" :weight 'normal :height 110)
-  ;; (set-face-attribute 'variable-pitch nil :family "Roboto" :weight 'semi-light :height 110 :width 'normal))
+  (scroll-conservatively 100))
+
 (use-package time
   :custom
   (display-time-format (concat (when (featurep 'all-the-icons)
@@ -87,7 +86,7 @@
 (use-package lg-system-theme-sync
   :load-path "~/.emacs.d/lisp/site-packages/"
   :custom 
-  (system-theme-sync-default-light-plist '(:background "/home/lucas/Images/Wallpaper/moutain.png"
+  (system-theme-sync-default-light-plist '(:background "/home/lucas/Images/Wallpaper/nature-mountain.jpg"
 					   :gtk-theme "Adwaita"
 					   :icon-theme "Papirus-Light"))
   (system-theme-sync-default-dark-plist '(:background "/home/lucas/Images/Wallpaper_bis/space3.png"
@@ -111,23 +110,18 @@
   (defvar lg/transparency-default-increment 5
     "Default {in, de}-crement value for the transparency alpha")
 
+  (defun lg/toggle-frame-decorations ()
+    (interactive)
+    (set-frame-parameter nil 'undecorated (not (frame-parameter nil 'undecorated))))
+
   (defun lg/toggle-transparency ()
     "Toggle the transparency of Emacs on and off"
     (interactive)
     (let ((alpha (frame-parameter nil 'alpha-background)))
-      (set-frame-parameter
-       nil 'alpha-background
-       (if (eql
-	    alpha
-	    ;; (cond ((numberp alpha) alpha)
-	    ;; 	      ((numberp (cdr alpha)) (cdr alpha))
-	    ;; 	      ;; Also handle undocumented (<active> <inactive>) form.
-	    ;; 	      ((numberp (cadr alpha)) (cadr alpha)))
-		100)
-	   lg/transparency-alpha
-	 ;;'(100 . 100)
-	 100
-	 ))))
+      (set-frame-parameter nil 'alpha-background
+			   (if (eql alpha 100)
+			       lg/transparency-alpha
+			     100))))
 
   (defun lg/transparency-alpha-increase (arg)
     "Decrease transparency of the frame"
@@ -156,30 +150,58 @@
 ;;; Modeline
 (use-package emacs ; modeline
   :init
-  (when (featurep 'all-the-icons)
-    (defvar lg/mode-line-major-mode '(:eval (all-the-icons-icon-for-buffer) " ")
-      "Display an icon in the modeline")
-    ;; the icons don't show if the variable is not declared risky
-    (put 'lg/mode-line-major-mode 'risky-local-variable t)
-    (setq-default mode-line-format
-		  '("%e"
-		    "    "
-		    mode-line-front-space
-		    mode-line-mule-info
-		    mode-line-client
-		    mode-line-modified
-		    mode-line-remote
-		    mode-line-frame-identification
-		    lg/mode-line-major-mode
-		    " "
-		    mode-line-buffer-identification
-		    "   "
-		    mode-line-position
-		    evil-mode-line-tag
-		    (vc-mode vc-mode)
-		    " "
-		    mode-line-modes
-		    mode-line-misc-info))))
+  (defvar lg/mode-line-major-mode
+    (if (featurep 'all-the-icons)
+	'(:eval (all-the-icons-icon-for-buffer) " ")
+      nil)
+    "Display an icon corresponding to major mode in the modeline")
+
+  (defvar lg/mode-line-vc-mode
+    (if (featurep 'all-the-icons)
+	'(:eval (all-the-icons-octicon "git-branch"))
+      nil)
+    "Display an icon in front of git in the modeline")
+
+  ;; the icons don't show if the variable is not declared risky
+  (put 'lg/mode-line-major-mode 'risky-local-variable t)
+  (put 'lg/mode-line-vc-mode 'risky-local-variable t)
+
+  (defun lg/mode-line-render (left center right)
+    "Return a string of `window-width' length.
+Containing LEFT, CENTER and RIGHT aligned respectively."
+    (let ((available-width
+	   (- (window-total-width)
+	      (+ (length (format-mode-line left))
+		 (length (format-mode-line center))
+		 (length (format-mode-line right))))))
+      (append left
+	      (list (format (format "%%%ds" (/ available-width 2)) ""))
+	      center
+	      (list (format (format "%%%ds" (/ available-width 2)) ""))
+	      right)))
+
+  (setq-default mode-line-format
+		'((:eval
+		   (lg/mode-line-render
+		    ;; left
+		    '("%e"
+		      mode-line-front-space
+		      evil-mode-line-tag
+		      mode-line-mule-info
+		      mode-line-client
+		      mode-line-modified
+		      mode-line-remote
+		      mode-line-frame-identification
+		      lg/mode-line-major-mode " "
+		      mode-line-buffer-identification)
+		    ;; center
+		    nil
+		    ;; right
+		    '("%p"
+		      (vc-mode vc-mode) " "
+		      mode-line-modes
+		      mode-line-misc-info
+		      mode-line-end-spaces))))))
 
 ;;;; Moody
 (use-package moody
@@ -191,19 +213,72 @@
   (x-underline-at-descent-line t)
   :config
   (setq-default mode-line-format
-    '("%e"
-      mode-line-front-space
-      mode-line-mule-info
-      mode-line-client
-      mode-line-modified
-      mode-line-remote
-      mode-line-frame-identification
-      moody-mode-line-buffer-identification
-      "   "
-      mode-line-position
-      evil-mode-line-tag
-      (vc-mode moody-vc-mode)
-      mode-line-modes)))
+		'("%e"
+		  mode-line-front-space
+		  mode-line-mule-info
+		  mode-line-client
+		  mode-line-modified
+		  mode-line-remote
+		  mode-line-frame-identification
+		  lg/mode-line-major-mode
+		  " "
+		  moody-mode-line-buffer-identification
+		  "   "
+		  mode-line-position
+		  evil-mode-line-tag
+		  (vc-mode moody-vc-mode)
+		  mode-line-modes
+		  mode-line-misc-info)))
+
+;;;; fancy-battery
+(use-package fancy-battery
+  :straight t
+  :custom
+  (fancy-battery-show-percentage t)
+  :config
+  (when (featurep 'all-the-icons)
+    (defun fancy-battery-default-mode-line ()
+      "Assemble a mode line string for Fancy Battery Mode.
+Display the remaining battery time, if available and
+`fancy-battery-show-percentage' is non-nil, otherwise the
+percentage.  If the battery is critical, use
+`battery-critical-face'.  Otherwise use `fancy-battery-charging'
+or `fancy-battery-discharging', depending on the current
+state. An icon is also shown for eye candy."
+      (when fancy-battery-last-status
+	(let* ((time (cdr (assq ?t fancy-battery-last-status)))
+	       (percentage (cdr (assq ?p fancy-battery-last-status)))
+	       (percentage-int (string-to-number percentage))
+	       (face (if (>= percentage-int 98)
+			 'fancy-battery-charging
+		       (pcase (cdr (assq ?b fancy-battery-last-status))
+			 ("!" 'fancy-battery-critical)
+			 ("+" 'fancy-battery-charging)
+			 (_ 'fancy-battery-discharging))))
+	       (icon (cond
+		      ((or (>= percentage-int 99) (equal face 'fancy-battery-charging))
+		       (all-the-icons-alltheicon "battery-charging" :face face :v-adjust 0.025 :height 1.5))
+		      ((>= percentage-int 90)
+		       (all-the-icons-faicon"battery-full" :face face :v-adjust 0.025 :height 1.25))
+		      ((>= percentage-int 62.5)
+		       (all-the-icons-faicon "battery-three-quarters" :face face :v-adjust 0.025 :height 1.25))
+		      ((>= percentage-int 37.5)
+		       (all-the-icons-faicon "battery-half" :face face :v-adjust 0.025 :height 1.25))
+		      ((>= percentage-int 20)
+		       (all-the-icons-faicon "battery-quarter" :face face :v-adjust 0.025 :height 1.25))
+		      (t
+		       (all-the-icons-faicon "battery-empty" :face face :v-adjust 0.025 :height 1.25))))
+	       (status (if (or fancy-battery-show-percentage (string= time "N/A"))
+			   (and percentage (concat percentage "%%"))
+			 time)))
+	  (concat
+	   " " icon " "
+	   (if status
+	       (propertize status 'face face
+			   'help-echo (format "Il reste %s temps de charge" time))
+	     ;; Battery status is not available
+	     (propertize "N/A" 'face 'error)))))))
+  (fancy-battery-mode +1))
 
 ;;;; hide-mode-line
 (use-package hide-mode-line
@@ -212,10 +287,30 @@
 ;;; Helpful
 (use-package helpful
   :straight t
+;  :init
+;  (defvar read-symbol-positions-list nil)
+					;(defvar read-symbol-positions nil)
   :commands (helpful-callable
 	     helpful-key
 	     helpful-symbol
 	     helpful-variable))
+ ;;  :config
+ ;;  ;; TODO: Remove once fixed upstream in helpful https://github.com/Wilfred/helpful/issues/282
+ ;;  (defun helpful--autoloaded-p (sym buf)
+ ;;    "Return non-nil if function SYM is autoloaded."
+ ;;    (-when-let (file-name (buffer-file-name buf))
+ ;;      (setq file-name (s-chop-suffix ".gz" file-name))
+ ;;      (help-fns--autoloaded-p sym)))
+
+ ;; (defun helpful--skip-advice (docstring)
+ ;;   "Remove mentions of advice from DOCSTRING."
+ ;;   (let* ((lines (s-lines docstring))
+ ;; 	  (relevant-lines
+ ;; 	   (--take-while
+ ;; 	    (not (or (s-starts-with-p ":around advice:" it)
+ ;; 		     (s-starts-with-p "This function has :around advice:" it)))
+ ;; 	    lines)))
+ ;;     (s-trim (s-join "\n" relevant-lines)))))
 
 ;;; Outshine
 (use-package outshine
@@ -244,14 +339,16 @@
   (modus-themes-bold-constructs nil)
   (modus-themes-fringes nil) ; {nil,'subtle,'intense}
   (modus-themes-lang-checkers nil) ; '(straight-underline text-also background intense faint)
-  (modus-themes-mode-line '(moody)) ; list '(3d moody borderless accented)
+  (modus-themes-mode-line '(2 borderless)) ; list '(3d moody borderless accented)
   (modus-themes-syntax nil) ; list '(faint yellow-comments green-strings alt-syntax)
   (modus-themes-hl-line '(accented)) ; list '(accented underline intense)
   (modus-themes-subtle-line-numbers nil)
   (modus-themes-paren-match '(intense bold)) ; {nil,'subtle-bold,'intense,'intense-bold}
   (modus-themes-links '(neutral-underline))
   (modus-themes-prompts '(intense gray)) ; '(intense background gray italic bold)
-  (modus-themes-completions 'moderate) ; {nil,'moderate,'opinionated})
+  (modus-themes-completions '((matches . (extrabold))
+			      (selection . nil)
+			      (popup . (accented))))
   (modus-themes-region '(accent)) ; '(accented bg-only no-extend)
   (modus-themes-diffs nil) ; {nil, 'desaturated, 'bg-only}
   (modus-themes-org-blocks 'tinted-background) ; {nil,'gray-background,'tinted-background}
@@ -265,24 +362,7 @@
      (6 . (rainbow 1.1))
      (7 . (rainbow 1.1))
      (8 . (rainbow 1.1))
-     (t . (rainbow))))
-  :config
-  ;; (defun lg/modus-themes-custom-faces (theme &rest args)
-  ;;   (when (member theme '(modus-operandi modus-vivendi)) 
-  ;;     (set-face-attribute 'mode-line-inactive nil
-  ;; 			  :background (modus-themes-color 'bg-main))
-  ;;     (set-face-attribute 'mode-line nil
-  ;; 			  :background (modus-themes-color 'green-refine-bg))
-  ;;     (set-face-attribute 'typit-wrong-char nil
-  ;; 			  :foreground (modus-themes-color 'red))
-  ;;     (set-face-attribute 'typit-correct-char nil
-  ;; 			  :foreground (modus-themes-color 'green))
-  ;;     (set-face-attribute 'typit-current-word nil
-  ;; 			  :background (modus-themes-color 'blue-nuanced-bg))))
-
-  ;; (advice-add 'load-theme :after #'lg/modus-themes-custom-faces)
-  ;; (advice-remove 'load-theme #'lg/modus-themes-custom-faces)
-  )
+     (t . (rainbow)))))
 
 ;;;; modus-themes-exporter
 (use-package modus-themes-exporter
@@ -307,6 +387,14 @@ settings applied to them."
 ;;;; spacemacs themes
 (use-package spacemacs-theme
   :commands load-theme
+  :straight t)
+
+;;;; github-dark-vscode-theme
+(use-package github-dark-vscode-theme
+  :straight t)
+
+;;;; kaolin-theme
+(use-package kaolin-themes
   :straight t)
 
 ;;; solar
@@ -344,21 +432,37 @@ settings applied to them."
 ;;; Tabs
 ;;;; tab-bar
 (use-package tab-bar
-  :bind ("s-?" . tab-bar-mode)
-  :custom (tab-bar-format '(tab-bar-format-history
-			    tab-bar-format-tabs-groups
+  :bind ("s-?" . 'toggle-frame-tab-bar)
+  :init
+  (defun lg/tab-bar-format-align-right ()
+    "Align the rest of tab bar items to the right. Take icons into account"
+    (let* ((rest (cdr (memq 'tab-bar-format-align-right tab-bar-format)))
+	   (rest (tab-bar-format-list rest))
+	   (rest (mapconcat (lambda (item) (nth 2 item)) rest ""))
+	   (hpos (+ (length rest) 16))
+	   (str (propertize " " 'display `(space :align-to (- right ,hpos)))))
+      `((align-right menu-item ,str ignore))))
+  :custom
+  (tab-bar-menu-bar-button `(if (featurep 'all-the-icons)
+			       (concat " " (all-the-icons-icon-for-mode 'emacs-lisp-mode :height 1.1 :v-adjust 0.05) " ")
+			       "Menu"))
+  (tab-bar-format '(tab-bar-format-menu-bar
+			    tab-bar-format-history
+			    tab-bar-format-tabs
 			    tab-bar-separator
 			    tab-bar-format-add-tab
-			    ;;tab-bar-format-align-right
-			    ;tab-bar-format-echo
-			   ; tab-bar-format-global
-			    ))
+			    lg/tab-bar-format-align-right
+			    tab-bar-format-global))
   :config
-  (tab-bar-mode -1))
+  (tab-bar-mode +1))
+
 ;;;; tab-line
 (use-package lg-tab-line
+  :demand t
   :bind
   ("s-/" . global-tab-line-mode)
+  ;:custom-face
+  ;(custom-set-faces '(tab-line ((t (:inherit 'tab-line :overline t)))))
   :general
   (general-def :states 'normal
     "C-t" 'tab-line-new-tab
@@ -368,30 +472,33 @@ settings applied to them."
     "C-t" 'tab-line-new-tab)
   :custom
   (tab-line-new-button-show t)
-  (tab-line-new-button "NEW")
-  (tab-line-separator '(propertize " " 'face (face-attribute 'default :foreground)))
+  ;(tab-line-separator '(propertize " " 'face (face-attribute 'default :foreground)))
   (tab-line-close-button-show t)
   (tab-line-switch-cycling t)
-  (tab-line-new-tab-choice #'lg/tab-line-new-tab)
-  (tab-line-tabs-function #'tab-line-tabs-mode-buffers)
-  (tab-line-tab-name-function #'lg/tab-line-name-buffer-padded)
-  (tab-line-tab-name-format-function #'lg/tab-line-tab-name-format)
+  (tab-line-new-tab-choice #'lg/tab-line-new-tab "Context aware new tab behaviour.")
   (tab-line-close-tab-function #'lg/tab-line-kill-buffer)
-  :hook
-  ((emms-playlist-mode
-    org-ql-sidebar-buffer-setup
-    dashboard-mode
-    calendar-mode
-    Info-mode
-    ibuffer-sidebar-mode
-    ibuffer-mode
-    dired-mode
-    dired-sidebar-mode
-    pdf-outline-buffer-mode
-    calc-mode
-    calc-trail-mode) . lg/tab-line-local-disable)
+  (tab-line-tabs-function #'tab-line-tabs-mode-buffers "Group buffers by major mode.")
+  (tab-line-tab-name-function #'lg/tab-line-name-buffer-padded "Tabs have all the same width.")
+  (tab-line-tab-name-format-function #'lg/tab-line-tab-name-format "Add icon to the beginning of the tab.")
+  (tab-line-exclude-modes '(emms-playlist-mode
+			    org-ql-sidebar-buffer-setup
+			    dashboard-mode
+			    calendar-mode
+			    debugger-mode
+			    Info-mode
+			    ibuffer-sidebar-mode
+			    ibuffer-mode
+			    use-package-statistics-mode
+			    dired-mode
+			    dired-sidebar-mode
+			    pdf-outline-buffer-mode
+			    osm-mode
+			    calc-mode
+			    calc-trail-mode
+			    matlab-shell-mode
+			    so-long-mode
+			    apt-utils-mode))
   :config
-  (defun lg/tab-line-local-disable () (interactive) (tab-line-mode -1))
   (add-hook 'window-configuration-change-hook
 	    #'(lambda ()
 		(dolist (window (window-list))
@@ -400,6 +507,7 @@ settings applied to them."
 
 ;;;; centaur-tabs
 (use-package centaur-tabs
+  :disabled t
   :straight t
   :after evil
   :bind ("s-/" . centaur-tabs-mode)
@@ -451,6 +559,7 @@ settings applied to them."
 ;;; display-line-numbers
 (use-package display-line-numbers
   :hook ((prog-mode
+	  matlab-mode
 	  ledger-mode). lg/display-line-numbers-mode-enable)
   :config
   (defun lg/display-line-numbers-mode-enable ()
@@ -505,16 +614,10 @@ settings applied to them."
   :config
   (good-scroll-mode +1))
 
-;;;; pixel scroll mode
-(use-package pixel-scroll
-  :straight nil
-  :config (pixel-scroll-mode +1))
-
 ;;; hl-line
 (use-package hl-line
   :straight nil
-  :config
-  (global-hl-line-mode +1))
+  :hook (prog-mode . hl-line-mode))
 
 ;;; LIN
 (use-package lin
@@ -532,7 +635,12 @@ settings applied to them."
 (use-package git-gutter-fringe
   :diminish (global-git-gutter-mode git-gutter-mode)
   :straight t
+  :custom
+  (git-gutter:update-interval 0.2)
   :config
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(bottom nil))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(bottom nil))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil '(bottom nil))
   (global-git-gutter-mode +1))
 
 ;;; visual-fill-column
@@ -588,9 +696,11 @@ settings applied to them."
 
 ;;; beacon
 (use-package beacon
+  :disabled t
   :straight t
   :diminish beacon-mode
   :custom
+  (beacon-size 20)
   (beacon-blink-when-point-moves-vertically 1)
   (beacon-blink-when-buffer-changes t)
   (beacon-blink-when-window-changes t)
@@ -598,5 +708,17 @@ settings applied to them."
   (beacon-blink-when-focused t)
   :config
   (beacon-mode +1))
+
+;;; pulsar
+(use-package pulsar
+  :straight (:host github :repo "protesilaos/pulsar")
+  :custom
+  (pulsar-face 'pulsar-red)
+  (pulsar-delay 0.05)
+  :config
+  (pulsar-setup))
+
+;;; Zen mode
+(use-package lg-zen-mode)
 
 (provide 'lg-ui)
