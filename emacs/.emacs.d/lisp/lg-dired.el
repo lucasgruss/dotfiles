@@ -9,11 +9,18 @@
   (dired-clean-confirm-killing-deleted-buffers nil)
   (dired-listing-switches "-al --group-directories-first")
   (dired-dwim-target t)
-  :config
-  (setq dired-compress-directory-default-suffix ".zip")
-  (general-def :keymaps 'dired-mode-map :states 'normal
-    "h" #'dired-up-directory
-    "l" #'dired-find-file))
+  (dired-compress-directory-default-suffix ".zip")
+  :general
+  (:keymaps 'dired-mode-map
+	    "<mouse-8>" #'dired-up-directory)
+  (:keymaps 'dired-mode-map
+	    :states 'normal
+	    "h" #'dired-up-directory
+	    "l" #'dired-find-file))
+
+;;; dired-async-mode
+(use-package dired-async
+  :hook (dired-mode . dired-async-mode))
 
 ;;; Diredfl
 (use-package diredfl
@@ -41,5 +48,10 @@
   :after dired
   :hook (dired-mode . dired-hide-dotfiles-mode)
   :straight t)
+
+(use-package dired-git
+  :disabled t
+  :straight t
+  :hook (dired-mode . dired-git-mode))
 
 (provide 'lg-dired)
