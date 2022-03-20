@@ -10,7 +10,7 @@
    ("s-q" . delete-window))
   :custom
   (display-buffer-alist
-   `(("\\*\\(helpful\\|Help\\).*\\*"
+   `(("\\*\\(helpful\\|Help\\|MATLAB Help\\).*\\*"
       (display-buffer-in-side-window)
       (window-width . ,(+ 3 fill-column))
       (side . right)
@@ -33,6 +33,11 @@
   (defun lg/toggle-all-frames-fullscreen ()
     (interactive)
     (lambda () (mapc 'toggle-frame-fullscreen (frame-list)))))
+
+;;; Winner mode
+(use-package winner
+  :config
+  (winner-mode +1))
 
 ;;; Windmove
 (use-package windmove
