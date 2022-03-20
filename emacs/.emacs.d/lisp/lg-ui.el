@@ -721,4 +721,25 @@ settings applied to them."
 ;;; Zen mode
 (use-package lg-zen-mode)
 
+;;; logos
+(use-package logos
+  :straight t
+  :general
+  (:keymaps 'outline-mode-map
+	    :states 'normal
+	    "C-j" #'logos-forward-page-dwim
+	    "C-k" #'logos-backward-page-dwim)
+  :custom
+  (logos-hide-mode-line t)
+  (logos-variable-pitch nil)
+  (logos-outlines-are-pages t)
+  (logos-outline-regexp-alist '((emacs-lisp-mode . "^;;; ")
+				(org-mode . "^\\*+ +")
+				(t . ";;[;]\\{1,8\\} ")))
+  :config
+  (let ((map global-map))
+    (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
+    (define-key map [remap forward-page] #'logos-forward-page-dwim)
+    (define-key map [remap backward-page] #'logos-backward-page-dwim)))
+
 (provide 'lg-ui)
