@@ -81,7 +81,6 @@
 (use-package evil-anzu
   :straight t
   :diminish anzu-mode
-  :commands (evil-search-forward evil-search-backward)
   :config (global-anzu-mode +1))
 
 ;;; Evil-escape
@@ -125,8 +124,13 @@
 (use-package which-key
   :diminish which-key-mode
   :straight t
-  :custom (which-key-idle-delay 0.7)
-  :config (which-key-mode +1))
+  :custom
+  (which-key-min-display-lines 15 "Prefer vertical display of candidates.")
+  (which-key-idle-delay 0.3)
+  (which-key-separator " " )
+  :config
+  (which-key-setup-minibuffer)
+  (which-key-mode +1))
 
 ;;; Hercules
 (use-package hercules
