@@ -2,7 +2,10 @@ auto-save-list/
 eln-cache/
 elpa/
 emms/
+etc/
+emojis/
 eshell/
+devdocs-browser/
 image-dired/
 straight/
 transient/
@@ -20,3 +23,5 @@ custom.el
 recentf
 session.*
 tramp
+bookmarks
+projects
