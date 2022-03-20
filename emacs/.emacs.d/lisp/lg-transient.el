@@ -6,7 +6,7 @@
   :config
   (my-leader-def :keymaps 'override "" 'lg/transient-root)
 
-  (define-transient-command lg/transient-root ()
+  (transient-define-prefix lg/transient-root ()
     "Main transient, accessed through SPC"
     [["Quick access"
       ("SPC" "M-x" execute-extended-command)
@@ -29,7 +29,7 @@
       ("w" "Window" lg/transient-w)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-b ()
+  (transient-define-prefix lg/transient-b ()
     "Buffers"
     [["Buffers"
       ("b" "Switch to buffer" switch-to-buffer)
@@ -42,7 +42,7 @@
       ("s" "Set" bookmark-save)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-c ()
+  (transient-define-prefix lg/transient-c ()
     "Completion"
     [["Consult"
       ("r" "Consult ripgrep" consult-ripgrep)]
@@ -52,7 +52,7 @@
       ("f" "flyspell" flyspell-correct-wrapper)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-e ()
+  (transient-define-prefix lg/transient-e ()
     "Emms"
     [["Emms"
       ("a" "Show all" emms-show-all)
@@ -66,7 +66,7 @@
       ("S" "Shuffle" emms-shuffle)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-f ()
+  (transient-define-prefix lg/transient-f ()
     "Files"
     [["Files"
       ("f" "Open file" find-file)
@@ -80,7 +80,7 @@
       ("p" "Package" lg/consult-use-package)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-h ()
+  (transient-define-prefix lg/transient-h ()
     "Help"
     [["Help and documentation"
       ("c" "Command (helpful)" helpful-command)
@@ -104,21 +104,21 @@
       ("R" "Profiler report" profiler-report)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-M ()
+  (transient-define-prefix lg/transient-M ()
     "Manage"
     [["System packages"
       ("i" "Install package" system-packages-install)
-      ("s" "Search packages" system-packages-search)
+      ("s" "Search packages" apt-utils-show-package)
       ("u" "Update packages" system-packages-update)]
      ["Emacs packages"
       ("p" "Pull recipes (straight.el)" straight-pull-recipe-repositories)
       ("r" "Refresh (package.el)" package-refresh-contents)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-o ()
+  (transient-define-prefix lg/transient-o ()
     "Open/Org"
     [["Open"
-      ("a" "Application" app-launcher-run-app)
+      ("A" "Application" app-launcher-run-app)
       ("b" "Bluetooth" bluetooth-list-devices)
       ("c" "Calendar" calendar)
       ("C" "Calc" calc)
@@ -129,6 +129,7 @@
       ("f" "Elfeed" elfeed)
       ("g" "Magit" magit-status)
       ;;("N" "Enwc (Network manager)" enwc)
+      ("m" "Open-street-map" osm-home)
       ("p" "Pass" pass)
       ("P" "Proced" proced)
       ("r" "Ripgrep" rg)
@@ -139,7 +140,7 @@
       ("w" "Eww" eww)
       ("W" " Weather (wttrin)" wttrin)]
      ["Org"
-      ("A" "Agenda" org-agenda)
+      ("a" "Agenda" org-agenda)
       ("i" "Clock in" org-clock-in)
       ("j" "Org journal" org-journal-new-entry)
       ("k" "Capture" org-capture)
@@ -148,21 +149,23 @@
       ("R" "Org-Roam" org-roam-ui-open)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-p ()
+  (transient-define-prefix lg/transient-p ()
     "Project"
     [["Project"
+      ("b" "Project switch to buffer" project-switch-to-buffer)
       ("c" "Compile" project-compile)
-      ("d" "Dired" project-dired)]]
+      ("d" "Dired" project-dired)
+      ("f" "Find file" project-find-file)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-q ()
+  (transient-define-prefix lg/transient-q ()
     "Quit"
     [["Quit"
       ("e" "Exit emacs" (lambda () (interactive) (when (y-or-n-p "Really exit emacs ?") (kill-emacs))))
       ("q" "Turn computer off" lg/poweroff-computer)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-s ()
+  (transient-define-prefix lg/transient-s ()
     "Search/sidebars"
     [["Search"
       ("O" "Occur" occur)
@@ -178,7 +181,7 @@
       ("i" "Insert snippet" consult-yasnippet)]]
     [:hide (lambda () t)])
   
-  (define-transient-command lg/transient-t ()
+  (transient-define-prefix lg/transient-t ()
     "Toggle / Activate"
     [["Toggle"
       ("c" "Center" lg/toggle-visual-fill-center)
@@ -200,14 +203,13 @@
       ("k" "Set caps to control" lg/swap-caps-control)]]
     [:hide (lambda () t)])
 
-  (define-transient-command lg/transient-w ()
+  (transient-define-prefix lg/transient-w ()
     "Windows"
     [["Window"
       ("h" "Focus left window" windmove-left)
       ("j" "Focus bottom window" windmove-down)
       ("k" "Focus top window" windmove-up)
       ("l" "Focus right window" windmove-right)]]
-    [:hide (lambda () t)])
-  )
+    [:hide (lambda () t)]))
 
 (provide 'lg-transient)
