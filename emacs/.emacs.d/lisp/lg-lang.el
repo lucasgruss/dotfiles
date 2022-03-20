@@ -40,6 +40,15 @@
   :custom
   (python-shell-interpreter "/usr/bin/python3"))
 
+;;;; pylint
+(use-package pylint
+  :straight t
+  :ensure-system-package pylint
+  :general
+  (:keymaps 'python-mode-map
+	    :states 'normal
+	    "<localleader>l" #'pylint))
+
 ;;;; LSP server
 (use-package lsp-pyright
   :ensure-system-package (npm nodejs (pyright . "npm install -g pyright"))
@@ -47,6 +56,7 @@
   :after (:any eglot lsp))
 
 ;;; Formatting
+;;;; apheleia
 (use-package apheleia
   :disabled t
   :straight (apheleia :host github :repo "raxod502/apheleia")
@@ -57,33 +67,58 @@
   :init
   (add-to-list 'exec-path "/home/lucas/.local/bin/"))
 
-;;; Emacs lisp
-(use-package emacs
-  :straight nil
-  :config
-  (when (featurep 'transient)
-    (define-transient-command lg/transient-elisp ()
-      "Emacs lisp mode"
-      [["Misc"
-	("e" "Eval" eval-buffer)
-	("n" "Narrow" outshine-narrow-to-subtree)
-	("N" "Narrow" narrow-to-defun)
-	("w" "Widen" widen)]]
-      [:hide (lambda () t)])
+;;;; c-style
+(use-package cc-vars ; indentation and overall style
+  :defer t
+  :custom
+  (c-default-style 
+    '((java-mode . "java")
+      (awk-mode . "awk")
+      (c++-mode . "stroustrup")
+      (other . "gnu"))))
 
-    (general-define-key
-     :states 'normal
-     :keymaps 'emacs-lisp-mode-map
-     "<localleader>" 'lg/transient-elisp)))
+;;; Emacs lisp
+(use-package emacs ;; emacs-lisp
+  :straight nil
+  :general
+  (:keymaps 'emacs-lisp-mode-map
+	    :states 'normal
+	    "<localleader>e" #'eval-buffer
+	    "<localleader>l" #'elint
+	    "<localleader>n" #'outshine-narrow-to-subtree
+	    "<localleader>N" #'narrow-to-defun
+	    "<localleader>w" #'widen))
+;; :config
+;; (when (featurep 'transient)
+;;   (define-transient-command lg/transient-elisp ()
+;;     "Emacs lisp mode"
+;;     [["Misc"
+;; 	("e" "Eval" eval-buffer)
+;; 	("n" "Narrow" outshine-narrow-to-subtree)
+;; 	("N" "Narrow" narrow-to-defun)
+;; 	("w" "Widen" widen)]]
+;;     [:hide (lambda () t)])
+
+;;   (general-define-key
+;;    :states 'normal
+;;    :keymaps 'emacs-lisp-mode-map
+;;    "<localleader>" 'lg/transient-elisp)))
 
 ;;;; eldoc
 (use-package eldoc
   :straight nil
-  :diminish (global-eldoc-mode eldoc-mode))
+  :diminish (global-eldoc-mode eldoc-mode)
+  :config
+  (global-eldoc-mode +1))
+
+;;;; elisp-indent-docstrings-mode
+(use-package elisp-indent-docstrings-mode
+  :config
+  (elisp-indent-docstrings-mode +1))
 
 ;;; Graphviz
 (use-package graphviz-dot-mode :straight t :defer t)
-(use-package company-graphviz-dot :defer 10)
+(use-package company-graphviz-dot :defer t :if (featurep 'company))
 
 ;;; Yaml
 (use-package yaml
@@ -96,9 +131,27 @@
   :mode ("\\.yml\\'" . yaml-mode))
 
 ;;; Matlab
-(use-package matlab-mode
-  :disabled t
-  :straight t)
+(use-package matlab
+  :straight matlab-mode
+  :defer t
+  :ensure-system-package (matlab . matlab-support)
+  :custom
+  (matlab-shell-command-switches '("-nodesktop" "-nosplash"))
+  :config
+  (evil-define-key 'visual matlab-mode-map "gr" #'lg/matlab-mode-eval-region)
+
+  (defun lg/matlab-mode-eval-region (start end)
+    (interactive "r")
+    (let ((region-str (buffer-substring-no-properties start end)))
+      (with-current-buffer (concat "*" matlab-shell-buffer-name "*")
+	(insert region-str)
+	(comint-send-input))))
+
+  (defun lg/matlab-eval-buffer ()
+    (interactive)
+      (with-current-buffer (concat "*" matlab-shell-buffer-name "*")
+	(insert buffer-file-name)
+	(comint-send-input))))
 
 ;;; lua
 (use-package lua-mode
