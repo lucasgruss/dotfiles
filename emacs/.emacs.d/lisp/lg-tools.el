@@ -27,6 +27,7 @@
      ("https://www.youtube.com/feeds/videos.xml?channel_id=UCKH_iLhhkTyt8Dk4dmeCQ9w" science)
      ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL43OynbWaTMLEbdAWr-DnAfveOonmhlT1" france_inter)
      ("https://www.reddit.com/r/emacs/.rss" emacs reddit)
+     ("https://www.reddit.com/r/hajimenoippo/.rss" manga reddit)
      "https://api.lemediatv.fr/rss.xml"))
   (elfeed-search-filter "")
   :config
@@ -137,6 +138,13 @@ playlist in a side-window"
   :custom (espotify-service-name "spotifyd")
   :straight t)
 
+;;; nov.el
+(use-package nov
+  :straight t
+  :defer t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+
 ;;; Pdf-tools
 (use-package pdf-tools
   :straight t
@@ -146,14 +154,14 @@ playlist in a side-window"
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
   :config
-
   (defun lg/pdf-tools-midnight-colors-with-theme (theme &rest args)
     "Use the loaded theme background and foreground colors for the
     midnight mode."
     (setq pdf-view-midnight-colors
 	  `(,(face-foreground 'default) . ,(face-background 'default))))
 
-  (advice-add 'load-theme :after #'lg/pdf-tools-midnight-colors-with-theme))
+  (advice-add 'load-theme :after #'lg/pdf-tools-midnight-colors-with-theme)
+  (pdf-tools-install))
 
 ;;; pdfgrep
 (use-package pdfgrep
@@ -293,6 +301,9 @@ behaviour. Delete the frame after that command has exited"
 ;;; Scanner
 (use-package scanner
   :ensure-system-package sane-utils
+  :custom
+  (scanner-tessdata-dir "/usr/share/tesseract-ocr/4.00/tessdata/")
+  (scanner-tesseract-configdir "/usr/share/tesseract-ocr/4.00/tessdata/configs/")
   :commands
   (scanner-scan-document
    scanner-scan-multi-doc
@@ -321,7 +332,7 @@ behaviour. Delete the frame after that command has exited"
 (use-package app-launcher
   :straight (app-launcher :type git :host github
 			  :repo "SebastienWae/app-launcher")
-  :commands app-launcher-run-app
+  :commands (app-launcher-run-app emacs-run-launcher)
   :bind ("s-d" . 'app-launcher-run-app)
   :config
   ;; stolen from https://www.reddit.com/r/emacs/comments/s7pei3/using_emacs_as_your_app_launcher_crosspost_from/
@@ -375,24 +386,6 @@ behaviour. Delete the frame after that command has exited"
 	      :map evil-normal-state-map
 	      ("f" . avy-goto-char-timer)))
 
-;;; yasnippets
-(use-package yasnippet
-  :straight t
-  :diminish yas-minor-mode
-  :hook
-  (org-mode . yas-minor-mode-on)
-  (prog-mode . yas-minor-mode-on))
-
-;;;; Yasnippet-snippets
-(use-package yasnippet-snippets
-  :straight t
-  :after yasnippet)
-
-;;;; Consult-yasnippet
-(use-package consult-yasnippet
-  :straight t
-  :after yasnippet)
-
 ;;; yequake
 (use-package yequake
   :straight t
@@ -437,10 +430,46 @@ behaviour. Delete the frame after that command has exited"
                            (sticky . t))))
      )))
 
+;;; flycheck
+(use-package flycheck
+  :straight t
+  :defer t
+  :hook (ledger-mode . flycheck-mode))
+
+;;;; flycheck-ledger
+(use-package flycheck-ledger
+  :straight t
+  :after ledger)
+
+;;;; flycheck-languagetool
+(use-package flycheck-languagetool
+  :straight t
+  :defer t
+  :init
+  (defvar lg/langtool-dir "~/packages/LanguageTool/")
+  :custom
+  (flycheck-languagetool-server-port "8082") 
+  (flycheck-languagetool-language "fr")
+  (flycheck-languagetool-server-jar (expand-file-name "languagetool-server.jar" lg/langtool-dir)) )
+
+;;; langtool
+(use-package langtool 
+  :straight t
+  :defer t
+  :custom 
+  (langtool-language-tool-jar (expand-file-name "languagetool-commandline.jar" lg/langtool-dir))
+  (langtool-language-tool-server-jar (expand-file-name "languagetool-server.jar" lg/langtool-dir))
+  (langtool-server-user-arguments '("-p" "8082")) 
+  (langtool-http-server-host "localhost") 
+  (langtool-http-server-port 8082))
+
 ;;; flyspell
 (use-package flyspell
+  :disabled
   :straight t
-  :hook (org-mode . flyspell-mode))
+  :hook
+  (org-mode . flyspell-mode)
+  (flyspell-mode . flyspell-buffer))
 
 ;;; flyspell-correct
 ;; provide interface through completing-read
@@ -462,7 +491,7 @@ behaviour. Delete the frame after that command has exited"
           "mpv"
           '(file))
     (list (openwith-make-extension-regexp
-           '("doc" "xls" "ppt" "odt" "ods" "odg" "odp"))
+           '("doc" "xls" "ppt" "odt" "ods" "odg" "odp" "docx"))
           "libreoffice"
           '(file)))))
 
@@ -501,5 +530,86 @@ behaviour. Delete the frame after that command has exited"
 (use-package mpv
   :straight t
   :defer t)
+
+;;; empv
+(use-package empv
+  :straight (:type git :host github :repo "isamert/empv.el")
+  :defer t
+  :custom
+  (empv-invidious-instance "https://invidio.xamh.de/"))
+
+;;; markdown-preview-mode
+(use-package markdown-preview-mode
+  :disabled t
+  :straight t)
+
+;;; calfw
+(use-package calfw
+  :straight t
+  :defer t
+  :custom
+  ;; (cfw:render-line-breaker 'cfw:render-line-breaker-wordwrap)
+  (cfw:render-line-breaker 'cfw:render-line-breaker-simple))
+
+;;; keycast
+(use-package keycast
+  :straight t)
+
+;;; gif-screencast
+(use-package gif-screencast
+  :straight t)
+
+;;; dictionnary
+(use-package dictionary
+  :ensure-system-package (dict dictd)
+  :defer t)
+
+;;; debian
+;; https://salsa.debian.org/emacsen-team/debian-el
+(use-package debian-el
+  :straight t
+  :general
+  (:keymaps 'apt-utils-mode-map
+	    :states 'normal
+	    "RET" #'apt-utils-follow-link
+	    "q" #'apt-utils-quit ))
+
+;;; el2org
+(use-package el2org
+  :straight t
+  :defer t)
+
+;;;; osm
+(use-package osm
+  :straight (:host github :repo "minad/osm")
+  :general
+  (:keymaps 'osm-mode-map
+	    :states '(normal motion)
+	    "h" #'osm-left
+	    "j" #'osm-down
+	    "k" #'osm-up
+	    "l" #'osm-right
+	    "t" #'osm-goto
+	    "H" #'osm-home
+	    "s" #'osm-search
+	    "v" #'osm-server
+	    "x" #'osm-gpx-show
+	    "X" #'osm-gpx-hide
+	    "L" #'org-store-link
+	    "b" #'osm-bookmark-set
+	    "RET" #'osm-bookmark-jump
+	    "q" #'quit-window
+	    ;; <arrow>: Small step scrolling
+	    ;; C-<arrow>, M-<arrow>: Large step scrolling
+	    "+" #'osm-zoom-in 
+	    "SPC" #'osm-zoom-in 
+	    "-" #'osm-zoom-out
+	    "<S-SPC>" #'osm-zoom-out
+	    ;; <osm-bookmark mouse-*>: osm-bookmark-delete-click
+	    ;; <down-mouse-*>: osm-mouse-drag
+	    ;; d, DEL: osm-bookmark-delete
+	    ;; n: osm-bookmark-rename
+	    ;; c: clone-buffer - Clone buffer
+	    ))
 
 (provide 'lg-tools)
