@@ -19,11 +19,9 @@
 
 ;;; dank-mode (reddit)
 (use-package dank-mode
+  :disabled t
   :straight (dank-mode :host github :repo "john2x/dank-mode")
-  :commands (dank-mode)
-  :config
-  (use-package markdown-mode
-    :straight t))
+  :commands (dank-mode))
 
 ;;; fireplace
 (use-package fireplace
