@@ -7,6 +7,7 @@
   :hook ((org-mode . auto-fill-mode)
 	 ;; (before-save . org-footnote-normalize)
 	 (before-save . org-table-recalculate-buffer-tables))
+  :diminish org-indent-mode
   :init
   (when (featurep 'transient)
     (define-transient-command lg/transient-org ()
@@ -77,6 +78,27 @@
      ("docker" modus-themes-nuanced-cyan)))
   (org-export-dispatch-use-expert-ui nil)
   (org-export-in-background nil)
+
+  (org-format-latex-header
+   "\\documentclass{article}
+\\usepackage[usenames]{color}
+[PACKAGES]
+[DEFAULT-PACKAGES]
+\\pagestyle{empty}
+% do not remove
+% The settings below are copied from fullpage.sty
+\\setlength{\\textwidth}{\\paperwidth}
+%\\addtolength{\\textwidth}{-3cm}
+\\setlength{\\oddsidemargin}{1.5cm}
+%\\addtolength{\\oddsidemargin}{-2.54cm}
+\\setlength{\\evensidemargin}{\\oddsidemargin}
+\\setlength{\\textheight}{\\paperheight}
+%\\addtolength{\\textheight}{-\\headheight}
+%\\addtolength{\\textheight}{-\\headsep}
+%\\addtolength{\\textheight}{-\\footskip}
+%\\addtolength{\\textheight}{-3cm}
+\\setlength{\\topmargin}{1.5cm}
+\\addtolength{\\topmargin}{-2.54cm}")
   :config 
   (push 'org-habit org-modules)
   (plist-put org-format-latex-options :scale 1.5))
@@ -142,7 +164,7 @@
   (org-habit-show-habits-only-for-today t)
   (org-habit-following-days 7)
   (org-habit-preceding-days 14)
-  (org-habit-graph-column 40))
+  (org-habit-graph-column 60))
 
 ;;; org-journal
 (use-package org-journal
@@ -169,11 +191,6 @@
   :defer t
   :after org-plus-contrib
   :commands (org-babel-execute:dot))
-
-;;; org-beamer
-(use-package ox-beamer
-  :defer t
-  :after org)
 
 ;;; Org-sidebar
 (use-package org-sidebar
@@ -227,21 +244,17 @@
   :straight t
   :after org
   :defer t
-  :preface
-  ;; Allow the user to preempt this and set the document search path
-  ;; If not set then use `org-directory'
-  (defvar org-noter-notes-search-path nil)
-  :config
-  (unless org-noter-notes-search-path
-    (setq org-noter-notes-search-path (list org-directory)))
-  (setq org-noter-auto-save-last-location t
-	org-noter-default-notes-file-names '("lecture.org")
-	org-noter-separate-notes-from-heading t
-	org-noter-always-create-frame nil
-	org-noter-kill-frame-at-session-end nil)
-  (general-def :states 'normal
-    :keymaps 'pdf-view-mode-map
-    "i" #'org-noter-insert-note))
+  :custom
+  (org-noter-notes-search-path '("/home/lucas/org/roam/reference")); "~/org" ))
+  (org-noter-auto-save-last-location t)
+  (org-noter-default-notes-file-names '("~/org/lecture.org")) ;;'("lecture.org")
+  (org-noter-separate-notes-from-heading t)
+  (org-noter-always-create-frame nil)
+  (org-noter-kill-frame-at-session-end nil)
+  :general
+  (:states '(normal visual)
+	   :keymaps 'pdf-view-mode-map
+	   "i" #'org-noter-insert-note))
 
 ;;;; org-pdf-tools
 (use-package org-pdftools
@@ -253,10 +266,22 @@
   :after org-noter
   :straight t)
 
-;;; Ox-report
+;;; org export
+(use-package ox
+  :commands org-export-dispatch
+  :custom
+  (org-export-coding-system 'utf-8)
+  (org-export-default-language "fr")
+  (org-export-preserve-breaks t "Better line breaks in latex and others."))
+
+;;;; ox-beamer
+(use-package ox-beamer
+  :after ox)
+
+;;;; Ox-report
 (use-package ox-report
   :straight t
-  :after org
+  :after ox
   :defer t)
 
 ;;; org-ref
@@ -274,34 +299,35 @@
 ;;; org-contacts
 (use-package org-contacts
   :after org
-  :defer t
-  :config
-  (setq org-contacts-files '("~/org/contacts.org"))
-  ;; (setq org-contacts-keymap)
-  (setq org-contacts-matcher "EMAIL<>\"\"|ALIAS<>\"\"|TEL<>\"\"|ADRESSE<>\"\"|ANNIVERSAIRE<>\"\"")
-  (setq org-contacts-icon-size 32)
-  (setq org-contacts-vcard-file "~/org/contacts.vcf")
+  :commands org-agenda
+  :custom
   ;; (setq org-contacts-last-update nil)
-  (setq org-contacts-tel-property "TEL")
-  (setq org-contacts-group-prefix "+")
-  (setq org-contacts-icon-property "ICON")
-  (setq org-contacts-note-property "NOTE")
-  (setq org-contacts-alias-property "ALIAS")
-  (setq org-contacts-email-property "EMAIL")
-  (setq org-contacts-ignore-property "IGNORE")
-  (setq org-contacts-birthday-format "Anniversaire: %l (%Y)")
-  (setq org-contacts-address-property "ADRESSE")
-  (setq org-contacts-tags-props-prefix "#")
-  (setq org-contacts-icon-use-gravatar t)
-  (setq org-contacts-enable-completion t)
-  (setq org-contacts-birthday-property "ANNIVERSAIRE")
-  (setq org-contacts-nickname-property "NICKNAME")
-  ;; (setq org-contacts-complete-functions )
-  (setq org-contacts-completion-ignore-case t)
-  (setq org-contacts-last-read-mail-property "DERNIER_MAIL")
-  (setq org-contacts-property-values-separators "[,; \f\11\n\15\13]+")
-  (setq org-contacts-email-link-description-format "%s (%d)")
-  ;;(setq calendar-date-style 'american)
+  (org-contacts-files '("~/org/contacts.org"))
+  (org-contacts-matcher "EMAIL<>\"\"|ALIAS<>\"\"|TEL<>\"\"|ADRESSE<>\"\"|ANNIVERSAIRE<>\"\"")
+  (org-contacts-icon-size 32)
+  (org-contacts-vcard-file "~/org/contacts.vcf")
+  (org-contacts-tel-property "TEL")
+  (org-contacts-group-prefix "+")
+  (org-contacts-icon-property "ICON")
+  (org-contacts-note-property "NOTE")
+  (org-contacts-alias-property "ALIAS")
+  (org-contacts-email-property "EMAIL")
+  (org-contacts-ignore-property "IGNORE")
+  (org-contacts-birthday-format "Anniversaire: %l (%Y)")
+  (org-contacts-address-property "ADRESSE")
+  (org-contacts-tags-props-prefix "#")
+  (org-contacts-icon-use-gravatar t)
+  (org-contacts-enable-completion t)
+  (org-contacts-birthday-property "ANNIVERSAIRE")
+  (org-contacts-nickname-property "NICKNAME")
+  (org-contacts-completion-ignore-case t)
+  (org-contacts-last-read-mail-property "DERNIER_MAIL")
+  (org-contacts-property-values-separators "[,; \f\11\n\15\13]+")
+  (org-contacts-email-link-description-format "%s (%d)")
+  ;;(calendar-date-style 'american)
+  :config
+  (dolist (file org-contacts-files)
+    (add-to-list 'org-agenda-files file))
   (defun org-contacts-anniversaries (&optional field format)
     "Compute FIELD anniversary for each contact, returning FORMAT.
 Default FIELD value is \"BIRTHDAY\".
@@ -313,6 +339,7 @@ Format is a string matching the following format specification:
   %y - Number of year
   %Y - Number of year (ordinal)"
     (let ((calendar-date-style 'american)
+	  (date (calendar-current-date))
           (entry ""))
       (unless format (setq format org-contacts-birthday-format))
       (cl-loop for contact in (org-contacts-filter)
@@ -343,15 +370,38 @@ Format is a string matching the following format specification:
   :bind ("s-c" . org-capture)
   :custom
   (org-capture-templates
-   '(("b" "Books" entry
-      (file+headline "~/org/lecture.org" "Inbox")
+   '(("c" "Contact" entry
+      (file "~/org/contacts.org")
       "* %?
-%^{AUTEUR}p
-%^{DATE_LECTURE}p "
-      )
+:PROPERTIES:
+:EMAIL: 
+:PHONE:
+:ALIAS:
+:NICKNAME:
+:IGNORE:
+:ICON:
+:NOTE:
+:ADDRESS:
+:BIRTHDAY:
+:END:")
+     ("b" "Books" entry
+      (file+headline "~/org/lecture.org" "Inbox")
+      "* %?\n%^{AUTEUR}p\n%^{DATE_LECTURE}p")
      ("t" "Todo" entry
       (file+headline org-default-notes-file "Inbox")
       "* %?\n%i\n" :prepend t)
+     ("r" "Reunion" entry
+      (file "~/org/reunions.org")
+      "* %?
+%^t
+:PROPERTIES:
+:LIEU: %^{Où a lieu la réunion ?|Présentiel|Skype|Zoom|Teams}
+:PEOPLE: Lucas GRUSS 
+:END:
+** TODO Préparation de réunion (amont) [/]
+** Contexte (amont/pendant)
+** Notes (pendant)
+** TODO Taches à réaliser (après réunion) [/]")
      ("l" "Link" entry (file+headline "~/org/links.org" "Links")
       "* %a %^g\n %?\n %T\n %i"))))
 
@@ -485,6 +535,8 @@ Format is a string matching the following format specification:
   (org-roam-directory "~/org/roam")
   (org-roam-database-connector 'sqlite)
   :config
+  ;; (setq org-roam-node-display-template
+  ;;  (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   ;; https://jethrokuan.github.io/org-roam-guide/
   (defun jethro/org-roam-node-from-cite (keys-entries)
     (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
@@ -516,4 +568,9 @@ Format is a string matching the following format specification:
   (org-roam-ui-open-on-start t)
   (org-roam-ui-browser-function #'xwidget-webkit-browse-url))
 
+;;; org-modern-mode
+(use-package org-modern
+  :straight t
+  :defer t)
+  
 (provide 'lg-org)
