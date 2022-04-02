@@ -85,14 +85,21 @@
 ;;;; Syncing system themes with emacs theme
 (use-package lg-system-theme-sync
   :load-path "~/.emacs.d/lisp/site-packages/"
-  :custom 
+  :demand t
+  :custom
   (system-theme-sync-default-light-plist '(:background "/home/lucas/Images/Wallpaper/nature-mountain.jpg"
-					   :gtk-theme "Adwaita"
-					   :icon-theme "Papirus-Light"))
+						       :gtk-theme "Adwaita"
+						       :icon-theme "Papirus-Light"))
   (system-theme-sync-default-dark-plist '(:background "/home/lucas/Images/Wallpaper_bis/space3.png"
-					  :gtk-theme "Adwaita-dark"
-				          :icon-theme "Papirus-Dark"))
+						      :gtk-theme "Adwaita-dark"
+						      :icon-theme "Papirus-Dark"))
+  :hook
+  (system-theme-sync-theme . lg/system-theme-sync-update-xresources)
   :init
+  (defun lg/system-theme-sync-update-xresources ()
+    (shell-command (format "sed -i 's/\*background.*/\*background\: %s/g' ~/.Xresources" (face-background 'default)))
+    (shell-command (format "sed -i 's/\*foreground.*/\*foreground\: %s/g' ~/.Xresources" (face-foreground 'default)))
+    (shell-command "xrdb ~/.Xresources"))
   (defun load-theme--disable-old-theme(theme &rest args)
     "Disable current theme before loading new one."
     (mapcar #'disable-theme custom-enabled-themes))
@@ -101,7 +108,7 @@
   (system-theme-sync-mode +1))
 
 ;;;; Transparency
-(use-package emacs
+(use-package emacs ; transparency
   :init
   (setq frame-alpha-lower-limit 1)
   (defvar lg/transparency-alpha 80
@@ -330,7 +337,7 @@ state. An icon is also shown for eye candy."
   :defer t)
 
 
-;;; Themes 
+;;; Themes
 ;;;; modus-themes
 (use-package modus-themes
   :straight t
@@ -472,8 +479,9 @@ settings applied to them."
     "C-t" 'tab-line-new-tab)
   :custom
   (tab-line-new-button-show t)
-  ;(tab-line-separator '(propertize " " 'face (face-attribute 'default :foreground)))
+  (tab-line-separator " ")
   (tab-line-close-button-show t)
+  (tab-line-tab-max-width 20)
   (tab-line-switch-cycling t)
   (tab-line-new-tab-choice #'lg/tab-line-new-tab "Context aware new tab behaviour.")
   (tab-line-close-tab-function #'lg/tab-line-kill-buffer)
@@ -488,6 +496,7 @@ settings applied to them."
 			    Info-mode
 			    ibuffer-sidebar-mode
 			    ibuffer-mode
+			    flycheck-error-list-mode
 			    use-package-statistics-mode
 			    dired-mode
 			    dired-sidebar-mode
@@ -495,6 +504,7 @@ settings applied to them."
 			    osm-mode
 			    calc-mode
 			    calc-trail-mode
+			    special-mode
 			    matlab-shell-mode
 			    so-long-mode
 			    apt-utils-mode))
@@ -580,7 +590,7 @@ settings applied to them."
 ;;;; scroll-on-jump
 (use-package scroll-on-jump
   :demand t
-  :straight   
+  :straight
   (scroll-on-jump :type git :host gitlab
 		  :repo "ideasman42/emacs-scroll-on-jump")
   :after evil
@@ -624,7 +634,7 @@ settings applied to them."
   :straight (:host gitlab :repo "protesilaos/lin")
   :commands lin-mode
   :config (lin-add-to-many-modes))
-  
+
 ;;; hl-todo
 (use-package hl-todo
   :straight t
@@ -662,9 +672,10 @@ settings applied to them."
       (visual-fill-column-mode +1)))
   :hook
   ((Info-mode
-    org-mode
-    minibuffer-mode
-    ledger-mode) . lg/activate-visual-fill-center))
+  ;;   org-mode
+   minibuffer-mode
+   ledger-mode) . lg/activate-visual-fill-center))
+
 
 ;;; page-break-lines
 (use-package page-break-lines
@@ -673,7 +684,7 @@ settings applied to them."
   :config
   (global-page-break-lines-mode +1))
 
-;;; Eros : Evaluation Result Overlays 
+;;; Eros : Evaluation Result Overlays
 (use-package eros
   :straight t
   :config (eros-mode +1))
@@ -743,3 +754,4 @@ settings applied to them."
     (define-key map [remap backward-page] #'logos-backward-page-dwim)))
 
 (provide 'lg-ui)
+;;; lg-ui.el ends here
