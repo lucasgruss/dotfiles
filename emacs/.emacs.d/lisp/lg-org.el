@@ -245,7 +245,7 @@
   :after org
   :defer t
   :custom
-  (org-noter-notes-search-path '("/home/lucas/org/roam/reference")); "~/org" ))
+  (org-noter-notes-search-path '("~/org/roam/reference/")); "~/org" ))
   (org-noter-auto-save-last-location t)
   (org-noter-default-notes-file-names '("~/org/lecture.org")) ;;'("lecture.org")
   (org-noter-separate-notes-from-heading t)
@@ -502,8 +502,33 @@ Format is a string matching the following format specification:
   :commands (citar-select-ref citar-open citar-open-notes citar-open-entry)
   :custom
   (citar-bibliography "~/bib/references.bib")
-  (citar-file-extensions '("pdf" "org" "tex"))
-  (citar-notes-paths '("~/org/notes/"))
+  (citar-file-extensions '("pdf" "org" "tex" "md"))
+  (citar-notes-paths '("~/org/roam/reference/"))
+  (citar-templates
+   '((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
+     (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords keywords:*}")
+     (preview . "${author editor} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+     (note . ":PROPERTIES:\n:ROAM_REFS: [cite:@${=key=}]\n:END:\n#+title: ${author} ${editor} :: ${title}")))
+  (citar-format-note-function #'lg/citar-org-format-note)
+
+  :init
+  (defun lg/citar-org-format-note (key entry filepath)
+    "Format a note FILEPATH from KEY and ENTRY."
+    (with-current-buffer (find-file filepath)
+      ;; This just overrides other template insertion.
+      (erase-buffer)
+      (insert (citar--format-entry-no-widths entry ":PROPERTIES:
+:ROAM_REFS: [cite:@${=key=}]
+:ID: :${=key=}
+:END:
+#+title: ${author} ${editor} :: ${title}\n
+* Notes\n:PROPERTIES:\n:NOTER_DOCUMENT: ${file}\n:END:
+\n|\n\n#+print_bibliography:"))
+      (search-backward "|")
+      (delete-char 1)
+      (when (fboundp 'evil-insert)
+	(evil-insert 1))))
+
   :config
   (citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook)))
 
@@ -541,12 +566,16 @@ Format is a string matching the following format specification:
   (defun jethro/org-roam-node-from-cite (keys-entries)
     (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
     (let ((title (citar--format-entry-no-widths (cdr keys-entries)
-						"${author editor} :: ${title}")))
+						"${author editor} :: ${title}"))
+	  (file (citar--format-entry-no-widths (cdr keys-entries)
+					       "${file}")))
+      (echo file)
       (org-roam-capture- :templates
 			 '(("r" "reference" plain "%?" :if-new
 			    (file+head "reference/${citekey}.org"
 				       ":PROPERTIES:
 :ROAM_REFS: [cite:@${citekey}]
+:NOTER_DOCUMENT: ${file}
 :END:
 #+title: ${title}\n")
 			    :immediate-finish t
