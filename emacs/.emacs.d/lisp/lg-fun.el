@@ -62,4 +62,9 @@
   :straight t
   :defer t)
 
+;;; xkcd
+(use-package xkcd
+  :straight t
+  :defer t)
+
 (provide 'lg-fun)
