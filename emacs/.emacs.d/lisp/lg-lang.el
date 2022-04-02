@@ -158,11 +158,11 @@
   :straight t)
 
 ;;; markdown
-  (use-package markdown-mode
-    :straight t
-    :ensure-system-package pandoc
-    :custom
-    (markdown-command "pandoc")
-   (markdown-live-preview-window-function ))
+(use-package markdown-mode
+  :straight t
+  :defer t
+  :ensure-system-package pandoc
+  :custom
+  (markdown-command "pandoc"))
 
 (provide 'lg-lang)
