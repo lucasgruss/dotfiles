@@ -46,11 +46,12 @@
   :defer t)
 
 ;;; enime : watch anime
-(use-package esxml
-  :straight t)
 (use-package enime
   :straight (:host github :repo "xl666/enime" :files (:defaults "video_scrapping.sh"))
-  :commands (enime-main-transient))
+  :commands (enime-main-transient)
+  :init
+  (use-package s :straight t)
+  (use-package esxml :straight t))
 
 ;;; vimgolf
 (use-package vimgolf
