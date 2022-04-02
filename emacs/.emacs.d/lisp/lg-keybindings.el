@@ -1,6 +1,16 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-keybindings: basic configuration needed for the keybindings
+;;; lg-keybindings: basic configuration needed for the keybindings  -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
+
+;;; general
+(use-package general
+  :straight t
+  :config
+  (general-def :states 'normal :keymaps 'Info-mode-map
+    "RET" 'Info-follow-nearest-node)
+  (general-def :states '(normal visual) :keymaps 'eww-mode-map
+    "i" 'evil-insert)
+  (general-create-definer my-leader-def :states '(normal visual motion) :prefix "SPC")
+  (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m"))
 
 ;;; Evil-mode
 (use-package evil
@@ -13,17 +23,6 @@
   (setq evil-undo-system 'undo-redo)
   :bind (:map evil-visual-state-map ("gr" . eval-last-sexp))
   :config (evil-mode +1))
-
-;;; general
-(use-package general
-  :straight t
-  :config
-  (general-def :states 'normal :keymaps 'Info-mode-map
-    "RET" 'Info-follow-nearest-node)
-  (general-def :states '(normal visual) :keymaps 'eww-mode-map
-    "i" 'evil-insert)
-  (general-create-definer my-leader-def :states '(normal visual motion) :prefix "SPC")
-  (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m"))
 
 ;;; Evil-collection
 (use-package evil-collection
@@ -95,6 +94,7 @@
   (evil-escape-excluded-major-modes '(magit-status-mode))
   :config (evil-escape-mode +1))
 
+;;; evil-goggles
 (use-package evil-goggles
   :straight t
   :diminish evil-goggles-mode
@@ -104,13 +104,13 @@
   (evil-goggles-enable-surround t)
   (evil-goggles-duration 0.3))
 
-;; evil-surround
+;;; evil-surround
 (use-package evil-surround
   :straight t
   :after evil
   :config (global-evil-surround-mode +1))
 
-;; evil-numbers
+;;; evil-numbers
 (use-package evil-numbers
   :straight t
   :after evil
