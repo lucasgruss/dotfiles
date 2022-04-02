@@ -23,6 +23,7 @@
    '(("\\`mailto:" . browse-url--mailto)
     ("\\www\.youtube\.com" . browse-url-umpv)
     ("\\`man:" . browse-url--man)
+    ("\\`.mp4" . browse-url-umpv)
     (browse-url--non-html-file-url-p . browse-url-emacs)))
 
   :init
@@ -67,6 +68,7 @@
 (use-package wikinforg
   :straight t
   :defer t)
+
 ;;; wttrin
 (use-package wttrin
   :straight t
