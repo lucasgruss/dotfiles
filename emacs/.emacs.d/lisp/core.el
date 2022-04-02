@@ -71,7 +71,11 @@
 
 ;;; no-littering
 (use-package no-littering
-  :straight t)
+  :straight t
+  :after recentf
+  :config
+  (add-to-list 'recentf-exclude no-littering-var-directory)
+  (add-to-list 'recentf-exclude no-littering-etc-directory))
 
 ;;;; Esup : emacs startup time profiler
 (use-package esup
@@ -96,11 +100,9 @@
 
 ;;; recentf-mode
 (use-package recentf
-  :custom (recentf-max-saved-items 1000)
+  :custom
+  (recentf-max-saved-items 1000)
   :config
-  (when (featurep 'no-littering)
-    (add-to-list 'recentf-exclude no-littering-var-directory)
-    (add-to-list 'recentf-exclude no-littering-etc-directory))
   (recentf-mode +1))
 
 ;;; so-long
