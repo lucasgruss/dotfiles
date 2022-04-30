@@ -117,6 +117,7 @@ behaviour. Delete the frame after that command has exited"
 ;;; Consult
 (use-package consult
   :straight t
+  :ensure-system-package (rg . ripgrep)
   :bind ("s-\'" . consult-buffer)
   :init
   (defun lg/consult-use-package ()
