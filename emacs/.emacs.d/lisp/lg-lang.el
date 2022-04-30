@@ -165,4 +165,16 @@
   :custom
   (markdown-command "pandoc"))
 
+;;; latex
+;; https://karthinks.com/software/latex-input-for-impatient-scholars/
+;;;; auctex
+(use-package latex
+  :straight auctex)
+
+;;;; cdlatex
+(use-package cdlatex
+  :straight t
+  :hook (org-mode . org-cdlatex-mode))
+
+
 (provide 'lg-lang)
