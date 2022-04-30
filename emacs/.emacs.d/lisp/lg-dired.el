@@ -4,6 +4,7 @@
 (use-package dired
   :hook
   (dired-mode . dired-hide-details-mode)
+  (dired-mode . auto-revert-mode)
   :custom
   (dired-kill-when-opening-new-dired-buffer nil)
   (dired-clean-confirm-killing-deleted-buffers nil)
@@ -31,7 +32,7 @@
 ;;; Dired-sidebar
 (use-package dired-sidebar
   :straight t
-  :commands (dired-sidebar-find-file dired-sidebar-toggle)
+  ;:commands (dired-sidebar-find-file dired-sidebar-toggle)
   :bind (:map dired-sidebar-mode-map ("<localleader>m" . emms-play-dired))
   :general
   (general-def :keymaps 'dired-sidebar-mode-map :states 'normal
@@ -49,6 +50,7 @@
   :hook (dired-mode . dired-hide-dotfiles-mode)
   :straight t)
 
+;;; dired-get
 (use-package dired-git
   :disabled t
   :straight t
