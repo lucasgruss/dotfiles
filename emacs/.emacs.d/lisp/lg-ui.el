@@ -85,6 +85,7 @@
 ;;;; Syncing system themes with emacs theme
 (use-package lg-system-theme-sync
   :load-path "~/.emacs.d/lisp/site-packages/"
+  ;:ensure-system-package papirus-icon-theme
   :demand t
   :custom
   (system-theme-sync-default-light-plist '(:background "/home/lucas/Images/Wallpaper/nature-mountain.jpg"
@@ -497,6 +498,7 @@ settings applied to them."
 			    ibuffer-sidebar-mode
 			    ibuffer-mode
 			    flycheck-error-list-mode
+			    fireplace-mode
 			    use-package-statistics-mode
 			    dired-mode
 			    dired-sidebar-mode
@@ -671,10 +673,12 @@ settings applied to them."
 	(visual-fill-column-mode -1)
       (visual-fill-column-mode +1)))
   :hook
-  ((Info-mode
+  ((
+  ;;Info-mode
   ;;   org-mode
    minibuffer-mode
-   ledger-mode) . lg/activate-visual-fill-center))
+   ;;ledger-mode
+   ) . lg/activate-visual-fill-center))
 
 
 ;;; page-break-lines
