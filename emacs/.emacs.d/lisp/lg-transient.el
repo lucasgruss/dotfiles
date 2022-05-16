@@ -1,4 +1,7 @@
 ;;; lg-transient --- Global menu with transient.el -*- lexical-binding: t; -*-
+;;; Commentary:
+;; Configuration for transient, implementing a menu system.
+;;; Code:
 
 ;;; Transient
 (use-package transient
@@ -12,15 +15,16 @@
       ("SPC" "M-x" execute-extended-command)
       ;("S-SPC" "M-X : buffer" execute-extended-command-for-buffer)
       ("j" "Avy" avy-goto-char-timer)
-      ("m" "Local leader" evil-send-localleader)
-      ("x" "Org capture" org-capture)]
+      ("k" "Org capture" org-capture)
+      ("m" "Local leader" evil-send-localleader)]
      ["Dispatch"
       ("b" "Buffers/Bookmarks" lg/transient-b)
       ("c" "Consult/Code" lg/transient-c)
       ("e" "Emms" lg/transient-e)
       ("f" "Files" lg/transient-f)
       ("h" "Help" lg/transient-h)
-      ("M" "Manage" lg/transient-M)
+      ("M" "Manage" lg/transient-M)]
+     [""
       ("o" "Open/Org" lg/transient-o)
       ("p" "Project" lg/transient-p)
       ("q" "Quit" lg/transient-q)
@@ -49,7 +53,10 @@
      ["Code"
       ("c" "Comment region" comment-region)]
      ["Checking spelling"
-      ("f" "flyspell" flyspell-correct-wrapper)]]
+      ("f" "flyspell" flyspell-correct-wrapper)]
+     ["Citar"
+      ("o" "Open citar resource" citar-open)
+      ("n" "Open citar note" citar-open-notes)]]
     [:hide (lambda () t)])
 
   (transient-define-prefix lg/transient-e ()
@@ -134,7 +141,7 @@
       ("P" "Proced" proced)
       ("r" "Ripgrep" rg)
       ("s" "Smudge" smudge-my-playlists)
-      ("t" "Terminal" vterm)
+      ;("t" "Terminal" vterm)
       ("u" "Disk-usage" disk-usage)
       ;;("s" "Smudge" lg/transient-smudge)
       ("w" "Eww" eww)
@@ -161,7 +168,7 @@
   (transient-define-prefix lg/transient-q ()
     "Quit"
     [["Quit"
-      ("e" "Exit emacs" (lambda () (interactive) (when (y-or-n-p "Really exit emacs ?") (kill-emacs))))
+      ("e" "Exit Emacs" (lambda () (interactive) (when (y-or-n-p "Really exit Emacs ?") (kill-emacs))))
       ("q" "Turn computer off" lg/poweroff-computer)]]
     [:hide (lambda () t)])
 
@@ -188,12 +195,15 @@
       ("d" "Decoration" lg/toggle-frame-decorations)
       ("f" "Fullscreen" toggle-frame-fullscreen)
       ("F" "Fullscreen all frames" lg/toggle-all-frames-fullscreen)
+      ("l" "Toggle line numbers" lg/display-line-numbers-mode-enable)
       ("m" "Hide modeline" hide-mode-line-mode)
       ("M" "Hide modeline globally" global-hide-mode-line-mode)
       ("t" "Transparency" lg/toggle-transparency)
+      ("s" "Scroll bars (in this frame)" toggle-scroll-bar)
+      ("S" "Scroll bars (all frames)" scroll-bar-mode)
       ("v" "Visual fill column" visual-fill-column-mode)
       ("V" "Visual fill column globally" visual-fill-column-mode)
-      ]
+      ("z" "Zen mode" lg/zen-mode)]
      ["Modes"
       ("C-f" "Fringes" fringe-mode)
       ("h" "Hl-line" hl-line-mode)
