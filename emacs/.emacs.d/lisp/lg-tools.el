@@ -655,4 +655,11 @@ behaviour. Delete the frame after that command has exited"
 	    ;; c: clone-buffer - Clone buffer
 	    ))
 
+;;; solar
+(use-package solar
+  :demand t
+  :custom
+  (calendar-latitude 48.856613)
+  (calendar-longitude 2.352222))
+
 (provide 'lg-tools)

@@ -405,16 +405,10 @@ settings applied to them."
 (use-package kaolin-themes
   :straight t)
 
-;;; solar
-(use-package solar
-  :custom
-  (calendar-latitude 48.856613)
-  (calendar-longitude 2.352222))
-
 ;;; Circadian
 (use-package circadian
   :straight t
-  :demand t
+  :after solar
   :custom
   (circadian-themes '((:sunrise . modus-operandi)
 		      (:sunset . modus-vivendi)))
