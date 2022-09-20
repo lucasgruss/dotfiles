@@ -70,7 +70,11 @@
       ("p" "Playlist (sidebar)" lg/emms-go-playlist)
       ("r" "Radios" emms-streams)
       ("s" "Stop" emms-stop)
-      ("S" "Shuffle" emms-shuffle)]]
+      ("S" "Shuffle" emms-shuffle)]
+     ["Emojis"
+      ("i" "Insert + search" emoji-describe)
+      ("i" "Insert + search" emoji-search)
+      ("I" "Insert + transient" emoji-insert)]]
     [:hide (lambda () t)])
 
   (transient-define-prefix lg/transient-f ()
@@ -136,7 +140,8 @@
       ("f" "Elfeed" elfeed)
       ("g" "Magit" magit-status)
       ;;("N" "Enwc (Network manager)" enwc)
-      ("m" "Open-street-map" osm-home)
+      ("m" "Mail (mu4e)" mu4e)
+      ("M" "Open-street-map" osm-home)
       ("p" "Pass" pass)
       ("P" "Proced" proced)
       ("r" "Ripgrep" rg)
