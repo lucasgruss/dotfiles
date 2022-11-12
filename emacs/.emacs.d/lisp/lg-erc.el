@@ -2,6 +2,12 @@
 ;; Inspiration from:
 ;; https://github.com/SystemCrafters/systemcrafters.github.io/blob/6e0686022b84c291686fc773d2974e7be02ec2b9/content/live-streams/june-04-2021.org
 
+;; /msg NickServ info 
+;; /msg NickServ register password email-address
+;; /msg NickServ VERIFY REGISTER nickname secret-password
+;; /msg nickserv identify password
+;; /join #emacs
+
 ;;; erc
 (use-package erc
   :commands (erc erc-tls)
@@ -17,7 +23,7 @@
      :password (password-store-get "libera-chat")))
 
   :custom
-  (erc-prompt-for-password nil)
+  (erc-prompt-for-password t)
   (erc-server "irc.libera.chat")
   (erc-nick "poinkalu")
   (erc-user-full-name "Lucas Gruss")

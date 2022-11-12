@@ -4,8 +4,9 @@
 ;;; EWW
 (use-package eww
   :commands (eww eww-browse-with-history)
-  :hook (eww-after-render . prot-eww--rename-buffer)
+  ;:hook (eww-after-render . prot-eww--rename-buffer)
   :custom
+  (eww-auto-rename-buffer 'title)
   (eww-download-directory "~/Téléchargements/eww/")
   (eww-desktop-data-save '(:url :title))
   :config

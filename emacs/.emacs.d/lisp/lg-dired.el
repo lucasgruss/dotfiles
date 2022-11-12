@@ -11,6 +11,7 @@
   (dired-listing-switches "-al --group-directories-first")
   (dired-dwim-target t)
   (dired-compress-directory-default-suffix ".zip")
+  (dired-mouse-drag-files t)
   :general
   (:keymaps 'dired-mode-map
 	    "<mouse-8>" #'dired-up-directory)
@@ -18,6 +19,11 @@
 	    :states 'normal
 	    "h" #'dired-up-directory
 	    "l" #'dired-find-file))
+
+;;; dired-x
+(use-package dired-x 
+  :custom
+  (dired-omit-extensions "config"))
 
 ;;; dired-async-mode
 (use-package dired-async
@@ -47,7 +53,7 @@
 ;;; Dired-hide-dotfiles
 (use-package dired-hide-dotfiles
   :after dired
-  :hook (dired-mode . dired-hide-dotfiles-mode)
+  ;:hook (dired-mode . dired-hide-dotfiles-mode)
   :straight t)
 
 ;;; dired-get

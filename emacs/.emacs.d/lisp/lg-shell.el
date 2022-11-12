@@ -2,37 +2,37 @@
 
 ;;; Vterm
 (use-package vterm
-  ;; :ensure-system-package (libvterm . libvterm-dev)
   :straight (vterm :type git :repo "akermu/emacs-libvterm")
+  :ensure-system-package (libvterm . libvterm-dev)
   :commands vterm
   :custom
   (vterm-shell "bash")
   (vterm-always-compile-module t)
   (vterm-module-cmake-args "-DUSE_SYSTEM_VTERM=YES"))
 
-;;; Multi-vterm
-(use-package multi-vterm
-  :straight t
-  :after vterm)
+;; ;;; Multi-vterm
+;; (use-package multi-vterm
+;;   :straight t
+;;   :after vterm)
 
-;;; Vterm-toggle
-;; run-or-raise-or-dismiss for vterm
-(use-package vterm-toggle
-  :straight t
-  :bind ("s-<return>" . 'lg/vterm-toggle)
-  :commands (vterm-toggle)
-  :custom
-  (vterm-toggle-fullscreen-p nil)
-  :init
-  (defun lg/vterm-toggle ()
-    (interactive)
-    (if (string= (frame-parameter nil 'name) "yequake-vterm")
-	(delete-frame (select-frame-by-name "yequake-vterm"))
-      (vterm-toggle))))
+;; ;;; Vterm-toggle
+;; ;; run-or-raise-or-dismiss for vterm
+;; (use-package vterm-toggle
+;;   :straight t
+;;   :after vterm
+;;   ;:bind ("s-<return>" . 'lg/vterm-toggle)
+;;   :commands (vterm-toggle)
+;;   :custom
+;;   (vterm-toggle-fullscreen-p nil)
+;;   :init
+;;   (defun lg/vterm-toggle ()
+;;     (interactive)
+;;     (if (string= (frame-parameter nil 'name) "yequake-vterm")
+;; 	(delete-frame (select-frame-by-name "yequake-vterm"))
+;;       (vterm-toggle))))
 
 ;;; Eshell
 ;;;; eshell
-
 (use-package eshell
   :defer t
   :init
@@ -72,8 +72,9 @@
 
 ;;;; eshell-vterm
 (use-package eshell-vterm
+  :disabled t
   :straight t
-  :after eshell
+  :after eshell vterm
   :config (eshell-vterm-mode +1))
 
 ;;;; eshell-git-prompt

@@ -158,9 +158,9 @@ buffer (=minimizing in other WM/DE)"
      ([?\s-u] . lg/toggle-line-char-modes)
      ([s-return] . vterm-toggle)
      ([s-escape] . lg/kill-this-buffer)
-     ([?\s-/]  . centaur-tabs-mode)
-     ([?\s-m]  . centaur-tabs-backward)
-     ([?\s-,]  . centaur-tabs-forward)
+     ;([?\s-/]  . centaur-tabs-mode)
+     ;([?\s-m]  . centaur-tabs-backward)
+     ;([?\s-,]  . centaur-tabs-forward)
      ([?\s-?]  . tab-bar-mode)
      ([?\s-M]  . lg/tab-previous-and-hide-maybe)
      ([?\s-<]  . lg/tab-next-and-hide-maybe)
@@ -211,7 +211,7 @@ buffer (=minimizing in other WM/DE)"
 (use-package exwm-randr
   :after exwm
   :config
-  (setq exwm-randr-workspace-monitor-plist '(0 "eDP-1" 1 "DP-2"))
+  (setq exwm-randr-workspace-monitor-plist '(0 "eDP-1" 1 "HDMI-1"))
   (setq exwm-randr-screen-change-hook nil)
   (defun lg/setup-screens ()
     (start-process-shell-command

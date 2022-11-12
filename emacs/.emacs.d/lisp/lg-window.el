@@ -2,7 +2,7 @@
 ;;; lg-window.el : window (as in "emacs window") management configuration 
 
 ;;; Emacs settings
-(use-package emacs
+(use-package emacs ;; display-buffer-alist
   :straight nil
   :bind
   (("s-v" . split-window-right)
@@ -25,14 +25,48 @@
       (window-width . ,(+ 3 fill-column))
       (side . right)
       (slot . -2))
+     ("*elfeed-entry*"
+      (display-buffer-in-direction)
+      (direction . below))
      ("\\*\\Outline .*\.pdf\\*"
       (display-buffer-in-direction)
       (direction . right)
-      (window-width . 0.2))))
+      (window-width . 0.2))
+     ("Browsing by: .*"
+      (display-buffer-in-direction)
+      (direction . left)
+      (window-width . 0.15))
+     ("\\*org-roam\\*"
+      (display-buffer-in-side-window)
+      (side . right)
+      (slot . 0)
+      (window-width . 0.33)
+      (window-parameters . ((no-other-window . t)
+			    (no-delete-other-windows . t))))
+     ("*Music*"
+      (display-buffer-in-direction)
+      (direction . left)
+      (window-width . 0.15))))
   :config
   (defun lg/toggle-all-frames-fullscreen ()
     (interactive)
     (lambda () (mapc 'toggle-frame-fullscreen (frame-list)))))
+
+;;; popper
+(use-package popper
+  :straight t
+  :custom
+  (popper-display-control nil) 
+  (popper-reference-buffers
+   '("\\*Messages\\*"
+     "Output\\*$"
+     emms-playlist-mode
+     emms-browser-mode
+     ;help-mode
+     ;compilation-mode
+     ))
+  :config
+  (popper-mode +1))
 
 ;;; Winner mode
 (use-package winner
@@ -71,8 +105,9 @@
 
 ;;; Framemove
 (use-package framemove
-  :load-path "~/.emacs.d/lisp/site-packages"
+  ;:load-path "~/.emacs.d/lisp/site-packages"
   :demand t
+  :after windmove
   :custom
   (framemove-hook-into-windmove t))
 

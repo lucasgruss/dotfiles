@@ -5,8 +5,7 @@
 (use-package lsp-mode
   :disabled t
   :straight t
-  :unless (featurep 'eglot)
-  :defer t
+  :commands lsp
   :hook (python-mode . lsp)
   :custom (read-process-output-max (* 1024 1024)) ;; 1mb
   :init (setq lsp-keymap-prefix "s-x"))
@@ -14,8 +13,7 @@
 ;;;; eglot
 (use-package eglot
   :straight t
-  :defer t
-  :unless (featurep 'lsp-mode)
+  :commands eglot
   :hook (python-mode . eglot)
   :custom
   (read-process-output-max (* 1024 1024)) ;; 1mb
@@ -132,6 +130,7 @@
 
 ;;; Matlab
 (use-package matlab
+  :disabled t
   :straight matlab-mode
   :defer t
   :ensure-system-package (matlab . matlab-support)
@@ -169,11 +168,13 @@
 ;; https://karthinks.com/software/latex-input-for-impatient-scholars/
 ;;;; auctex
 (use-package latex
+  :defer t
   :straight auctex)
 
 ;;;; cdlatex
 (use-package cdlatex
   :straight t
+  :defer t
   :hook (org-mode . org-cdlatex-mode))
 
 

@@ -1,15 +1,21 @@
 ;;; core.el --- core packages needed for my configuration -*- lexical-binding: t; -*-
+;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;; This is the core of my emacs configuration. It covers the configuration of
+;; use-package, the package manager and performance enhancements.
+;;
+;;; Code:
 
 (setq native-comp-async-report-warnings-errors nil)
 (setq native-comp-async-jobs-number 4)
-
-;;; set *some* security settings early
-;; cf https://glyph.twistedmatrix.com/2015/11/editor-malware.html
 (setq tls-checktrust t)
 (setq gnutls-verify-error t)
 
 ;; magically bootstrap straight
 (defvar bootstrap-version)
+(setq straight-repository-branch "develop")
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -24,8 +30,6 @@
   (load bootstrap-file nil 'nomessage))
 
 (setq straight-disable-native-compile nil)
-(setq straight-disable-native-compilation nil)
-(setq straight-disable-byte-compilation nil)
 (setq straight-disable-compile nil)
 
 ;;; use-package
@@ -35,7 +39,7 @@
   :straight t
   :custom
   (use-package-compute-statistics t)
-  (use-package-verbose t))
+  (use-package-verbose nil))
 
 ;;;; bind-key
 ;; needed for the :bind-key keyword
@@ -102,6 +106,7 @@
 (use-package recentf
   :custom
   (recentf-max-saved-items 1000)
+  :defer 5
   :config
   (recentf-mode +1))
 
@@ -119,6 +124,7 @@
   ("s-b" . 'bury-buffer)
   :custom
   (idle-update-delay 0.3)
+  (delete-by-moving-to-trash t) 
   (comp-async-report-warnings-errors nil)
   (make-backup-files nil)
   (ring-bell-function 'ignore)
@@ -128,10 +134,11 @@
   (y-or-n-p-use-read-key t)
   (x-select-enable-clipboard-manager t)
   (mouse-scroll-delay 0.01)
+  (mouse-drag-and-drop-region-cross-program t)
   :config
   (context-menu-mode +1)
   (show-paren-mode +1)
-  (auto-revert-mode +1)
+  (global-auto-revert-mode +1)
   (fset 'yes-or-no-p 'y-or-n-p)
   (load (setq custom-file "~/.emacs.d/lisp/custom.el"))
   (setq-default fill-column 80)
@@ -169,4 +176,7 @@
     (interactive)
     (efs/run-in-background "setxkbmap gb -variant extd -option ctrl:nocaps")))
 
+(straight-use-package '(f :type git :flavor melpa :files ("f.el" "f-shortdoc.el" "f-pkg.el") :host github :repo "rejeep/f.el"))
+
 (provide 'core)
+;;; core.el ends here

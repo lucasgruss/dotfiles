@@ -23,7 +23,7 @@ behaviour. Delete the frame after that command has exited"
 	  (execute-extended-command nil)
 	(delete-frame)))))
 
-;;;Selectrum
+;;; Selectrum
 (use-package selectrum
   :straight t
   :defer nil
@@ -259,7 +259,7 @@ targets."
 	      ("C-l" . corfu-complete))
   :init
   (define-key evil-insert-state-map (kbd "C-k") nil)  ;; TODO remove once evil-collection supports corfu
-  (corfu-global-mode +1)
+  (global-corfu-mode)
   ;; :config
   ;; (advice-add 'corfu--setup :after 'evil-normalize-keymaps)
   ;; (advice-add 'corfu--teardown :after 'evil-normalize-keymaps)

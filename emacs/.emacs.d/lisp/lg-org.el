@@ -8,7 +8,27 @@
 	 ;; (before-save . org-footnote-normalize)
 	 (before-save . org-table-recalculate-buffer-tables))
   :diminish org-indent-mode
+  :defer t
+  :magic ("\\.org" . org-mode)
   :init
+  ;;https://www.emacswiki.org/emacs/WordCount
+  (defun word-count-analysis (start end)
+    "Count how many times each word is used in the region.
+    Punctuation is ignored."
+    (interactive "r")
+    (let (words)
+      (save-excursion
+	(goto-char start)
+	(while (re-search-forward "\\w+" end t)
+	  (let* ((word (intern (match-string 0)))
+		 (cell (assq word words)))
+	    (if cell
+		(setcdr cell (1+ (cdr cell)))
+	      (setq words (cons (cons word 1) words))))))
+      (when (interactive-p)
+	(message "%S" words))
+      words))
+
   (when (featurep 'transient)
     (define-transient-command lg/transient-org ()
       "Org mode"
@@ -31,6 +51,9 @@
 	("i" "Clock in" org-clock-in)
 	("o" "Clock out" org-clock-out)
 	("p" "Pomodoro" org-pomodoro)]
+       ["Roam"
+	("b" "Toggle the org-roam buffer" org-roam-buffer-toggle)
+	("u" "Org-roam-ui" org-roam-ui-open)]
        ["Todo"
 	("m" "Change todo state" org-todo)
 	("k" "Increase priority" org-priority-up)
@@ -53,6 +76,7 @@
   (org-hide-leading-stars t "We can't count too many stars anyway.")
   (org-startup-indented t "Activate indent-mode.")
   (org-archive-location "archive/%s_archive::")
+  (org-enforce-todo-dependencies t)
   (org-archive-subtree-add-inherited-tags t "Keep tags of from parent heading.")
   (org-hide-emphasis-markers t)
   (org-src-block-faces
@@ -78,35 +102,16 @@
      ("docker" modus-themes-nuanced-cyan)))
   (org-export-dispatch-use-expert-ui nil)
   (org-export-in-background nil)
-
-  (org-format-latex-header
-   "\\documentclass{article}
-\\usepackage[usenames]{color}
-[PACKAGES]
-[DEFAULT-PACKAGES]
-\\pagestyle{empty}
-% do not remove
-% The settings below are copied from fullpage.sty
-\\setlength{\\textwidth}{\\paperwidth}
-%\\addtolength{\\textwidth}{-3cm}
-\\setlength{\\oddsidemargin}{1.5cm}
-%\\addtolength{\\oddsidemargin}{-2.54cm}
-\\setlength{\\evensidemargin}{\\oddsidemargin}
-\\setlength{\\textheight}{\\paperheight}
-%\\addtolength{\\textheight}{-\\headheight}
-%\\addtolength{\\textheight}{-\\headsep}
-%\\addtolength{\\textheight}{-\\footskip}
-%\\addtolength{\\textheight}{-3cm}
-\\setlength{\\topmargin}{1.5cm}
-\\addtolength{\\topmargin}{-2.54cm}")
   :config 
   (push 'org-habit org-modules)
-  (plist-put org-format-latex-options :scale 1.5))
+  (plist-put org-format-latex-options :scale 1.5)
+  (defun lg/org-footnotes-normalize ()
+    (when (equal major-mode 'org-mode)
+      (org-footnote-normalize))))
 
 ;;; org-agenda
 (use-package org-agenda
   :after org
-  :defer t
   :init
   ;; Mostly inspired from Protesilaos Stavrou's configuration  
   ;; https://protesilaos.com/codelog/2021-12-09-emacs-org-block-agenda/
@@ -156,7 +161,6 @@
 	`(("A" "Daily agenda and top priority tasks"
 	   ,lg/org-custom-daily-agenda))))
 
-;;; org-habit
 (use-package org-habit
   :straight nil
   :after org
@@ -166,42 +170,38 @@
   (org-habit-preceding-days 14)
   (org-habit-graph-column 60))
 
-;;; org-journal
 (use-package org-journal
   :straight t
   :commands (org-journal-new-entry)
   :custom
   (org-journal-dir "~/org/journal/")
-  (org-journal-file-type 'monthly))
+  (org-journal-file-type 'monthly)
+  (org-journal-time-format "%H:%M"))
 
 ;;; Org-babel
-;;;; emacs -lisp
 (use-package ob-emacs-lisp
   :defer t
   :after org-plus-contrib
   :commands (org-babel-execute:emacs-lisp))
 
-;;;; python
 (use-package ob-python
   :commands (org-babel-execute:python)
   :custom (org-babel-python-command "python3"))
 
-;;;; dot
 (use-package ob-dot
   :defer t
   :after org-plus-contrib
   :commands (org-babel-execute:dot))
 
-;;; Org-sidebar
+;;; UI
 (use-package org-sidebar
   :after org 
   :commands (org-sidebar org-sidebar-toggle)
   :straight t)
 
-;;; Org-tree-slide
 (use-package org-tree-slide
   :straight t
-  :after org
+  :defer t
   :custom
   (org-tree-slide-breadcrumbs nil)
   (org-tree-slide-header nil)
@@ -218,7 +218,7 @@
    (propertize "Presentation mode ON" 'face 'success))
   (org-tree-slide-deactivate-message
         (propertize "Presentation mode OFF" 'face 'error))
-  :config
+  :init
   ;; inspired by protesilaos' configuration
   (define-minor-mode lg/org-presentation-mode
     "Parameters for plain text presentations with `org-mode'."
@@ -272,97 +272,42 @@
   :custom
   (org-export-coding-system 'utf-8)
   (org-export-default-language "fr")
-  (org-export-preserve-breaks t "Better line breaks in latex and others."))
+  (org-export-preserve-breaks nil)
+  (org-export-with-tags nil)
 
-;;;; ox-beamer
-(use-package ox-beamer
-  :after ox)
-
-;;;; Ox-report
-(use-package ox-report
-  :straight t
-  :after ox
-  :defer t)
-
-;;; org-ref
-(use-package org-ref
-  :straight t
-  :disabled t
-  :after org
-  :defer t)
-
-;;; org-contrib
-(use-package org-contrib
-  :straight t
-  :after org)
-
-;;; org-contacts
-(use-package org-contacts
-  :after org
-  :commands org-agenda
-  :custom
-  ;; (setq org-contacts-last-update nil)
-  (org-contacts-files '("~/org/contacts.org"))
-  (org-contacts-matcher "EMAIL<>\"\"|ALIAS<>\"\"|TEL<>\"\"|ADRESSE<>\"\"|ANNIVERSAIRE<>\"\"")
-  (org-contacts-icon-size 32)
-  (org-contacts-vcard-file "~/org/contacts.vcf")
-  (org-contacts-tel-property "TEL")
-  (org-contacts-group-prefix "+")
-  (org-contacts-icon-property "ICON")
-  (org-contacts-note-property "NOTE")
-  (org-contacts-alias-property "ALIAS")
-  (org-contacts-email-property "EMAIL")
-  (org-contacts-ignore-property "IGNORE")
-  (org-contacts-birthday-format "Anniversaire: %l (%Y)")
-  (org-contacts-address-property "ADRESSE")
-  (org-contacts-tags-props-prefix "#")
-  (org-contacts-icon-use-gravatar t)
-  (org-contacts-enable-completion t)
-  (org-contacts-birthday-property "ANNIVERSAIRE")
-  (org-contacts-nickname-property "NICKNAME")
-  (org-contacts-completion-ignore-case t)
-  (org-contacts-last-read-mail-property "DERNIER_MAIL")
-  (org-contacts-property-values-separators "[,; \f\11\n\15\13]+")
-  (org-contacts-email-link-description-format "%s (%d)")
-  ;;(calendar-date-style 'american)
   :config
-  (dolist (file org-contacts-files)
-    (add-to-list 'org-agenda-files file))
-  (defun org-contacts-anniversaries (&optional field format)
-    "Compute FIELD anniversary for each contact, returning FORMAT.
-Default FIELD value is \"BIRTHDAY\".
+  (defun org/get-headline-string-element  (headline backend info)
+    (let ((prop-point (next-property-change 0 headline)))
+      (if prop-point (plist-get (text-properties-at prop-point headline) :parent))))
 
-Format is a string matching the following format specification:
+  (defun org/ensure-latex-clearpage (headline backend info)
+    (when (org-export-derived-backend-p backend 'latex)
+      (let ((elmnt (org/get-headline-string-element headline backend info)))
+	(when (member "newpage" (org-element-property :tags elmnt))
+	  (concat "\\clearpage\n" headline)))))
 
-  %h - Heading name
-  %l - Link to the heading
-  %y - Number of year
-  %Y - Number of year (ordinal)"
-    (let ((calendar-date-style 'american)
-	  (date (calendar-current-date))
-          (entry ""))
-      (unless format (setq format org-contacts-birthday-format))
-      (cl-loop for contact in (org-contacts-filter)
-               for anniv = (let ((anniv (cdr (assoc-string
-					      (or field org-contacts-birthday-property)
-					      (nth 2 contact)))))
-			     (when anniv
-			       (calendar-gregorian-from-absolute
-				(org-time-string-to-absolute anniv))))
-               ;; Use `diary-anniversary' to compute anniversary.
-               if (and anniv (apply 'diary-anniversary anniv))
-               collect (format-spec format
-				    `((?l . ,(org-with-point-at (cadr contact) (org-store-link nil)))
-				      (?h . ,(car contact))
-				      (?y . ,(- (calendar-extract-year date)
-						(calendar-extract-year anniv)))
-				      (?Y . ,(let ((years (- (calendar-extract-year date)
-							     (calendar-extract-year anniv))))
-					       (format "%d%s" years (diary-ordinal-suffix years))))))))))
+  (add-to-list 'org-export-filter-headline-functions
+	       'org/ensure-latex-clearpage))
 
-;;; org-protocol
-(use-package org-protocol
-  :after org)
+(use-package ox-latex
+  :after ox
+					;:ensure-system-package texlive-publishers
+  :custom
+  (org-latex-pdf-process
+   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "bibtex %b"
+     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  :config
+  (add-to-list 'org-latex-classes
+	       '("IEEEtran"
+		 "\\documentclass{IEEEtran}"
+		 ("\\section{%s}" . "\\section*{%s}")
+		 ("\\subsection{%s}" . "\\subsection*{%s}")
+		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+		 ("\\subsubsubsection{%s}" . "\\subsubsubsection*{%s}"))))
+
+(use-package ox-beamer :after ox)
 
 ;;; org-capture
 (use-package org-capture
@@ -422,21 +367,6 @@ Format is a string matching the following format specification:
   (org-pomodoro-long-break-sound "/usr/share/sounds/freedesktop/stereo/complete.oga")
   (org-pomodoro-finished-sound "/usr/share/sounds/freedesktop/stereo/complete.oga"))
 
-;;; org-pomodoro third-time
-(use-package org-pomodoro-third-time
-  :straight (:host github :repo "telotortium/org-pomodoro-third-time")
-  :diminish t
-  :defer t)
-
-;;; Integration between org and zotero
-;;;; org-zotxt
-(use-package org-zotxt
-  :after zotxt)
-
-;;;; org-zotxt-noter
-(use-package org-zotxt-noter
-  :after zotxt)
-
 ;;; org-appear
 (use-package org-appear
   :straight t
@@ -449,18 +379,8 @@ Format is a string matching the following format specification:
 ;;; org-fragtog
 (use-package org-fragtog
   :straight t
+  :ensure-system-package dvipng
   :hook (org-mode . org-fragtog-mode))
-
-;;; org-drill
-(use-package org-drill
-  :straight t
-  :defer t)
-
-;;; org-books
-(use-package org-books
-  :disabled t
-  :straight t
-  :defer t)
 
 ;;; org-variable-pitch
 (use-package org-variable-pitch
@@ -476,80 +396,66 @@ Format is a string matching the following format specification:
   (org-preview-html-viewer 'xwidget)
   (org-preview-html-refresh-configuration 'save))
 
-;;; org-cite
-(use-package oc
-  :custom
-  (org-cite-global-bibliography '("~/bib/references.bib"))
-  (org-cite-insert-processor 'citar)
-  (org-cite-follow-processor 'citar)
-  (org-cite-activate-processor 'citar)
-  (org-cite-export-processors '((beamer natbib)
-				(latex csl)
-				(html csl)
-				(t basic))))
-
 ;;; deft
 (use-package deft
   :straight t
   :commands deft
   :custom
+  (deft-recursive t)
   (deft-extensions '("txt" "tex" "org"))
+  (deft-use-filter-string-for-filename t)
   (deft-directory "~/org"))
 
-;;; Citar
-(use-package citar
-  :straight t
-  :commands (citar-select-ref citar-open citar-open-notes citar-open-entry)
+;;; Citations
+(use-package oc
+  :after org
   :custom
-  (citar-bibliography "~/bib/references.bib")
-  (citar-file-extensions '("pdf" "org" "tex" "md"))
-  (citar-notes-paths '("~/org/roam/reference/"))
-  (citar-templates
-   '((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
-     (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords keywords:*}")
-     (preview . "${author editor} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
-     (note . ":PROPERTIES:\n:ROAM_REFS: [cite:@${=key=}]\n:END:\n#+title: ${author} ${editor} :: ${title}")))
-  (citar-format-note-function #'lg/citar-org-format-note)
-
-  :init
-  (defun lg/citar-org-format-note (key entry filepath)
-    "Format a note FILEPATH from KEY and ENTRY."
-    (with-current-buffer (find-file filepath)
-      ;; This just overrides other template insertion.
-      (erase-buffer)
-      (insert (citar--format-entry-no-widths entry ":PROPERTIES:
-:ROAM_REFS: [cite:@${=key=}]
-:ID: :${=key=}
-:END:
-#+title: ${author} ${editor} :: ${title}\n
-* Notes\n:PROPERTIES:\n:NOTER_DOCUMENT: ${file}\n:END:
-\n|\n\n#+print_bibliography:"))
-      (search-backward "|")
-      (delete-char 1)
-      (when (fboundp 'evil-insert)
-	(evil-insert 1))))
-
-  :config
-  (citar-filenotify-setup '(LaTeX-mode-hook org-mode-hook)))
-
-;;;; citar-org
-(use-package citar-org
-  :after citar)
-
-;;;; export processors
-(use-package oc-basic :after org)
-(use-package oc-biblatex :after org)
-(use-package oc-natbib :after org)
-(use-package oc-csl :after org :defer t)
+  (org-cite-global-bibliography '("~/bib/references.bib"))
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  (org-cite-export-processors '((beamer csl)
+				(latex csl)
+				(html csl)
+				(t basic))))
+(use-package oc-basic :after oc)
+(use-package oc-biblatex :after oc)
+(use-package oc-natbib :after oc)
+(use-package oc-csl :after oc :defer t)
 (use-package citeproc
   :straight t
+  :after org
   :defer t
   :ensure-system-package
-  (("/usr/share/citation-style-language/locales/" . "apt install citation-style-language-locales")
-  ("/usr/share/citation-style-language/styles/" . "apt install citation-style-language-styles"))
+  (("/usr/share/citation-style-language/locales/" . "sudo apt install citation-style-language-locales")
+   ("/usr/share/citation-style-language/styles/" . "sudo apt install citation-style-language-styles"))
   :custom
   (org-cite-csl-styles-dir "/usr/share/citation-style-language/styles/")
   (org-cite-csl-locales-dir "/usr/share/citation-style-language/locales/"))
+
+(use-package citar
+  :straight t
+  :commands (citar-select-ref citar-open citar-open-notes citar-open-entry)
+  :after citeproc
+  :custom
+  (citar-citeproc-csl-styles-dir org-cite-csl-styles-dir)
+  (citar-bibliography "~/bib/references.bib")
+  (citar-file-extensions '("pdf" "org" "tex" "md"))
+  (citar-notes-paths '("~/org/roam/references/")))
+
+(use-package citar-org
+  :after (citar org))
+
+;; (car (gethash "alessandriAdvancesMovingHorizon2010" (citar-get-files "alessandriAdvancesMovingHorizon2010")))
+(use-package citar-org-roam
+  :straight t
+  :after (citar org-roam)
+  :diminish 'citar-org-roam-mode
+  :config (citar-org-roam-mode))
+
+(use-package citar-embark
+  :after (citar embark)
+  :config (citar-embark-mode +1))
 
 ;;; Roam
 (use-package org-roam
@@ -559,33 +465,8 @@ Format is a string matching the following format specification:
   :custom
   (org-roam-directory "~/org/roam")
   (org-roam-database-connector 'sqlite)
-  :config
-  ;; (setq org-roam-node-display-template
-  ;;  (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  ;; https://jethrokuan.github.io/org-roam-guide/
-  (defun jethro/org-roam-node-from-cite (keys-entries)
-    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
-    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
-						"${author editor} :: ${title}"))
-	  (file (citar--format-entry-no-widths (cdr keys-entries)
-					       "${file}")))
-      (echo file)
-      (org-roam-capture- :templates
-			 '(("r" "reference" plain "%?" :if-new
-			    (file+head "reference/${citekey}.org"
-				       ":PROPERTIES:
-:ROAM_REFS: [cite:@${citekey}]
-:NOTER_DOCUMENT: ${file}
-:END:
-#+title: ${title}\n")
-			    :immediate-finish t
-			    :unnarrowed t))
-			 :info (list :citekey (car keys-entries))
-			 :node (org-roam-node-create :title title)
-			 :props '(:finalize find-file))))
-  (org-roam-db-autosync-mode +1))
+  :config (org-roam-db-autosync-mode +1))
 
-;;;; org roam ui
 (use-package org-roam-ui
   :straight t
   :after org-roam
@@ -595,11 +476,15 @@ Format is a string matching the following format specification:
   (org-roam-ui-follow t)
   (org-roam-ui-update-on-save t)
   (org-roam-ui-open-on-start t)
-  (org-roam-ui-browser-function #'xwidget-webkit-browse-url))
-
-;;; org-modern-mode
-(use-package org-modern
-  :straight t
-  :defer t)
+  (org-roam-ui-browser-function #'browse-url))
   
+;;; denote
+(use-package denote :straight t)
+
+;;; misc
+(use-package org-contrib :straight t :after org)
+(use-package org-protocol :after org)
+(use-package org-modern :straight t :defer t)
+(use-package org-drill :disabled t :straight t :defer t)
+
 (provide 'lg-org)

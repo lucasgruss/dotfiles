@@ -17,8 +17,8 @@
   :straight t
   :demand t
   :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
+  (setq evil-want-integration t)  ;; should be t for evil-collection
+  (setq evil-want-keybinding nil) ;; should be nil for evil-collection
   (setq evil-want-Y-yank-to-eol t)
   (setq evil-undo-system 'undo-redo)
   :bind (:map evil-visual-state-map ("gr" . eval-last-sexp))
@@ -29,6 +29,7 @@
   :diminish evil-collection-unimpaired-mode
   :straight t
   :after evil
+  :custom (evil-collection-calendar-want-org-bindings t)
   :config
   (evil-collection-init))
 
@@ -69,6 +70,7 @@
 ;;; evil-org
 (use-package evil-org
   :straight (:type git :host github :repo "Somelauw/evil-org-mode")
+  :after org
   :diminish 'evil-org-mode
   :hook (org-mode . evil-org-mode)
   :commands (org-agenda)
@@ -119,6 +121,11 @@
   (evil-define-key '(normal visual) 'global (kbd "g -") 'evil-numbers/dec-at-pt)
   (evil-define-key '(normal visual) 'global (kbd "g C-+") 'evil-numbers/inc-at-pt-incremental)
   (evil-define-key '(normal visual) 'global (kbd "g C--") 'evil-numbers/dec-at-pt-incremental))
+
+;; ;;; evil-mu4e
+;; (use-package evil-mu4e
+;;   :straight t
+;;   :after mu4e)
 
 ;;; Which-key
 (use-package which-key

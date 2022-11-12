@@ -37,13 +37,15 @@
   :straight t
   :demand t
   :diminish all-the-icons-dired-mode
-  :hook (dired-mode . all-the-icons-dired-mode))
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :custom
+  (all-the-icons-dired-monochrome nil))
 
 ;;;; all-the-icons-ibuffer
 (use-package all-the-icons-ibuffer
   :straight t
   :demand t
-  :config (all-the-icons-ibuffer-mode +1))
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 
 ;;;; all-the-icons-completion
 (use-package all-the-icons-completion
@@ -57,10 +59,13 @@
 (use-package emacs ; scrolling
   :init
   (pixel-scroll-precision-mode +1)
+  (display-battery-mode +1)
+  (setq use-system-tooltips t)
   :custom
   (scroll-step 1)
   (scroll-conservatively 100))
 
+;;; time
 (use-package time
   :custom
   (display-time-format (concat (when (featurep 'all-the-icons)
@@ -88,10 +93,10 @@
   ;:ensure-system-package papirus-icon-theme
   :demand t
   :custom
-  (system-theme-sync-default-light-plist '(:background "/home/lucas/Images/Wallpaper/nature-mountain.jpg"
+  (system-theme-sync-default-light-plist '(;:background "/home/lucas/Images/Wallpaper/nature-mountain.jpg"
 						       :gtk-theme "Adwaita"
 						       :icon-theme "Papirus-Light"))
-  (system-theme-sync-default-dark-plist '(:background "/home/lucas/Images/Wallpaper_bis/space3.png"
+  (system-theme-sync-default-dark-plist '(;:background "/home/lucas/Images/Wallpaper_bis/space3.png"
 						      :gtk-theme "Adwaita-dark"
 						      :icon-theme "Papirus-Dark"))
   :hook
@@ -240,7 +245,9 @@ Containing LEFT, CENTER and RIGHT aligned respectively."
 
 ;;;; fancy-battery
 (use-package fancy-battery
+  :disabled t
   :straight t
+  :defer 10
   :custom
   (fancy-battery-show-percentage t)
   :config
@@ -361,16 +368,19 @@ state. An icon is also shown for eye candy."
   (modus-themes-diffs nil) ; {nil, 'desaturated, 'bg-only}
   (modus-themes-org-blocks 'tinted-background) ; {nil,'gray-background,'tinted-background}
   (modus-themes-variable-pitch-ui nil)
+  (modus-themes-org-agenda
+   '((header-date . (grayscale))))
+  ;; (modus-themes-headings
+  ;;  '((1 . (rainbow 1.9))
+  ;;    (2 . (rainbow 1.6))
+  ;;    (3 . (rainbow 1.3))
+  ;;    (t . (rainbow 1.1))))
   (modus-themes-headings
-   '((1 . (rainbow 1.1))
-     (2 . (rainbow 1.1))
-     (3 . (rainbow 1.1))
-     (4 . (rainbow 1.1))
-     (5 . (rainbow 1.1))
-     (6 . (rainbow 1.1))
-     (7 . (rainbow 1.1))
-     (8 . (rainbow 1.1))
-     (t . (rainbow)))))
+   '((1 . (rainbow 1))
+     (2 . (rainbow 1))
+     (3 . (rainbow 1))
+     (t . (rainbow 1))))
+  )
 
 ;;;; modus-themes-exporter
 (use-package modus-themes-exporter
@@ -405,6 +415,10 @@ settings applied to them."
 (use-package kaolin-themes
   :straight t)
 
+;;;; ef-themes
+(use-package ef-themes
+  :straight (:host github :repo "protesilaos/ef-themes"))
+
 ;;; Circadian
 (use-package circadian
   :straight t
@@ -417,6 +431,7 @@ settings applied to them."
 
 ;;; Dashboard
 (use-package dashboard
+  :disabled t
   :straight t
   :when (featurep 'all-the-icons)
   :custom
@@ -435,16 +450,8 @@ settings applied to them."
 ;;;; tab-bar
 (use-package tab-bar
   :bind ("s-?" . 'toggle-frame-tab-bar)
-  :init
-  (defun lg/tab-bar-format-align-right ()
-    "Align the rest of tab bar items to the right. Take icons into account"
-    (let* ((rest (cdr (memq 'tab-bar-format-align-right tab-bar-format)))
-	   (rest (tab-bar-format-list rest))
-	   (rest (mapconcat (lambda (item) (nth 2 item)) rest ""))
-	   (hpos (+ (length rest) 16))
-	   (str (propertize " " 'display `(space :align-to (- right ,hpos)))))
-      `((align-right menu-item ,str ignore))))
   :custom
+  (tab-bar-show nil "Hide the tab-bar by default")
   (tab-bar-menu-bar-button `(if (featurep 'all-the-icons)
 			       (concat " " (all-the-icons-icon-for-mode 'emacs-lisp-mode :height 1.1 :v-adjust 0.05) " ")
 			       "Menu"))
@@ -453,7 +460,7 @@ settings applied to them."
 			    tab-bar-format-tabs
 			    tab-bar-separator
 			    tab-bar-format-add-tab
-			    lg/tab-bar-format-align-right
+			    tab-bar-format-align-right
 			    tab-bar-format-global))
   :config
   (tab-bar-mode +1))
@@ -484,9 +491,15 @@ settings applied to them."
   (tab-line-tab-name-function #'lg/tab-line-name-buffer-padded "Tabs have all the same width.")
   (tab-line-tab-name-format-function #'lg/tab-line-tab-name-format "Add icon to the beginning of the tab.")
   (tab-line-exclude-modes '(emms-playlist-mode
+			    emms-browser-mode
 			    org-ql-sidebar-buffer-setup
 			    dashboard-mode
+			    bluetooth-mode
+			    diary-mode
+			    enwc-mode
 			    calendar-mode
+			    elfeed-search-mode
+			    elfeed-show-mode
 			    debugger-mode
 			    Info-mode
 			    ibuffer-sidebar-mode
@@ -503,7 +516,8 @@ settings applied to them."
 			    special-mode
 			    matlab-shell-mode
 			    so-long-mode
-			    apt-utils-mode))
+			    apt-utils-mode
+			    tmr-mode))
   :config
   (add-hook 'window-configuration-change-hook
 	    #'(lambda ()
@@ -513,7 +527,7 @@ settings applied to them."
 
 ;;;; centaur-tabs
 (use-package centaur-tabs
-  :disabled t
+  :disabled
   :straight t
   :after evil
   :bind ("s-/" . centaur-tabs-mode)
@@ -665,15 +679,12 @@ settings applied to them."
     (interactive)
     (if visual-fill-column-mode
 	(visual-fill-column-mode -1)
-      (visual-fill-column-mode +1)))
-  :hook
-  ((
-  ;;Info-mode
-  ;;   org-mode
-   minibuffer-mode
-   ;;ledger-mode
-   ) . lg/activate-visual-fill-center))
-
+      (visual-fill-column-mode +1))))
+;; :hook
+;; ((Info-mode
+;;   org-mode
+;;   minibuffer-mode
+;;   ledger-mode) . lg/activate-visual-fill-center))
 
 ;;; page-break-lines
 (use-package page-break-lines
@@ -720,12 +731,12 @@ settings applied to them."
 
 ;;; pulsar
 (use-package pulsar
-  :straight (:host github :repo "protesilaos/pulsar")
+  :straight t
   :custom
   (pulsar-face 'pulsar-red)
   (pulsar-delay 0.05)
   :config
-  (pulsar-setup))
+  (pulsar-global-mode +1))
 
 ;;; Zen mode
 (use-package lg-zen-mode)

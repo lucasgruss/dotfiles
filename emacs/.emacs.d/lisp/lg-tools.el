@@ -1,4 +1,4 @@
-;;; lg-tools --- tools for emacs, to do everything in emacs -*- lexical-binding: t; -*-
+;; lg-tools --- tools for emacs, to do everything in emacs -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
 
 ;;; alert
@@ -20,28 +20,86 @@
   :custom
   (elfeed-feeds
    '(("https://xkcd.com/atom.xml" comic)
-     ("https://protesilaos.com/codelog.xml" code)
-     ("https://blog.tecosaur.com/tmio/rss.xml" org)
-     ("https://www.youtube.com/feeds/videos.xml?channel_id=UC0uTPqBCFIpZxlz_Lv1tk_g" protesilaos)
-     ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL0H7ONNEUnnt59niYAZ07dFTi99u2L2n_" ouvrez_les_guillements usul)
-     ("https://www.youtube.com/feeds/videos.xml?channel_id=UCKH_iLhhkTyt8Dk4dmeCQ9w" science)
-     ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL43OynbWaTMLEbdAWr-DnAfveOonmhlT1" france_inter)
+     ("https://protesilaos.com/master.xml" protesilaos)
+     ("https://blog.tecosaur.com/tmio/rss.xml" org-mode)
+     ("https://www.youtube.com/feeds/videos.xml?channel_id=UC0uTPqBCFIpZxlz_Lv1tk_g" protesilaos youtube)
+     ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL0H7ONNEUnnt59niYAZ07dFTi99u2L2n_" ouvrez_les_guillements usul youtube)
+     ("https://www.youtube.com/feeds/videos.xml?channel_id=UCKH_iLhhkTyt8Dk4dmeCQ9w" science youtube)
+     ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL43OynbWaTMLEbdAWr-DnAfveOonmhlT1" france_inter youtube)
      ("https://www.reddit.com/r/emacs/.rss" emacs reddit)
-     ("https://www.reddit.com/r/hajimenoippo/.rss" manga reddit)
-     "https://api.lemediatv.fr/rss.xml"))
+     ("https://www.reddit.com/r/orgmode/.rss" emacs reddit org-mode)
+     ("https://nullprogram.com/feed/" programming skeeto)
+     ("https://www.reddit.com/r/hajimenoippo/.rss" manga reddit hajime)
+     ("https://www.reddit.com/r/HitomiChanIsShy/" manga reddit hitomi)
+     ("https://www.reddit.com/r/OnePunchMan/.rss" manga reddit punch)
+     ("https://www.youtube.com/feeds/videos.xml?channel_id=UCsqZk5V2d44TNLRFSI5aVfg" climbing youtube)))
   (elfeed-search-filter "")
   :config
-  (use-package lg-elfeed
-    :load-path "~/.emacs.d/lisp/site-packages"
-    :after elfeed))
+  (run-with-timer nil 600 #'elfeed-update))
 
-;;; Elfeed-org
+;;;; lg-elfeed
+(use-package lg-elfeed
+:load-path "~/.emacs.d/lisp/site-packages"
+:after elfeed)
+
+;;;; elfeed-goodies
+(use-package elfeed-goodies
+  :straight t
+  :after elfeed
+  :custom
+  (elfeed-goodies/entry-pane-size 0.75)
+  (elfeed-goodies/entry-pane-position 'bottom)
+  :config
+  (defun lg/elfeed-goodies-setup ()
+    "Setup Elfeed with extras:
+* Adaptive header bar and entries.
+* Header bar using powerline.
+* Split pane view via popwin."
+    (interactive)
+    (add-hook 'elfeed-show-mode-hook #'elfeed-goodies/show-mode-setup)
+    (add-hook 'elfeed-new-entry-hook #'elfeed-goodies/html-decode-title)
+    (when (boundp 'elfeed-new-entry-parse-hook)
+      (add-hook 'elfeed-new-entry-parse-hook #'elfeed-goodies/parse-author))
+    (setq elfeed-search-header-function #'elfeed-goodies/search-header-draw
+	  elfeed-search-print-entry-function #'elfeed-goodies/entry-line-draw
+	  elfeed-show-entry-switch #'elfeed-goodies/switch-pane
+	  elfeed-show-entry-delete #'elfeed-goodies/delete-pane
+	  ;;elfeed-show-refresh-function #'elfeed-goodies/show-refresh--plain
+	  elfeed-show-refresh-function #'elfeed-show-refresh--mail-style)
+    (define-key elfeed-show-mode-map "n" #'elfeed-goodies/split-show-next)
+    (define-key elfeed-show-mode-map "p" #'elfeed-goodies/split-show-prev))
+
+  (lg/elfeed-goodies-setup))
+
+;;;; Elfeed-org
 (use-package elfeed-org
   :disabled t
   :after elfeed
   :config
   (elfeed-org)
   (setq rmh-elfeed-org-files "~/org/elfeed.org"))
+
+;;;; elfeed-tube
+(use-package elfeed-tube
+  :disabled t
+  :straight t
+  :after elfeed
+  :demand t
+  :config
+  ;; (setq elfeed-tube-auto-save-p nil) ;; t is auto-save (not default)
+  ;; (setq elfeed-tube-auto-fetch-p t) ;;  t is auto-fetch (default)
+  (elfeed-tube-setup)
+  :bind (:map elfeed-show-mode-map
+         ("F" . elfeed-tube-fetch)
+         ([remap save-buffer] . elfeed-tube-save)
+         :map elfeed-search-mode-map
+         ("F" . elfeed-tube-fetch)
+         ([remap save-buffer] . elfeed-tube-save)))
+
+;;;; elfeed-tube-mpv
+(use-package elfeed-tube-mpv
+  :disabled t
+  :straight t)
 
 ;;; Multimedia
 ;;;; Emms
@@ -51,8 +109,9 @@
 			  (mp3info . mp3info)
 			  (mpv . mpv)
 			  (mplayer . mplayer))
-  ;:commands (emms-play-dired)
+  :commands (emms-play-dired emms-browser)
   :custom
+  (emms-browser-info-title-format "%t")
   (emms-source-file-default-directory "~/Audio/Musique/")
   (emms-streams-file "~/.config/doom/emms/streams.emms")
   (emms-playlist-buffer-name "*Music*")
@@ -64,6 +123,7 @@
   (emms-player-list '(emms-player-mplayer emms-player-mpv))
   (emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display"))
   :init
+
   (defun lg/find-music-directory ()
     (interactive)
     ;;(find-file "~/Audio/Musique")
@@ -84,13 +144,27 @@ playlist in a side-window"
       (with-selected-window window
 	(let ((window-size-fixed))
 	  (dired-sidebar-set-width dired-sidebar-width)))))
+
+  (defun lg/emms-go-browser ()
+    "Go to the playlist buffer. This function exist for the sake of
+the display-buffer-alist variable and enable the display of the
+playlist in a side-window"
+    (interactive)
+    (display-buffer-in-side-window (get-buffer-create "*Music*")
+				   lg/emms-sidebar-display-alist)
+    (let ((window (get-buffer-window (get-buffer "*Music*"))))
+      (when emms-sidebar-no-delete-other-windows
+	(set-window-parameter window 'no-delete-other-windows t))
+      (set-window-dedicated-p window t)
+      (with-selected-window window
+	(let ((window-size-fixed))
+	  (dired-sidebar-set-width dired-sidebar-width)))))
+
   :general
   (general-def :states 'normal :keymaps 'emms-playlist-mode-map
     "q" #'emms-playlist-mode-bury-buffer)
 
   :config
-  (when (featurep 'recentf)
-	(add-to-list 'recentf-exclude emms-source-file-default-directory))
   (require 'emms-source-file)
   (require 'emms-source-playlist)
   (require 'emms-player-simple)
@@ -132,11 +206,14 @@ playlist in a side-window"
   (require 'emms-playlist-limit)
   (require 'emms-librefm-scrobbler)
   (require 'emms-librefm-stream)
+  (when (featurep 'recentf)
+	(add-to-list 'recentf-exclude emms-source-file-default-directory))
   (add-to-list 'emms-track-initialize-functions #'emms-info-initialize-track)
   (emms-cache +1)
   (defun lg/emms-kill-mpv ()
     (interactive)
     (shell-command "killall mpv"))
+
 
   (defcustom emms-sidebar-no-delete-other-windows t
     "Whether or not to add no-delete-other-window parameter to window.")
@@ -196,6 +273,13 @@ playlist in a side-window"
   (pdf-view-mode . pdf-isearch-minor-mode)
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
+  :custom
+  (pdf-misc-print-program-executable "/usr/bin/lpr")
+  (pdf-misc-print-programm-args '("-o media=Letter" "-o fitplot"))
+  :general
+  (:keymaps 'pdf-view-mode-map
+	    :states 'visual
+	    "<localleader> h" #'pdf-annot-add-highlight-markup-annotation)
   :config
   (defun lg/pdf-tools-midnight-colors-with-theme (theme &rest args)
     "Use the loaded theme background and foreground colors for the
@@ -286,9 +370,9 @@ counsel-linux-app on that frame, which is an emacs command that
 prompts you to select an app and open it in a dmenu like
 behaviour. Delete the frame after that command has exited"
     (interactive)
-    (with-selected-frame (make-frame '((name . "emacs-run-launcher")
+    (with-selected-frame (make-frame '((name . "Choose a password")
 				       (minibuffer . only)
-				       (undecorated . t)
+				       (undecorated . nil)
 				       (width . 0.4)
 				       (height . 11)
 				       (top . 0.5)
@@ -300,7 +384,14 @@ behaviour. Delete the frame after that command has exited"
 ;;;; Pass: frontend to pass in Emacs
 (use-package pass
   :straight t
-  :commands pass)
+  :commands pass
+  :config
+  (setq pass-view-mask "****************"))
+
+;;; auth-source-pass
+(use-package auth-source-pass
+  :config
+  (auth-source-pass-enable))
 
 ;;; Ledger mode
 (use-package ledger-mode
@@ -389,7 +480,7 @@ behaviour. Delete the frame after that command has exited"
     (interactive)
     (with-selected-frame (make-frame '((name . "emacs-run-launcher")
 				       (minibuffer . only)
-				       (undecorated . t)
+				       (undecorated . nil)
 				       (width . 0.4)
 				       (height . 11)
 				       (top . 0.5)
@@ -453,7 +544,7 @@ behaviour. Delete the frame after that command has exited"
       (frame-parameters . ((undecorated . t)
                            (skip-taskbar . t)
                            (sticky . t))))
-     ("yequake-vterm"
+     ("yequake-term"
       (buffer-fns . (eshell
 		     evil-insert-state))
       (width . 0.75)
@@ -548,15 +639,15 @@ behaviour. Delete the frame after that command has exited"
 
 ;;; vc
 (use-package vc
-  :defer t
+  :defer 5
   :custom
   (vc-follow-symlinks t))
 
 ;;; enwc
 (use-package enwc
-  :straight t
-  :custom (enwc-default-backend 'nm)
-  :commands enwc)
+  :disabled t
+  :straight t 
+  :custom (enwc-default-backend 'nm))
 
 ;;; ytdl
 (use-package ytdl
@@ -589,10 +680,27 @@ behaviour. Delete the frame after that command has exited"
 ;;; calfw
 (use-package calfw
   :straight t
-  :defer t
+  :defer 10
   :custom
-  ;; (cfw:render-line-breaker 'cfw:render-line-breaker-wordwrap)
+  (cfw:fchar-junction ?╬)
+  (cfw:fchar-vertical-line ?║)
+  (cfw:fchar-horizontal-line ?═)
+  (cfw:fchar-left-junction ?╠)
+  (cfw:fchar-right-junction ?╣)
+  (cfw:fchar-top-junction ?╦)
+  (cfw:fchar-top-left-corner ?╔)
+  (cfw:fchar-top-right-corner ?╗)
   (cfw:render-line-breaker 'cfw:render-line-breaker-simple))
+
+(use-package calfw-ical
+  :after calfw
+  :straight t)
+(use-package calfw-cal
+  :after calfw
+  :straight t)
+(use-package calfw-org
+  :after calfw
+  :straight t)
 
 ;;; keycast
 (use-package keycast
@@ -655,11 +763,103 @@ behaviour. Delete the frame after that command has exited"
 	    ;; c: clone-buffer - Clone buffer
 	    ))
 
+;;; iscroll
+(use-package iscroll
+  :straight t
+  :hook
+  (eww-mode . iscroll-mode))
+
+;;; calendar / diary
+;;;; icalendar
+(use-package icalendar
+  :commands diary
+  :custom
+  (icalendar-uid-format "%t%c"))
+  
+;;;; calendar
+(use-package calendar ;; diary
+  :straight nil
+  :custom
+  (diary-number-of-entries 7)
+  (diary-comment-start ";")
+  (diary-header-line-flag nil)
+  (appt-time-regexp "appt [0-9]?[0-9]\\(h\\([0-9][0-9]\\)?\\|[:.][0-9][0-9]\\)\\(am\\|pm\\)?")
+  (calendar-week-start-day 1 "Week should start on monday.")
+  (calendar-timed-display-form  '(24-hours ":" minutes
+					   (if time-zone " (") time-zone (if time-zone ")"))
+				"Prefer european style to display time.")
+  (calendar-date-style 'european)
+  (calendar-mark-diary-entries-flag t "Mark diary entries by default.")
+  ;; :bind
+  ;; (:map evil-normal-state-map
+  ;; 	("RET" . diary-view-entries))
+  :hook
+  ;;(after-save . lg/automatic-icalendar-export-file)
+  (diary-list-entries . diary-include-other-diary-files)
+  (diary-mark-entries . diary-mark-included-diary-files)
+  :config
+  (defun lg/automatic-icalendar-export-file ()
+    "Called anytime the diary-file is saved"
+    (interactive)
+    (let ((cal-file (expand-file-name "diary.ics"
+				      (expand-file-name "calendar/"
+							user-emacs-directory))))
+      (delete-file cal-file)
+      (icalendar-export-file diary-file cal-file)
+      (bury-buffer cal-file)
+      (message (concat "Exported diary file to " cal-file))))
+
+  (transient-define-prefix lg/transient-calendar ()
+    "Windows"
+    [["Insert entries"
+    ("id" "Entry for today" diary-insert-entry)
+    ("iw" "Weekly entry" diary-insert-weekly-entry)
+    ("im" "Monthly entry" diary-insert-monthly-entry)
+    ("iy" "Yearly entry" diary-insert-yearly-entry)
+    ("ia" "Anniversary" diary-insert-anniversary-entry)
+    ("ib" "Block entry" diary-insert-block-entry)
+    ("ic" "Cyclic entry" diary-insert-cyclic-entry)]
+     ["Solar/Lunar"
+      ("S" "Sunrise/sunset" calendar-sunrise-sunset)
+      ("M" "Sunrise/sunset" calendar-lunar-phases)]
+     ["Misc"
+      ("d" "View Diary entries" diary-view-entries)
+      ("D" "View other Diary entries" diary-view-other-diary-entries)
+      ("s" "Show all entries" diary-show-all-entries)
+      ("v" "Mark" calendar-set-mark)]]
+    [:hide (lambda () t)])
+
+  (general-define-key
+   :states 'normal 
+   :keymaps 'calendar-mode-map
+   "<localleader>" 'lg/transient-calendar))
+
 ;;; solar
 (use-package solar
   :demand t
   :custom
-  (calendar-latitude 48.856613)
-  (calendar-longitude 2.352222))
+  (calendar-latitude 48.856613 "Somewhere in Paris, not my precise location")
+  (calendar-longitude 2.352222 "Somewhere in Paris, not my precise location"))
+
+;;; ebdb
+(use-package ebdb
+  :straight t
+  :defer t)
+
+;;; lg-window-switcher
+(use-package lg-window-switcher)
+
+;;; tmr
+(use-package tmr
+  :straight t)
+
+;;; most-used-words
+(use-package most-used-words
+  :straight t)
+
+;;; ebib
+(use-package ebib
+  :disabled t
+  :straight t)
 
 (provide 'lg-tools)
