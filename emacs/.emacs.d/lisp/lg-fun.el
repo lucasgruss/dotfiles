@@ -1,4 +1,10 @@
 ;;; lg-fun --- Fun stuff in emacs -*- lexical-binding: t; -*-
+;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;; Code:
 	
 (use-package cowsay
   :straight t
@@ -6,19 +12,16 @@
   :config
   (cowsay-load-cows-directory "~/.emacs.d/straight/repos/emacs-cowsay/cows"))
 
-;; display engine hacks
-(use-package magic-buffer
+(use-package magic-buffer ;; display engine hacks
   :commands (magic-buffer)
   :straight (magic-buffer :host github :repo "sabof/magic-buffer"))
 
-;; typing test
 (use-package typit
   :straight t
   :commands (typit-test typit-basic-test typit-advanced-test)
   :custom (typit-dict "french.txt"))
 
-;; watch anime
-(use-package enime
+(use-package enime ;; watch anime
   :straight (:host github :repo "xl666/enime" :files (:defaults "video_scrapping.sh"))
   :commands (enime-main-transient))
 
@@ -31,3 +34,4 @@
 (use-package wordel :straight t :defer t)
 
 (provide 'lg-fun)
+;;; lg-fun.el ends here

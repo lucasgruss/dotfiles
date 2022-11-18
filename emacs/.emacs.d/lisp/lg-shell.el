@@ -1,6 +1,11 @@
 ;;; lg-shell --- configuration for multiple shells -*- lexical-binding: t; -*-
+;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;; Code:
 
-;;; Vterm
 (use-package vterm
   :straight (vterm :type git :repo "akermu/emacs-libvterm")
   :ensure-system-package (libvterm . libvterm-dev)
@@ -10,29 +15,6 @@
   (vterm-always-compile-module t)
   (vterm-module-cmake-args "-DUSE_SYSTEM_VTERM=YES"))
 
-;; ;;; Multi-vterm
-;; (use-package multi-vterm
-;;   :straight t
-;;   :after vterm)
-
-;; ;;; Vterm-toggle
-;; ;; run-or-raise-or-dismiss for vterm
-;; (use-package vterm-toggle
-;;   :straight t
-;;   :after vterm
-;;   ;:bind ("s-<return>" . 'lg/vterm-toggle)
-;;   :commands (vterm-toggle)
-;;   :custom
-;;   (vterm-toggle-fullscreen-p nil)
-;;   :init
-;;   (defun lg/vterm-toggle ()
-;;     (interactive)
-;;     (if (string= (frame-parameter nil 'name) "yequake-vterm")
-;; 	(delete-frame (select-frame-by-name "yequake-vterm"))
-;;       (vterm-toggle))))
-
-;;; Eshell
-;;;; eshell
 (use-package eshell
   :defer t
   :init
@@ -56,7 +38,6 @@
 					     (kill-me . t)))
 	    (unwind-protect (eshell))))))))
 
-;;;; eshell-toggle 
 (use-package eshell-toggle
   :straight t
   :custom
@@ -64,27 +45,21 @@
   (eshell-toggle-size-fraction 2)
   :bind ("s-<return>" . eshell-toggle))
 
-;;;; eshell-info-banner
 (use-package eshell-info-banner
   :commands eshell
   :straight t
   :hook (eshell-banner-load . eshell-info-banner-update-banner))
 
-;;;; eshell-vterm
 (use-package eshell-vterm
-  :disabled t
   :straight t
   :after eshell vterm
   :config (eshell-vterm-mode +1))
 
-;;;; eshell-git-prompt
 (use-package eshell-git-prompt
   :straight t
   :after eshell
-  :config
-  (eshell-git-prompt-use-theme 'powerline))
+  :config (eshell-git-prompt-use-theme 'powerline))
 
-;;; Dtache
 (use-package dtache
   :disabled t
   :straight (:host gitlab :repo "niklaseklund/dtache")
@@ -94,7 +69,6 @@
 	 :map dtache-shell-mode-map
 	 ("C-c C-q" . dtache-detach-dwim))) 
 
-;;;; dtach-eshell
 (use-package dtache-eshell
   :after dtache
   :hook (after-init . dtache-eshell-setup)
@@ -103,9 +77,9 @@
 	       ("<C-return>" . dtache-eshell-attach)
 	       ("C-c C-q" . dtache-detach-dwim)))) 
 
-;;;; dtach-consult
 (use-package dtache-consult
   :after dtache
   :bind ([remap dtache-open-session] . dtache-consult-session))
 
 (provide 'lg-shell)
+;;; lg-shell.el ends here

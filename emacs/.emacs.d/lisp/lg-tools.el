@@ -1,19 +1,17 @@
 ;; lg-tools --- tools for emacs, to do everything in emacs -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;; Code:
 
-;;; alert
 (use-package alert
   :straight t
   :defer t
-  :custom
-  (alert-default-style 'notifications))
+  :custom (alert-default-style 'notifications))
 
-;;; sudo
-(use-package sudo-edit
-  :straight t
-  :defer t)
 
-;;; Elfeed
 (use-package elfeed
   :straight t
   :commands (elfeed elfeed-update)
@@ -37,12 +35,10 @@
   :config
   (run-with-timer nil 600 #'elfeed-update))
 
-;;;; lg-elfeed
 (use-package lg-elfeed
-:load-path "~/.emacs.d/lisp/site-packages"
-:after elfeed)
+  :load-path "~/.emacs.d/lisp/site-packages"
+  :after elfeed)
 
-;;;; elfeed-goodies
 (use-package elfeed-goodies
   :straight t
   :after elfeed
@@ -71,15 +67,6 @@
 
   (lg/elfeed-goodies-setup))
 
-;;;; Elfeed-org
-(use-package elfeed-org
-  :disabled t
-  :after elfeed
-  :config
-  (elfeed-org)
-  (setq rmh-elfeed-org-files "~/org/elfeed.org"))
-
-;;;; elfeed-tube
 (use-package elfeed-tube
   :disabled t
   :straight t
@@ -96,13 +83,10 @@
          ("F" . elfeed-tube-fetch)
          ([remap save-buffer] . elfeed-tube-save)))
 
-;;;; elfeed-tube-mpv
 (use-package elfeed-tube-mpv
   :disabled t
   :straight t)
 
-;;; Multimedia
-;;;; Emms
 (use-package emms
   :straight t
   :ensure-system-package (exiftool
@@ -224,7 +208,6 @@ playlist in a side-window"
 
   (add-hook 'emms-player-stopped-hook #'lg/emms-kill-mpv))
 
-;;;; Smudge (spotify)
 (use-package smudge
   :ensure-system-package curl
   :straight t
@@ -252,20 +235,17 @@ playlist in a side-window"
      :keymaps '(smudge-mode-map smudge-playlist-search-mode-map smudge-track-search-mode-map)
      "<localleader>" 'lg/transient-smudge)))
 
-;;;; Espotify
 (use-package espotify
   :disabled t
   :custom (espotify-service-name "spotifyd")
   :straight t)
 
-;;; nov.el
 (use-package nov
   :straight t
   :defer t
   :init
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
-;;; Pdf-tools
 (use-package pdf-tools
   :straight t
   :hook
@@ -290,18 +270,15 @@ playlist in a side-window"
   (advice-add 'load-theme :after #'lg/pdf-tools-midnight-colors-with-theme)
   (pdf-tools-install))
 
-;;; pdfgrep
 (use-package pdfgrep
   :straight t
   :ensure-system-package pdfgrep
   :commands pdfgrep)
 
-;;; ibuffer
 (use-package ibuffer
   :commands ibuffer
   :custom (ibuffer-use-header-line nil))
 
-;;; ibuffer-sidebar
 (use-package ibuffer-sidebar
   :straight t
   :commands ibuffer-sidebar-toggle-sidebar
@@ -315,50 +292,34 @@ playlist in a side-window"
   (ibuffer-sidebar-width 30))
   ;;(setq ibuffer-sidebar-mode-line-format nil))
 
-;;; Integration with external tools
-;;;; exec-path-from-shell
 (use-package exec-path-from-shell
   :straight t
   :demand t
-  :config
-  (exec-path-from-shell-initialize))
+  :config (exec-path-from-shell-initialize))
 
-;;;; Ripgrep
 (use-package rg
   :commands rg
   :straight t
   :ensure-system-package rg
   :custom (rg-executable "/usr/bin/rg"))
 
-;;;; Magit
 (use-package magit
   :straight t
   :defer t
   :commands magit-status
   :ensure-system-package git)
 
-;;;; Magit-todos
 (use-package magit-todos
   :straight t
+  :after magit
   :commands magit-status
   :config
   (magit-todos-mode +1))
 
-;;;; Bluetooth
-(use-package bluetooth
-  :straight t
-  :commands bluetooth-list-devices)
+(use-package bluetooth :straight t :commands bluetooth-list-devices)
+(use-package pulseaudio-control :straight t)
+(use-package disk-usage :straight t :commands disk-usage)
 
-;;;; Pulseaudio
-(use-package pulseaudio-control
-  :straight t)
-
-;;;; Disk-usage
-(use-package disk-usage
-  :straight t
-  :commands disk-usage)
-
-;;;; Password-store: integration of pass into emacs
 (use-package password-store
   :straight t
   :commands (password-store-copy password-store-insert)
@@ -381,19 +342,13 @@ behaviour. Delete the frame after that command has exited"
 	  (call-interactively #'password-store-copy)
 	(delete-frame)))))
 
-;;;; Pass: frontend to pass in Emacs
+(use-package auth-source-pass :config (auth-source-pass-enable))
 (use-package pass
   :straight t
   :commands pass
   :config
   (setq pass-view-mask "****************"))
 
-;;; auth-source-pass
-(use-package auth-source-pass
-  :config
-  (auth-source-pass-enable))
-
-;;; Ledger mode
 (use-package ledger-mode
   :ensure-system-package ledger
   :straight t
@@ -432,7 +387,6 @@ behaviour. Delete the frame after that command has exited"
   (add-hook 'ledger-mode-hook #'outline-minor-mode)
   (font-lock-add-keywords 'ledger-mode outline-font-lock-keywords))
 
-;;; Scanner
 (use-package scanner
   :ensure-system-package sane-utils
   :custom
@@ -445,24 +399,6 @@ behaviour. Delete the frame after that command has exited"
    scanner-scan-multi-images)
   :straight t)
 
-;;; Zotero
-;; this is meant to be used with an account, this is a wrapper to the web API
-(use-package zotero
-  :disabled t
-  :straight t
-  :commands (zotero-browser zotero-sync)
-  :config
-  (zotero-sync)
-  (zotero-browser-sync))
-
-;;; Zotxt
-;; the zotxt plugin for zotero has to be installed
-;; https://github.com/egh/zotxt
-(use-package zotxt
-  :straight t
-  :defer t)
-
-;;; App-launcher
 (use-package app-launcher
   :straight (app-launcher :type git :host github
 			  :repo "SebastienWae/app-launcher")
@@ -489,7 +425,6 @@ behaviour. Delete the frame after that command has exited"
 	  (app-launcher-run-app)
 	(delete-frame)))))
 
-;;; Deamons
 (use-package daemons
   :straight t
   :commands (daemons daemons-start daemons-stop))
@@ -506,12 +441,8 @@ behaviour. Delete the frame after that command has exited"
 ;;    (lambda () (finito-start-server-if-not-already))))
 
 
-;;; Simple-httpd
-(use-package simple-httpd
-  :straight t
-  :defer t)
+(use-package simple-httpd :straight t :defer t)
 
-;;; Avy
 (use-package avy
   :straight t
   :defer t
@@ -520,7 +451,6 @@ behaviour. Delete the frame after that command has exited"
 	      :map evil-normal-state-map
 	      ("f" . avy-goto-char-timer)))
 
-;;; yequake
 (use-package yequake
   :straight t
   :defer t
@@ -564,21 +494,18 @@ behaviour. Delete the frame after that command has exited"
                            (sticky . t))))
      )))
 
-;;; flycheck
 (use-package flycheck
   :straight t
   :defer t
   :hook (ledger-mode . flycheck-mode))
 
-;;;; flycheck-ledger
 (use-package flycheck-ledger
   :straight t
-  :after ledger)
+  :after (ledger flycheck))
 
-;;;; flycheck-languagetool
 (use-package flycheck-languagetool
   :straight t
-  :defer t
+  :after langtool
   :init
   (defvar lg/langtool-dir "~/packages/LanguageTool/")
   :custom
@@ -586,7 +513,6 @@ behaviour. Delete the frame after that command has exited"
   (flycheck-languagetool-language "fr")
   (flycheck-languagetool-server-jar (expand-file-name "languagetool-server.jar" lg/langtool-dir)) )
 
-;;; langtool
 (use-package langtool 
   :straight t
   :defer t
@@ -597,7 +523,6 @@ behaviour. Delete the frame after that command has exited"
   (langtool-http-server-host "localhost") 
   (langtool-http-server-port 8082))
 
-;;; flyspell
 (use-package flyspell
   :disabled
   :straight t
@@ -605,13 +530,11 @@ behaviour. Delete the frame after that command has exited"
   (org-mode . flyspell-mode)
   (flyspell-mode . flyspell-buffer))
 
-;;; flyspell-correct
 ;; provide interface through completing-read
 (use-package flyspell-correct
   :straight t
   :after flyspell)
 
-;;; openwith
 (use-package openwith
   :straight t
   :config
@@ -629,7 +552,6 @@ behaviour. Delete the frame after that command has exited"
           "libreoffice"
           '(file)))))
 
-;;; dirvish
 (use-package dirvish
   :straight t
   :ensure-system-package (exa)
@@ -637,47 +559,23 @@ behaviour. Delete the frame after that command has exited"
   :hook
   (dirvish-mode . (lambda () (all-the-icons-dired-mode -1))))
 
-;;; vc
-(use-package vc
-  :defer 5
-  :custom
-  (vc-follow-symlinks t))
+(use-package vc :defer 5 :custom (vc-follow-symlinks t))
 
-;;; enwc
-(use-package enwc
-  :disabled t
-  :straight t 
-  :custom (enwc-default-backend 'nm))
-
-;;; ytdl
 (use-package ytdl
   :straight t
   :ensure-system-package (youtube-dl . "pip3 install youtube-dl")
   :commands ytdl-download)
 
-;;; devdocs-browser
-(use-package devdocs-browser
-  :straight t
-  :defer t)
+(use-package devdocs-browser :straight t :defer t)
+(use-package mpv :straight t :defer t)
 
-;;; mpv.el:  control mpv through emacs
-(use-package mpv
-  :straight t
-  :defer t)
-
-;;; empv
 (use-package empv
   :straight (:type git :host github :repo "isamert/empv.el")
   :defer t
-  :custom
-  (empv-invidious-instance "https://invidio.xamh.de/"))
+  :custom (empv-invidious-instance "https://invidio.xamh.de/"))
 
-;;; markdown-preview-mode
-(use-package markdown-preview-mode
-  :disabled t
-  :straight t)
+(use-package markdown-preview-mode :disabled t :straight t)
 
-;;; calfw
 (use-package calfw
   :straight t
   :defer 10
@@ -690,32 +588,16 @@ behaviour. Delete the frame after that command has exited"
   (cfw:fchar-top-junction ?╦)
   (cfw:fchar-top-left-corner ?╔)
   (cfw:fchar-top-right-corner ?╗)
-  (cfw:render-line-breaker 'cfw:render-line-breaker-simple))
+  (cfw:render-line-breaker 'cfw:render-line-breaker-simple)
+  :config
+  (use-package calfw-ical :straight t)
+  (use-package calfw-cal :straight t)
+  (use-package calfw-org :straight t))
 
-(use-package calfw-ical
-  :after calfw
-  :straight t)
-(use-package calfw-cal
-  :after calfw
-  :straight t)
-(use-package calfw-org
-  :after calfw
-  :straight t)
-
-;;; keycast
-(use-package keycast
-  :straight t)
-
-;;; gif-screencast
-(use-package gif-screencast
-  :straight t)
-
-;;; dictionnary
 (use-package dictionary
   :ensure-system-package (dict dictd)
   :defer t)
 
-;;; debian
 ;; https://salsa.debian.org/emacsen-team/debian-el
 (use-package debian-el
   :straight t
@@ -725,12 +607,8 @@ behaviour. Delete the frame after that command has exited"
 	    "RET" #'apt-utils-follow-link
 	    "q" #'apt-utils-quit ))
 
-;;; el2org
-(use-package el2org
-  :straight t
-  :defer t)
+(use-package el2org :straight t :defer t)
 
-;;;; osm
 (use-package osm
   :straight (:host github :repo "minad/osm")
   :general
@@ -763,20 +641,16 @@ behaviour. Delete the frame after that command has exited"
 	    ;; c: clone-buffer - Clone buffer
 	    ))
 
-;;; iscroll
 (use-package iscroll
   :straight t
   :hook
   (eww-mode . iscroll-mode))
 
-;;; calendar / diary
-;;;; icalendar
 (use-package icalendar
   :commands diary
   :custom
   (icalendar-uid-format "%t%c"))
   
-;;;; calendar
 (use-package calendar ;; diary
   :straight nil
   :custom
@@ -834,32 +708,20 @@ behaviour. Delete the frame after that command has exited"
    :keymaps 'calendar-mode-map
    "<localleader>" 'lg/transient-calendar))
 
-;;; solar
 (use-package solar
   :demand t
   :custom
   (calendar-latitude 48.856613 "Somewhere in Paris, not my precise location")
   (calendar-longitude 2.352222 "Somewhere in Paris, not my precise location"))
 
-;;; ebdb
-(use-package ebdb
-  :straight t
-  :defer t)
-
-;;; lg-window-switcher
+(use-package ebdb :straight t :defer t)
 (use-package lg-window-switcher)
-
-;;; tmr
-(use-package tmr
-  :straight t)
-
-;;; most-used-words
-(use-package most-used-words
-  :straight t)
-
-;;; ebib
-(use-package ebib
-  :disabled t
-  :straight t)
+(use-package tmr :straight t)
+(use-package most-used-words :straight t)
+(use-package ebib :disabled t :straight t)
+(use-package keycast :straight t)
+(use-package gif-screencast :straight t)
+(use-package sudo-edit :straight t :defer t)
 
 (provide 'lg-tools)
+;;; lg-tools.el ends here

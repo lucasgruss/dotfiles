@@ -1,6 +1,13 @@
 ;;; lg-erc: configuration for the emacs irc client
+;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
 ;; Inspiration from:
 ;; https://github.com/SystemCrafters/systemcrafters.github.io/blob/6e0686022b84c291686fc773d2974e7be02ec2b9/content/live-streams/june-04-2021.org
+;;
+;;; Code:
+
 
 ;; /msg NickServ info 
 ;; /msg NickServ register password email-address
@@ -42,3 +49,4 @@
   (add-to-list 'erc-modules 'image))
 
 (provide 'lg-erc)
+;;; lg-erc.el ends here

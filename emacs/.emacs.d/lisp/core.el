@@ -32,62 +32,37 @@
 (setq straight-disable-native-compile nil)
 (setq straight-disable-compile nil)
 
-;;; use-package
 (straight-use-package 'use-package)
 
 (use-package use-package
   :straight t
-  :custom
-  (use-package-compute-statistics t)
-  (use-package-verbose nil))
+  :custom (use-package-compute-statistics t)
+          (use-package-verbose nil)
+  :config ;; add keywords
+  (use-package bind-key :straight t) 
+  (use-package use-package-ensure-system-package :straight t)
+  (use-package diminish :straight t :config (diminish 'auto-fill-function)))
 
-;;;; bind-key
-;; needed for the :bind-key keyword
-(use-package bind-key
-  :straight t)
+(use-package straight-x :straight nil) ; extended straight features
 
-;;;; use-package-ensure-system-package
-;; needed for the :ensure-system-package keyword
-(use-package use-package-ensure-system-package
-  :straight t
-  :defer t)
-
-;;;; diminish
-;; needed for the :diminish keyword
-(use-package diminish
-  :straight t
-  :config
-  (diminish 'auto-fill-function))
-
-;;; straight-x
-(use-package straight-x
-  :straight nil)
-
-;;; PERFORMANCES (as soon as possible)
-;; (setq gc-cons-threshold (* 4 100 1024 1024)) ;; try and speed up startup time
-
-;;;; GCMH : Garbage collector magic hack
-(use-package gcmh
+(use-package gcmh ;; Garbage collector magic hack
   :straight t
   :diminish gcmh-mode
-  :config
-  (gcmh-mode +1))
+  :config (gcmh-mode +1))
 
-;;; no-littering
-(use-package no-littering
+(use-package no-littering ;; remove pesky files polluting our config directory
   :straight t
   :after recentf
   :config
   (add-to-list 'recentf-exclude no-littering-var-directory)
   (add-to-list 'recentf-exclude no-littering-etc-directory))
 
-;;;; Esup : emacs startup time profiler
-(use-package esup
+(use-package esup ;; emacs startup time profiler
   :straight t
   :commands esup)
 
-;;; Package.el
-;; built-in package manager
+;; built-in package manager, useful to browse package repositories event if I
+;; don't use it to install packages
 (use-package package
   :straight nil
   :defer t
@@ -96,35 +71,24 @@
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
   (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
-;;; Super save mode
-(use-package super-save
+(use-package super-save ;; automatic saves
   :straight t
   :diminish super-save-mode
   :config (super-save-mode +1))
 
-;;; recentf-mode
-(use-package recentf
-  :custom
-  (recentf-max-saved-items 1000)
+(use-package recentf ;; access recent files
+  :custom (recentf-max-saved-items 1000)
   :defer 5
-  :config
-  (recentf-mode +1))
+  :config (recentf-mode +1))
 
-;;; so-long
-(use-package so-long
-  :config
-  (global-so-long-mode +1))
-
-;;; Emacs
-(use-package emacs ;; core
+(use-package emacs ;; core and convienence settings
   :straight nil
   :diminish (auto-revert-mode eldoc-mode)
-  :bind
-  ("s-<escape>" . 'lg/kill-this-buffer)
-  ("s-b" . 'bury-buffer)
+  :bind ("s-<escape>" . 'lg/kill-this-buffer)
+	("s-b" . 'bury-buffer)
   :custom
   (idle-update-delay 0.3)
-  (delete-by-moving-to-trash t) 
+  (delete-by-moving-to-trash t "Safer to move in trash than be sorry.") 
   (comp-async-report-warnings-errors nil)
   (make-backup-files nil)
   (ring-bell-function 'ignore)
@@ -136,8 +100,10 @@
   (mouse-scroll-delay 0.01)
   (mouse-drag-and-drop-region-cross-program t)
   :config
+  (global-so-long-mode +1)
   (context-menu-mode +1)
   (show-paren-mode +1)
+  (savehist-mode +1)
   (global-auto-revert-mode +1)
   (fset 'yes-or-no-p 'y-or-n-p)
   (load (setq custom-file "~/.emacs.d/lisp/custom.el"))

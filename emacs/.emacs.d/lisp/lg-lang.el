@@ -1,7 +1,11 @@
 ;;; lg-lang.el --- configuration for programming language -*- lexical-binding: t; -*-
+;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;; Code:
 
-;;; Tooling
-;;;; LSP mode
 (use-package lsp-mode
   :disabled t
   :straight t
@@ -10,7 +14,6 @@
   :custom (read-process-output-max (* 1024 1024)) ;; 1mb
   :init (setq lsp-keymap-prefix "s-x"))
 
-;;;; eglot
 (use-package eglot
   :straight t
   :commands eglot
@@ -19,26 +22,20 @@
   (read-process-output-max (* 1024 1024)) ;; 1mb
   (eglot-autoreconnect 3))
 
-;;;; DAP : debugging
 (use-package dap-mode
   :straight t
   :defer t
-  :custom
-  (dap-auto-configure-features '(sessions locals controls tooltip)))
+  :custom (dap-auto-configure-features '(sessions locals controls tooltip)))
 
-;;;; DAP-python
 (use-package dap-python
   :ensure-system-package (ptvsd . "pip install \"ptvsd>=4.2\"")
   :straight nil
   :after dap-mode)
 
-;;; Python
 (use-package python
   :defer t
-  :custom
-  (python-shell-interpreter "/usr/bin/python3"))
+  :custom (python-shell-interpreter "/usr/bin/python3"))
 
-;;;; pylint
 (use-package pylint
   :straight t
   :ensure-system-package pylint
@@ -47,25 +44,21 @@
 	    :states 'normal
 	    "<localleader>l" #'pylint))
 
-;;;; LSP server
 (use-package lsp-pyright
   :ensure-system-package (npm nodejs (pyright . "npm install -g pyright"))
   :straight t
   :after (:any eglot lsp))
 
-;;; Formatting
-;;;; apheleia
 (use-package apheleia
   :disabled t
   :straight (apheleia :host github :repo "raxod502/apheleia")
-  :ensure-system-package ((black . "pip3 install black")
-			  (clang-format . "sudo npm install -g clang-format"))
+  :ensure-system-package
+  ((black . "pip3 install black")
+   (clang-format . "sudo npm install -g clang-format"))
   :diminish 'apheleia-mode
   :hook (prog-mode . apheleia-mode)
-  :init
-  (add-to-list 'exec-path "/home/lucas/.local/bin/"))
+  :init (add-to-list 'exec-path "/home/lucas/.local/bin/"))
 
-;;;; c-style
 (use-package cc-vars ; indentation and overall style
   :defer t
   :custom
@@ -75,7 +68,6 @@
       (c++-mode . "stroustrup")
       (other . "gnu"))))
 
-;;; Emacs lisp
 (use-package emacs ;; emacs-lisp
   :straight nil
   :general
@@ -102,40 +94,28 @@
 ;;    :keymaps 'emacs-lisp-mode-map
 ;;    "<localleader>" 'lg/transient-elisp)))
 
-;;;; eldoc
 (use-package eldoc
   :straight nil
   :diminish (global-eldoc-mode eldoc-mode)
-  :config
-  (global-eldoc-mode +1))
+  :config (global-eldoc-mode +1))
 
-;;;; elisp-indent-docstrings-mode
 (use-package elisp-indent-docstrings-mode
-  :config
-  (elisp-indent-docstrings-mode +1))
+  :config (elisp-indent-docstrings-mode +1))
 
-;;; Graphviz
 (use-package graphviz-dot-mode :straight t :defer t)
 (use-package company-graphviz-dot :defer t :if (featurep 'company))
 
-;;; Yaml
-(use-package yaml
-  :defer t
-  :straight t)
-
-;;;; Yaml-mode
+(use-package yaml :defer t :straight t)
 (use-package yaml-mode
   :straight t
   :mode ("\\.yml\\'" . yaml-mode))
 
-;;; Matlab
 (use-package matlab
   :disabled t
   :straight matlab-mode
   :defer t
   :ensure-system-package (matlab . matlab-support)
-  :custom
-  (matlab-shell-command-switches '("-nodesktop" "-nosplash"))
+  :custom (matlab-shell-command-switches '("-nodesktop" "-nosplash"))
   :config
   (evil-define-key 'visual matlab-mode-map "gr" #'lg/matlab-mode-eval-region)
 
@@ -152,30 +132,24 @@
 	(insert buffer-file-name)
 	(comint-send-input))))
 
-;;; lua
-(use-package lua-mode
-  :straight t)
+(use-package lua-mode :straight t)
 
-;;; markdown
 (use-package markdown-mode
   :straight t
   :defer t
   :ensure-system-package pandoc
-  :custom
-  (markdown-command "pandoc"))
+  :custom (markdown-command "pandoc"))
 
-;;; latex
 ;; https://karthinks.com/software/latex-input-for-impatient-scholars/
-;;;; auctex
+;; auctex has to be declared as 'latex'
 (use-package latex
   :defer t
   :straight auctex)
 
-;;;; cdlatex
 (use-package cdlatex
   :straight t
   :defer t
   :hook (org-mode . org-cdlatex-mode))
 
-
 (provide 'lg-lang)
+;;; lg-lang.el ends here

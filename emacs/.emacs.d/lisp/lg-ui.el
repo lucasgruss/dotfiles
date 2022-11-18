@@ -1,24 +1,25 @@
 ;;; lg-ui --- Configuration for the UI of Emacs -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;; Code:
 
 ;;; Icons
-;;;; kind-icons
 (use-package kind-icon
   :straight t
   :after corfu
-  :hook
-  (system-theme-sync-theme . (lambda () (interactive) (kind-icon-reset-cache)))
-  :custom
-  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  :hook (system-theme-sync-theme . (lambda ()
+				     (interactive)
+				     (kind-icon-reset-cache)))
+  :custom (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-;;;; all-the-icons
 (use-package all-the-icons
   :straight t
-  :custom
-  (all-the-icons-scale-factor 0.9)
-  (all-the-icons-default-alltheicon-adjust 0.0)
+  :custom (all-the-icons-scale-factor 0.9)
+	  (all-the-icons-default-alltheicon-adjust 0.0)
   :config
   (add-to-list 'all-the-icons-mode-icon-alist
 	       '(exwm-mode  all-the-icons-faicon "toggle-on" :height 1.0 :v-adjust -0.2
@@ -32,133 +33,23 @@
 	       '("\\.ledger$" all-the-icons-faicon "money" :face all-the-icons-green))
   (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append))
 
-;;;; all-the-icons-dired
 (use-package all-the-icons-dired
   :straight t
   :demand t
   :diminish all-the-icons-dired-mode
   :hook (dired-mode . all-the-icons-dired-mode)
-  :custom
-  (all-the-icons-dired-monochrome nil))
+  :custom (all-the-icons-dired-monochrome nil))
 
-;;;; all-the-icons-ibuffer
 (use-package all-the-icons-ibuffer
   :straight t
   :demand t
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 
-;;;; all-the-icons-completion
 (use-package all-the-icons-completion
   :straight t
   :demand t
   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
-  :config
-  (all-the-icons-completion-mode))
-
-;;; Emacs settings
-(use-package emacs ; scrolling
-  :init
-  (pixel-scroll-precision-mode +1)
-  (display-battery-mode +1)
-  (setq use-system-tooltips t)
-  :custom
-  (scroll-step 1)
-  (scroll-conservatively 100))
-
-;;; time
-(use-package time
-  :custom
-  (display-time-format (concat (when (featurep 'all-the-icons)
-				 (all-the-icons-wicon "time-9")) " %H:%M"))
-  (display-time-string-forms
-   '((if
-	 (and
-	  (not display-time-format)
-	  display-time-day-and-date)
-	 (format-time-string "%a %b %e " now)
-       #1="")
-     (propertize
-      (format-time-string
-       (or display-time-format
-	   (if display-time-24hr-format "%H:%M" "%-I:%M%p"))
-       now)
-      'help-echo
-      (format-time-string "%a %b %e, %Y" now))))
-  :config
-  (display-time-mode +1))
-
-;;;; Syncing system themes with emacs theme
-(use-package lg-system-theme-sync
-  :load-path "~/.emacs.d/lisp/site-packages/"
-  ;:ensure-system-package papirus-icon-theme
-  :demand t
-  :custom
-  (system-theme-sync-default-light-plist '(;:background "/home/lucas/Images/Wallpaper/nature-mountain.jpg"
-						       :gtk-theme "Adwaita"
-						       :icon-theme "Papirus-Light"))
-  (system-theme-sync-default-dark-plist '(;:background "/home/lucas/Images/Wallpaper_bis/space3.png"
-						      :gtk-theme "Adwaita-dark"
-						      :icon-theme "Papirus-Dark"))
-  :hook
-  (system-theme-sync-theme . lg/system-theme-sync-update-xresources)
-  :init
-  (defun lg/system-theme-sync-update-xresources ()
-    (shell-command (format "sed -i 's/\*background.*/\*background\: %s/g' ~/.Xresources" (face-background 'default)))
-    (shell-command (format "sed -i 's/\*foreground.*/\*foreground\: %s/g' ~/.Xresources" (face-foreground 'default)))
-    (shell-command "xrdb ~/.Xresources"))
-  (defun load-theme--disable-old-theme(theme &rest args)
-    "Disable current theme before loading new one."
-    (mapcar #'disable-theme custom-enabled-themes))
-  (advice-add 'load-theme :before #'load-theme--disable-old-theme)
-  :config
-  (system-theme-sync-mode +1))
-
-;;;; Transparency
-(use-package emacs ; transparency
-  :init
-  (setq frame-alpha-lower-limit 1)
-  (defvar lg/transparency-alpha 80
-    "Transparency of all frames.")
-
-  (defvar lg/transparency-default-increment 5
-    "Default {in, de}-crement value for the transparency alpha")
-
-  (defun lg/toggle-frame-decorations ()
-    (interactive)
-    (set-frame-parameter nil 'undecorated (not (frame-parameter nil 'undecorated))))
-
-  (defun lg/toggle-transparency ()
-    "Toggle the transparency of Emacs on and off"
-    (interactive)
-    (let ((alpha (frame-parameter nil 'alpha-background)))
-      (set-frame-parameter nil 'alpha-background
-			   (if (eql alpha 100)
-			       lg/transparency-alpha
-			     100))))
-
-  (defun lg/transparency-alpha-increase (arg)
-    "Decrease transparency of the frame"
-    (interactive "P")
-    (let ((inc (if arg arg lg/transparency-default-increment)))
-      (setq lg/transparency-alpha (+ lg/transparency-alpha inc)))
-    (lg/transparency-apply))
-
-  (defun lg/transparency-alpha-decrease (arg)
-    "Increase transparency of the frame"
-    (interactive "P")
-    (let ((inc (if arg arg lg/transparency-default-increment)))
-      (setq lg/transparency-alpha (- lg/transparency-alpha inc)))
-    (lg/transparency-apply))
-
-  (defun lg/transparency-apply ()
-    "Apply the transparency parameter to the frame"
-    (interactive)
-    (when (< 100 lg/transparency-alpha) (setq lg/transparency-alpha 100))
-    (when (> 0 lg/transparency-alpha) (setq lg/transparency-alpha 0))
-    (set-frame-parameter
-     nil 'alpha-background lg/transparency-alpha))
-
-  (lg/toggle-transparency))
+  :config (all-the-icons-completion-mode))
 
 ;;; Modeline
 (use-package emacs ; modeline
@@ -216,14 +107,12 @@ Containing LEFT, CENTER and RIGHT aligned respectively."
 		      mode-line-misc-info
 		      mode-line-end-spaces))))))
 
-;;;; Moody
 (use-package moody
   :disabled
   :straight t
   :demand t
-  :custom
-  (moody-mode-line-height 20)
-  (x-underline-at-descent-line t)
+  :custom (moody-mode-line-height 20)
+	  (x-underline-at-descent-line t)
   :config
   (setq-default mode-line-format
 		'("%e"
@@ -243,13 +132,11 @@ Containing LEFT, CENTER and RIGHT aligned respectively."
 		  mode-line-modes
 		  mode-line-misc-info)))
 
-;;;; fancy-battery
 (use-package fancy-battery
   :disabled t
   :straight t
   :defer 10
-  :custom
-  (fancy-battery-show-percentage t)
+  :custom (fancy-battery-show-percentage t)
   :config
   (when (featurep 'all-the-icons)
     (defun fancy-battery-default-mode-line ()
@@ -295,11 +182,9 @@ state. An icon is also shown for eye candy."
 	     (propertize "N/A" 'face 'error)))))))
   (fancy-battery-mode +1))
 
-;;;; hide-mode-line
 (use-package hide-mode-line
   :straight t)
 
-;;; Helpful
 (use-package helpful
   :straight t
 ;  :init
@@ -327,26 +212,77 @@ state. An icon is also shown for eye candy."
  ;; 	    lines)))
  ;;     (s-trim (s-join "\n" relevant-lines)))))
 
-;;; Outshine
-(use-package outshine
-  :hook (emacs-lisp-mode . outshine-mode)
-  :diminish outshine-mode
-  :general
-  (general-def
-    :keymaps 'outshine-mode-map
-    :states 'normal
-    [S-?\t] #'outshine-cycle
-    [?\t] #'outshine-cycle)
-  :straight t)
-
-;;; Outline
-(use-package outline
-  :diminish outline-minor-mode
-  :defer t)
-
 
 ;;; Themes
-;;;; modus-themes
+(use-package lg-system-theme-sync
+  :load-path "~/.emacs.d/lisp/site-packages/"
+  ;:ensure-system-package papirus-icon-theme
+  :demand t
+  :custom
+  (system-theme-sync-default-light-plist '(;:background "/home/lucas/Images/Wallpaper/nature-mountain.jpg"
+						       :gtk-theme "Adwaita"
+						       :icon-theme "Papirus-Light"))
+  (system-theme-sync-default-dark-plist '(;:background "/home/lucas/Images/Wallpaper_bis/space3.png"
+						      :gtk-theme "Adwaita-dark"
+						      :icon-theme "Papirus-Dark"))
+  :hook (system-theme-sync-theme . lg/system-theme-sync-update-xresources)
+  :init
+  (defun lg/system-theme-sync-update-xresources ()
+    (shell-command (format "sed -i 's/\*background.*/\*background\: %s/g' ~/.Xresources" (face-background 'default)))
+    (shell-command (format "sed -i 's/\*foreground.*/\*foreground\: %s/g' ~/.Xresources" (face-foreground 'default)))
+    (shell-command "xrdb ~/.Xresources"))
+  (defun load-theme--disable-old-theme(theme &rest args)
+    "Disable current theme before loading new one."
+    (mapcar #'disable-theme custom-enabled-themes))
+  (advice-add 'load-theme :before #'load-theme--disable-old-theme)
+  :config (system-theme-sync-mode +1))
+
+(use-package emacs ; transparency
+  :init
+  (setq frame-alpha-lower-limit 1)
+  (defvar lg/transparency-alpha 80
+    "Transparency of all frames.")
+
+  (defvar lg/transparency-default-increment 5
+    "Default {in, de}-crement value for the transparency alpha")
+
+  (defun lg/toggle-frame-decorations ()
+    (interactive)
+    (set-frame-parameter nil 'undecorated (not (frame-parameter nil 'undecorated))))
+
+  (defun lg/toggle-transparency ()
+    "Toggle the transparency of Emacs on and off"
+    (interactive)
+    (let ((alpha (frame-parameter nil 'alpha-background)))
+      (set-frame-parameter nil 'alpha-background
+			   (if (eql alpha 100)
+			       lg/transparency-alpha
+			     100))))
+
+  (defun lg/transparency-alpha-increase (arg)
+    "Decrease transparency of the frame"
+    (interactive "P")
+    (let ((inc (if arg arg lg/transparency-default-increment)))
+      (setq lg/transparency-alpha (+ lg/transparency-alpha inc)))
+    (lg/transparency-apply))
+
+  (defun lg/transparency-alpha-decrease (arg)
+    "Increase transparency of the frame"
+    (interactive "P")
+    (let ((inc (if arg arg lg/transparency-default-increment)))
+      (setq lg/transparency-alpha (- lg/transparency-alpha inc)))
+    (lg/transparency-apply))
+
+  (defun lg/transparency-apply ()
+    "Apply the transparency parameter to the frame"
+    (interactive)
+    (when (< 100 lg/transparency-alpha) (setq lg/transparency-alpha 100))
+    (when (> 0 lg/transparency-alpha) (setq lg/transparency-alpha 0))
+    (set-frame-parameter
+     nil 'alpha-background lg/transparency-alpha))
+
+  (lg/toggle-transparency))
+
 (use-package modus-themes
   :straight t
   :custom
@@ -379,14 +315,12 @@ state. An icon is also shown for eye candy."
    '((1 . (rainbow 1))
      (2 . (rainbow 1))
      (3 . (rainbow 1))
-     (t . (rainbow 1))))
-  )
+     (t . (rainbow 1)))))
 
-;;;; modus-themes-exporter
 (use-package modus-themes-exporter
+  :disabled t
   :load-path "~/.emacs.d/lisp/"
   :after modus-themes
-  :disabled t
   :ensure-system-package xsettingsd
   :config
   (defun lg/modus-theme-propagate (theme &rest args)
@@ -397,29 +331,25 @@ settings applied to them."
       (modus-themes-exporter-export "xcolors" "~/.Xresources")))
   (advice-add #'load-theme :after #'lg/modus-theme-propagate))
 
-;;;; Doom themes
 (use-package doom-themes
-  :commands load-theme
-  :straight t)
+  :straight t
+  :commands load-theme)
 
-;;;; spacemacs themes
 (use-package spacemacs-theme
-  :commands load-theme
-  :straight t)
+  :straight t
+  :commands load-theme)
 
-;;;; github-dark-vscode-theme
 (use-package github-dark-vscode-theme
-  :straight t)
+  :straight t
+  :commands load-theme)
 
-;;;; kaolin-theme
 (use-package kaolin-themes
   :straight t)
 
-;;;; ef-themes
 (use-package ef-themes
-  :straight (:host github :repo "protesilaos/ef-themes"))
+  :straight (:host github :repo "protesilaos/ef-themes")
+  :commands load-theme)
 
-;;; Circadian
 (use-package circadian
   :straight t
   :after solar
@@ -429,25 +359,7 @@ settings applied to them."
   :config
   (circadian-setup))
 
-;;; Dashboard
-(use-package dashboard
-  :disabled t
-  :straight t
-  :when (featurep 'all-the-icons)
-  :custom
-  (dashboard-set-init-info nil)
-  (dashboard-center-content t)
-  (dashboard-startup-banner 'logo)
-  (dashboard-set-heading-icons t)
-  (dashboard-set-file-icons t)
-  (dashboard-set-navigator t)
-  (dashboard-items '((recents . 5)
-		     (bookmarks . 5)))
-  :config
-  (dashboard-setup-startup-hook))
-
 ;;; Tabs
-;;;; tab-bar
 (use-package tab-bar
   :bind ("s-?" . 'toggle-frame-tab-bar)
   :custom
@@ -465,13 +377,9 @@ settings applied to them."
   :config
   (tab-bar-mode +1))
 
-;;;; tab-line
 (use-package lg-tab-line
   :demand t
-  :bind
-  ("s-/" . global-tab-line-mode)
-  ;:custom-face
-  ;(custom-set-faces '(tab-line ((t (:inherit 'tab-line :overline t)))))
+  :bind ("s-/" . global-tab-line-mode)
   :general
   (general-def :states 'normal
     "C-t" 'tab-line-new-tab
@@ -525,15 +433,14 @@ settings applied to them."
 		  (set-window-parameter window 'tab-line-cache nil))))
   (global-tab-line-mode +1))
 
-;;;; centaur-tabs
 (use-package centaur-tabs
   :disabled
   :straight t
   :after evil
   :bind ("s-/" . centaur-tabs-mode)
-  :bind (:map evil-normal-state-map
-	 ("gt" . centaur-tabs-forward)
-	 ("gT" . centaur-tabs-backward))
+        (:map evil-normal-state-map
+	      ("gt" . centaur-tabs-forward)
+	      ("gT" . centaur-tabs-backward))
   :general
   (general-def :states 'normal "C-t" 'centaur-tabs--create-new-tab)
   :hook
@@ -551,7 +458,7 @@ settings applied to them."
     calc-trail-mode) . centaur-tabs-local-mode)
   (after-load-theme . centaur-tabs-display-update)
   (after-load-theme . centaur-tabs-headline-match)
-  :custom
+  :custom 
   (centaur-tabs-style "bar")
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-set-icons t)
@@ -568,19 +475,105 @@ settings applied to them."
   (centaur-tabs-label-fixed-length 15)
   (centaur-tabs-show-count t)
   (uniquify-separator "/")
-  :config
-  (centaur-tabs-mode +1))
+  :config (centaur-tabs-mode +1))
 
-;;;; lg-centaur-tabs : further configuration for centaur-tabs
 (use-package lg-centaur-tabs
   :load-path "~/.emacs.d/lisp/site-packages/"
   :after centaur-tabs)
 
-;;; display-line-numbers
+;;; Scrolling tweaks and perfomance
+(use-package emacs ; scrolling
+  :init (pixel-scroll-precision-mode +1)
+        (display-battery-mode +1)
+  :custom (use-system-tooltips t)
+	  (scroll-step 1)
+	  (scroll-conservatively 100))
+
+(use-package fast-scroll
+  :straight t
+  :diminish fast-scroll-mode
+  :config (fast-scroll-config)
+	  (fast-scroll-mode +1))
+
+(use-package scroll-on-jump
+  :demand t
+  :straight (scroll-on-jump :type git
+			    :host gitlab
+			    :repo "ideasman42/emacs-scroll-on-jump")
+  :after evil
+  :config (scroll-on-jump-advice-add evil-undo)
+	  (scroll-on-jump-advice-add evil-redo)
+	  (scroll-on-jump-advice-add evil-jump-item)
+	  (scroll-on-jump-advice-add evil-jump-forward)
+	  (scroll-on-jump-advice-add evil-jump-backward)
+	  (scroll-on-jump-advice-add evil-search-next)
+	  (scroll-on-jump-advice-add evil-search-previous)
+	  (scroll-on-jump-advice-add evil-forward-paragraph)
+	  (scroll-on-jump-advice-add evil-backward-paragraph)
+	  ;; Actions that themselves scroll.
+	  (scroll-on-jump-with-scroll-advice-add evil-goto-line)
+	  (scroll-on-jump-with-scroll-advice-add evil-goto-first-line)
+	  (scroll-on-jump-with-scroll-advice-add evil-scroll-down)
+	  (scroll-on-jump-with-scroll-advice-add evil-scroll-up)
+	  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-center)
+	  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
+	  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom)
+  :custom (scroll-on-jump-smooth t)
+          (scroll-on-jump-use-curve t)
+          (scroll-on-jump-duration 0.2))
+
+(use-package good-scroll
+  :disabled t
+  :straight t
+  :config (good-scroll-mode +1))
+
+;;; Lines
+(use-package hl-line
+  :straight nil
+  :hook (prog-mode . hl-line-mode))
+
+(use-package lin
+  :straight (:host gitlab :repo "protesilaos/lin")
+  :commands lin-mode
+  :config (lin-add-to-many-modes))
+
+(use-package hl-todo
+  :straight t
+  :config (global-hl-todo-mode +1))
+
+;;; Misc
+(use-package dashboard
+  :disabled t
+  :straight t
+  :when (featurep 'all-the-icons)
+  :custom
+  (dashboard-set-init-info nil)
+  (dashboard-center-content t)
+  (dashboard-startup-banner 'logo)
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+  (dashboard-set-navigator t)
+  (dashboard-items '((recents . 5)
+		     (bookmarks . 5)))
+  :config (dashboard-setup-startup-hook))
+
+(use-package outshine
+  :straight t
+  :hook (emacs-lisp-mode . outshine-mode)
+  :diminish outshine-mode
+  :general
+  (general-def
+    :keymaps 'outshine-mode-map
+    :states 'normal
+    [S-?\t] #'outshine-cycle
+    [?\t] #'outshine-cycle))
+
+(use-package outline
+  :diminish outline-minor-mode
+  :defer t)
+
 (use-package display-line-numbers
-  :hook ((prog-mode
-	  matlab-mode
-	  ledger-mode). lg/display-line-numbers-mode-enable)
+  :hook ((prog-mode matlab-mode ledger-mode) . lg/display-line-numbers-mode-enable)
   :config
   (defun lg/display-line-numbers-mode-enable ()
     "Enable display-line-numbers"
@@ -588,88 +581,44 @@ settings applied to them."
     (display-line-numbers-mode +1)
     (setq display-line-numbers 'relative)))
 
-;;; Scrolling performances
-;;;; fast-scroll
-(use-package fast-scroll
-  :straight t
-  :diminish fast-scroll-mode
-  :config
-  (fast-scroll-config)
-  (fast-scroll-mode +1))
-
-;;;; scroll-on-jump
-(use-package scroll-on-jump
-  :demand t
-  :straight
-  (scroll-on-jump :type git :host gitlab
-		  :repo "ideasman42/emacs-scroll-on-jump")
-  :after evil
-  :config
-  (scroll-on-jump-advice-add evil-undo)
-  (scroll-on-jump-advice-add evil-redo)
-  (scroll-on-jump-advice-add evil-jump-item)
-  (scroll-on-jump-advice-add evil-jump-forward)
-  (scroll-on-jump-advice-add evil-jump-backward)
-  (scroll-on-jump-advice-add evil-search-next)
-  (scroll-on-jump-advice-add evil-search-previous)
-  (scroll-on-jump-advice-add evil-forward-paragraph)
-  (scroll-on-jump-advice-add evil-backward-paragraph)
-  ;; Actions that themselves scroll.
-  (scroll-on-jump-with-scroll-advice-add evil-goto-line)
-  (scroll-on-jump-with-scroll-advice-add evil-goto-first-line)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-down)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-up)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-center)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom)
+(use-package time
   :custom
-  (scroll-on-jump-smooth t)
-  (scroll-on-jump-use-curve t)
-  (scroll-on-jump-duration 0.2))
+  (display-time-format (concat (when (featurep 'all-the-icons)
+				 (all-the-icons-wicon "time-9")) " %H:%M"))
+  (display-time-string-forms
+   '((if
+	 (and
+	  (not display-time-format)
+	  display-time-day-and-date)
+	 (format-time-string "%a %b %e " now)
+       #1="")
+     (propertize
+      (format-time-string
+       (or display-time-format
+	   (if display-time-24hr-format "%H:%M" "%-I:%M%p"))
+       now)
+      'help-echo
+      (format-time-string "%a %b %e, %Y" now))))
+  :config (display-time-mode +1))
 
-;;;; good-scroll
-(use-package good-scroll
-  :disabled t
-  :straight t
-  :config
-  (good-scroll-mode +1))
+(use-package emacs 
+  :custom (use-system-tooltips t))
 
-;;; hl-line
-(use-package hl-line
-  :straight nil
-  :hook (prog-mode . hl-line-mode))
-
-;;; LIN
-(use-package lin
-  :straight (:host gitlab :repo "protesilaos/lin")
-  :commands lin-mode
-  :config (lin-add-to-many-modes))
-
-;;; hl-todo
-(use-package hl-todo
-  :straight t
-  :config
-  (global-hl-todo-mode +1))
-
-;;; git-gutter-fringe
 (use-package git-gutter-fringe
   :diminish (global-git-gutter-mode git-gutter-mode)
   :straight t
-  :custom
-  (git-gutter:update-interval 0.2)
+  :custom (git-gutter:update-interval 0.2)
   :config
   (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(bottom nil))
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(bottom nil))
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil '(bottom nil))
   (global-git-gutter-mode +1))
 
-;;; visual-fill-column
 (use-package visual-fill-column
   :defer t
   :straight t
-  :custom
-  (visual-fill-column-width 130)
-  (visual-fill-column-center-text t)
+  :custom (visual-fill-column-width 130)
+	  (visual-fill-column-center-text t)
   :init
   (defun lg/activate-visual-fill-center ()
     (visual-fill-column-mode +1))
@@ -686,62 +635,48 @@ settings applied to them."
 ;;   minibuffer-mode
 ;;   ledger-mode) . lg/activate-visual-fill-center))
 
-;;; page-break-lines
 (use-package page-break-lines
   :straight t
   :diminish page-break-lines-mode
-  :config
-  (global-page-break-lines-mode +1))
+  :config (global-page-break-lines-mode +1))
 
-;;; Eros : Evaluation Result Overlays
 (use-package eros
   :straight t
   :config (eros-mode +1))
 
-;;; Sublimity
 (use-package sublimity
   :straight t)
 
-;;; rainbow mode
 (use-package rainbow-mode
   :straight t
   :diminish rainbow-mode
   :hook (prog-mode . rainbow-mode))
 
-;;; emojify
 (use-package emojify
   :straight t
   :hook (erc-mode . emojify-mode)
   :commands emojify-mode)
 
-;;; beacon
 (use-package beacon
-  :disabled t
+  :disabled t ;; we favor pulsar
   :straight t
   :diminish beacon-mode
-  :custom
-  (beacon-size 20)
-  (beacon-blink-when-point-moves-vertically 1)
-  (beacon-blink-when-buffer-changes t)
-  (beacon-blink-when-window-changes t)
-  (beacon-blink-when-window-scrolls t)
-  (beacon-blink-when-focused t)
-  :config
-  (beacon-mode +1))
+  :custom (beacon-size 20)
+	  (beacon-blink-when-point-moves-vertically 1)
+	  (beacon-blink-when-buffer-changes t)
+	  (beacon-blink-when-window-changes t)
+	  (beacon-blink-when-window-scrolls t)
+	  (beacon-blink-when-focused t)
+  :config (beacon-mode +1))
 
-;;; pulsar
 (use-package pulsar
   :straight t
-  :custom
-  (pulsar-face 'pulsar-red)
-  (pulsar-delay 0.05)
-  :config
-  (pulsar-global-mode +1))
+  :custom (pulsar-face 'pulsar-red)
+	  (pulsar-delay 0.05)
+  :config (pulsar-global-mode +1))
 
-;;; Zen mode
 (use-package lg-zen-mode)
 
-;;; logos
 (use-package logos
   :straight t
   :general

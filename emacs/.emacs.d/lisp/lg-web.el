@@ -23,6 +23,7 @@
   (browse-url-handlers
    '(("\\`mailto:" . browse-url--mailto)
     ("\\www\.youtube\.com" . browse-url-umpv)
+    ("https://youtu\.be/" . browse-url-umpv)
     ("\\`man:" . browse-url--man)
     ("\\`.mp4" . browse-url-umpv)
     (browse-url--non-html-file-url-p . browse-url-emacs)))

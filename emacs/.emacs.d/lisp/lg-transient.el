@@ -1,6 +1,10 @@
 ;;; lg-transient --- Global menu with transient.el -*- lexical-binding: t; -*-
+;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
 ;;; Commentary:
 ;; Configuration for transient, implementing a menu system.
+;;
 ;;; Code:
 
 ;;; Transient
@@ -228,3 +232,4 @@
     [:hide (lambda () t)]))
 
 (provide 'lg-transient)
+;;; lg-transient.el ends here

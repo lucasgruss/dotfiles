@@ -1,22 +1,30 @@
 ;;; lg-keybindings: basic configuration needed for the keybindings  -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;; For the most part, this module sets evil-mode up as well as compatibility
+;; packages.
+;;
+;;; Code:
 
-;;; general
 (use-package general
   :straight t
   :config
   (general-def :states 'normal :keymaps 'Info-mode-map
     "RET" 'Info-follow-nearest-node)
+  (general-def :states 'normal :keymaps 'org-mode-map
+    "RET" 'org-return)
   (general-def :states '(normal visual) :keymaps 'eww-mode-map
     "i" 'evil-insert)
   (general-create-definer my-leader-def :states '(normal visual motion) :prefix "SPC")
   (general-create-definer my-local-leader-def :states '(normal visual motion) :prefix "SPC m"))
 
-;;; Evil-mode
 (use-package evil
   :straight t
   :demand t
-  :init
+  :init ;; these variables have to be set before loading evil
+  (setq evil-respect-visual-line-mode t)
   (setq evil-want-integration t)  ;; should be t for evil-collection
   (setq evil-want-keybinding nil) ;; should be nil for evil-collection
   (setq evil-want-Y-yank-to-eol t)
@@ -24,29 +32,22 @@
   :bind (:map evil-visual-state-map ("gr" . eval-last-sexp))
   :config (evil-mode +1))
 
-;;; Evil-collection
 (use-package evil-collection
   :diminish evil-collection-unimpaired-mode
   :straight t
   :after evil
   :custom (evil-collection-calendar-want-org-bindings t)
-  :config
-  (evil-collection-init))
+  :config (evil-collection-init))
 
-;;;; Evil bindings for bluetooth.el
 (use-package evil-collection-bluetooth
   :straight nil ;; This is a site package until I submit a PR to evil-collection
   :after bluetooth
-  :config
-  (evil-collection-bluetooth-setup))
+  :config (evil-collection-bluetooth-setup))
 
-;;;; Evil-collection-webkit
 (use-package evil-collection-webkit
   :after webkit
-  :config
-  (evil-collection-xwidget-setup))
+  :config (evil-collection-xwidget-setup))
 
-;;; Evil-ledger
 (use-package evil-ledger
   :straight t
   :hook (ledger-mode . evil-ledger-mode)
@@ -67,10 +68,9 @@
      "<localleader>" 'lg/transient-ledger
      "I" 'lg/insert-transaction)))
 
-;;; evil-org
 (use-package evil-org
   :straight (:type git :host github :repo "Somelauw/evil-org-mode")
-  :after org
+  :after org-agenda
   :diminish 'evil-org-mode
   :hook (org-mode . evil-org-mode)
   :commands (org-agenda)
@@ -78,13 +78,11 @@
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 
-;;; Evil-anzu
 (use-package evil-anzu
   :straight t
   :diminish anzu-mode
   :config (global-anzu-mode +1))
 
-;;; Evil-escape
 ;; see for improvement: https://blog.d46.us/advanced-emacs-startup/
 (use-package evil-escape
   :straight t
@@ -96,7 +94,6 @@
   (evil-escape-excluded-major-modes '(magit-status-mode))
   :config (evil-escape-mode +1))
 
-;;; evil-goggles
 (use-package evil-goggles
   :straight t
   :diminish evil-goggles-mode
@@ -106,13 +103,11 @@
   (evil-goggles-enable-surround t)
   (evil-goggles-duration 0.3))
 
-;;; evil-surround
 (use-package evil-surround
   :straight t
   :after evil
   :config (global-evil-surround-mode +1))
 
-;;; evil-numbers
 (use-package evil-numbers
   :straight t
   :after evil
@@ -122,12 +117,6 @@
   (evil-define-key '(normal visual) 'global (kbd "g C-+") 'evil-numbers/inc-at-pt-incremental)
   (evil-define-key '(normal visual) 'global (kbd "g C--") 'evil-numbers/dec-at-pt-incremental))
 
-;; ;;; evil-mu4e
-;; (use-package evil-mu4e
-;;   :straight t
-;;   :after mu4e)
-
-;;; Which-key
 (use-package which-key
   :diminish which-key-mode
   :straight t
@@ -139,8 +128,5 @@
   (which-key-setup-minibuffer)
   (which-key-mode +1))
 
-;;; Hercules
-(use-package hercules
-  :straight t)
-
 (provide 'lg-keybindings)
+;;; lg-keybindings.el ends here

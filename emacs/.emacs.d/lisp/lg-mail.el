@@ -1,18 +1,21 @@
-;; -*- lexical-binding: t; -*-
-;;; lg-mail: configuration for mail
+;;; lg-mail --- configuration for mail -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;; Code:
 
 (use-package mu4e
   :straight (:type git :host github :repo "djcb/mu"
 		   :pre-build (("./autogen.sh") ("make") ("sudo" "make" "install")))
-  :bind
-  (:map mu4e-compose-mode-map
-	("<localleader> a" . #'mail-add-attachment))
+  :bind (:map mu4e-compose-mode-map
+	      ("<localleader> a" . #'mail-add-attachment))
   :defer t
   :commands mu4e
   :custom
   (mu4e-get-mail-command "offlineimap")
-  ;;(mu4e-update-interval 300 "Check for mail every 5 minutes")
+  (mu4e-update-interval 300 "Check for mail every 5 minutes")
   (message-send-mail-function 'smtpmail-send-it)
   (user-mail-address "lucas.gruss@laposte.net")
   (mu4e-compose-format-flowed t)
@@ -79,3 +82,4 @@
   :config (mu4e-marker-icons-mode +1))
 
 (provide 'lg-mail)
+;;; lg-mail.el ends here

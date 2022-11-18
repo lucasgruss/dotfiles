@@ -1,13 +1,17 @@
 ;; -*- lexical-binding: t; -*-
 ;;; lg-window.el : window (as in "emacs window") management configuration 
+;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;; 
+;;; Code:
 
-;;; Emacs settings
 (use-package emacs ;; display-buffer-alist
   :straight nil
-  :bind
-  (("s-v" . split-window-right)
-   ("s-z" . split-window-below)
-   ("s-q" . delete-window))
+  :bind (("s-v" . split-window-right)
+         ("s-z" . split-window-below)
+	 ("s-q" . delete-window))
   :custom
   (display-buffer-alist
    `(("\\*\\(helpful\\|Help\\|MATLAB Help\\).*\\*"
@@ -52,7 +56,6 @@
     (interactive)
     (lambda () (mapc 'toggle-frame-fullscreen (frame-list)))))
 
-;;; popper
 (use-package popper
   :straight t
   :custom
@@ -65,30 +68,23 @@
      ;help-mode
      ;compilation-mode
      ))
-  :config
-  (popper-mode +1))
+  :config (popper-mode +1))
 
-;;; Winner mode
 (use-package winner
-  :config
-  (winner-mode +1))
+  :config (winner-mode +1))
 
 ;;; Windmove
 (use-package windmove
-  :bind
-  (("s-h" . windmove-left)
-   ("s-j" . windmove-down)
-   ("s-k" . windmove-up)
-   ("s-l" . windmove-right))
-  :custom
-  (windmove-wrap-around nil)
-  (windmove-window-distance-delta 1))
+  :bind (("s-h" . windmove-left)
+	 ("s-j" . windmove-down)
+	 ("s-k" . windmove-up)
+	 ("s-l" . windmove-right))
+  :custom (windmove-wrap-around nil)
+          (windmove-window-distance-delta 1))
 
-;;; Windower
 (use-package windower
   :straight t
-  :init
-  (setq windower-border-move-distance 1)
+  :init (setq windower-border-move-distance 1)
   :bind
   (("s-H" . windower-swap-left)
    ("s-J"    . windower-swap-below)
@@ -103,12 +99,11 @@
    ("s-o"    . windower-toggle-single)
    ("s-\\"   . windower-toggle-split)))
 
-;;; Framemove
 (use-package framemove
   ;:load-path "~/.emacs.d/lisp/site-packages"
   :demand t
   :after windmove
-  :custom
-  (framemove-hook-into-windmove t))
+  :custom (framemove-hook-into-windmove t))
 
 (provide 'lg-window)
+;;; lg-window.el ends here

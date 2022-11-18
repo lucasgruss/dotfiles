@@ -1,6 +1,13 @@
 ;;; lg-org --- configuration for org -*- lexical-binding: t; -*-
 ;; Author: Lucas Gruss
-
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;; This is my configuration for org mode, including configuration of the builtin
+;; features as well as 3rd-party packages and features to extend and improve
+;; org.
+;; 
+;;; Code:
 ;;; Org
 (use-package org
   :straight t
@@ -102,6 +109,7 @@
      ("docker" modus-themes-nuanced-cyan)))
   (org-export-dispatch-use-expert-ui nil)
   (org-export-in-background nil)
+  (org-return-follows-link t)
   :config 
   (push 'org-habit org-modules)
   (plist-put org-format-latex-options :scale 1.5)
@@ -109,9 +117,12 @@
     (when (equal major-mode 'org-mode)
       (org-footnote-normalize))))
 
-;;; org-agenda
-(use-package org-agenda
+(use-package org-id
   :after org
+  :custom (org-id-method 'ts)
+	  (org-id-ts-format "%Y%m%dT%H%M%S"))
+
+(use-package org-agenda
   :init
   ;; Mostly inspired from Protesilaos Stavrou's configuration  
   ;; https://protesilaos.com/codelog/2021-12-09-emacs-org-block-agenda/
@@ -239,10 +250,9 @@
    "C-j" #'org-tree-slide-move-next-tree
    "C-k" #'org-tree-slide-move-previous-tree))
 
-;;; Org-noter
+;;; Notes
 (use-package org-noter
   :straight t
-  :after org
   :defer t
   :custom
   (org-noter-notes-search-path '("~/org/roam/reference/")); "~/org" ))
@@ -256,17 +266,15 @@
 	   :keymaps 'pdf-view-mode-map
 	   "i" #'org-noter-insert-note))
 
-;;;; org-pdf-tools
 (use-package org-pdftools
   :straight t
   :hook (org-mode . org-pdftools-setup-link))
 
-;;;; org-noter-pdftools
 (use-package org-noter-pdftools
   :after org-noter
   :straight t)
 
-;;; org export
+;; exporting
 (use-package ox
   :commands org-export-dispatch
   :custom
@@ -291,7 +299,7 @@
 
 (use-package ox-latex
   :after ox
-					;:ensure-system-package texlive-publishers
+  ;; :ensure-system-package texlive-publishers
   :custom
   (org-latex-pdf-process
    '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -309,7 +317,7 @@
 
 (use-package ox-beamer :after ox)
 
-;;; org-capture
+;;; Capture
 (use-package org-capture
   :after org
   :bind ("s-c" . org-capture)
@@ -350,7 +358,6 @@
      ("l" "Link" entry (file+headline "~/org/links.org" "Links")
       "* %a %^g\n %?\n %T\n %i"))))
 
-;;; org-pomodoro
 (use-package org-pomodoro
   :straight t
   :after org
@@ -367,7 +374,12 @@
   (org-pomodoro-long-break-sound "/usr/share/sounds/freedesktop/stereo/complete.oga")
   (org-pomodoro-finished-sound "/usr/share/sounds/freedesktop/stereo/complete.oga"))
 
-;;; org-appear
+;;; UI
+(use-package org-modern
+  :straight t
+  :defer t
+  :config (global-org-modern-mode +1))
+
 (use-package org-appear
   :straight t
   :hook (org-mode . org-appear-mode)
@@ -376,35 +388,22 @@
   (org-appear-autosubmarkers t)
   (org-appear-autoentities t))
 
-;;; org-fragtog
 (use-package org-fragtog
   :straight t
   :ensure-system-package dvipng
   :hook (org-mode . org-fragtog-mode))
 
-;;; org-variable-pitch
 (use-package org-variable-pitch
   :disabled t
   :straight t
   :hook (org-mode . org-variable-pitch-minor-mode))
 
-;;; org-preview-html
 (use-package org-preview-html
   :straight t
   :defer t
   :custom
   (org-preview-html-viewer 'xwidget)
   (org-preview-html-refresh-configuration 'save))
-
-;;; deft
-(use-package deft
-  :straight t
-  :commands deft
-  :custom
-  (deft-recursive t)
-  (deft-extensions '("txt" "tex" "org"))
-  (deft-use-filter-string-for-filename t)
-  (deft-directory "~/org"))
 
 ;;; Citations
 (use-package oc
@@ -417,11 +416,13 @@
   (org-cite-export-processors '((beamer csl)
 				(latex csl)
 				(html csl)
-				(t basic))))
-(use-package oc-basic :after oc)
-(use-package oc-biblatex :after oc)
-(use-package oc-natbib :after oc)
-(use-package oc-csl :after oc :defer t)
+				(t basic)))
+  :config
+  (use-package oc-basic)
+  (use-package oc-biblatex)
+  (use-package oc-natbib)
+  (use-package oc-csl))
+
 (use-package citeproc
   :straight t
   :after org
@@ -443,28 +444,48 @@
   (citar-file-extensions '("pdf" "org" "tex" "md"))
   (citar-notes-paths '("~/org/roam/references/")))
 
-(use-package citar-org
-  :after (citar org))
-
-;; (car (gethash "alessandriAdvancesMovingHorizon2010" (citar-get-files "alessandriAdvancesMovingHorizon2010")))
-(use-package citar-org-roam
-  :straight t
-  :after (citar org-roam)
-  :diminish 'citar-org-roam-mode
-  :config (citar-org-roam-mode))
-
 (use-package citar-embark
   :after (citar embark)
   :config (citar-embark-mode +1))
 
-;;; Roam
+(use-package citar-org
+  :after (citar org))
+
+(use-package citar-org-roam
+  :straight t
+  :after (citar org-roam)
+  :diminish 'citar-org-roam-mode
+  :custom (citar-org-roam-subdir "references")
+	  (citar-org-roam-note-title-template "${author} - ${title}\n#+date: %U\n#+filetags: ${tags}")
+  :config
+  (defun citar-org-roam--create-capture-note (citekey entry)
+    "Open or create org-roam node for CITEKEY and ENTRY."
+    ;; adapted from https://jethrokuan.github.io/org-roam-guide/#orgc48eb0d
+    (let ((title (citar-format--entry
+		  citar-org-roam-note-title-template entry)))
+      (org-roam-capture-
+       :templates
+       '(("r" "reference" plain "%?" :if-new
+	  (file+head
+	   "%(concat
+ (when citar-org-roam-subdir (concat citar-org-roam-subdir \"/\")) \"${citekey}.org\")"
+	   "#+title: ${title}\n")
+	  :immediate-finish t
+	  :unnarrowed t))
+       :info (list :citekey citekey)
+       :node (org-roam-node-create :title title)
+       :props '(:finalize find-file))
+      (org-roam-ref-add (concat "[cite:@" citekey "]"))))
+
+  (citar-org-roam-mode))
+
+;;; Notes
 (use-package org-roam
   :straight t
   :after org
   :defer t
-  :custom
-  (org-roam-directory "~/org/roam")
-  (org-roam-database-connector 'sqlite)
+  :custom (org-roam-directory "~/org/roam")
+	  (org-roam-database-connector 'sqlite)
   :config (org-roam-db-autosync-mode +1))
 
 (use-package org-roam-ui
@@ -479,12 +500,105 @@
   (org-roam-ui-browser-function #'browse-url))
   
 ;;; denote
-(use-package denote :straight t)
+(use-package denote
+  :disabled t
+  :straight t
+  :hook
+  (find-file . denote-link-buttonize-buffer) ;; if you use Markdown or plain text files
+  ;; (add-hook 'dired-mode-hook #'denote-dired-mode) ;; OR if only want it in `denote-dired-directories':
+  (dired-mode . #'denote-dired-mode-in-directories)
+  :bind (("C-c n j" . #'my-denote-journal) ; our custom command
+	 ("C-c n n" . #'denote)
+	 ("C-c n N" . #'denote-type)
+	 ("C-c n d" . #'denote-date)
+	 ("C-c n s" . #'denote-subdirectory)
+	 ("C-c n t" . #'denote-template)
+	 ;; If you intend to use Denote with a variety of file types, it is
+	 ;; easier to bind the link-related commands to the `global-map', as
+	 ;; shown here.  Otherwise follow the same pattern for `org-mode-map',
+	 ;; `markdown-mode-map', and/or `text-mode-map'.
+	 ("C-c n i" . #'denote-link) ; "insert" mnemonic
+	 ("C-c n I" . #'denote-link-add-links)
+	 ("C-c n b" . #'denote-link-backlinks)
+	 ("C-c n f f" . #'denote-link-find-file)
+	 ("C-c n f b" . #'denote-link-find-backlink)
+	 ;; Note that `denote-rename-file' can work from any context, not just
+	 ;; Dired bufffers.  That is why we bind it here to the `global-map'.
+	 ("C-c n r" . #'denote-rename-file)
+	 ("C-c n R" . #'denote-rename-file-using-front-matter)
+	 :map dired-mode-map
+	 ("C-c C-d C-i" . #'denote-link-dired-marked-notes)
+	 ("C-c C-d C-r" . #'denote-dired-rename-marked-files)
+	 ("C-c C-d C-R" . #'denote-dired-rename-marked-files-using-front-matter))
+  :custom
+  (denote-directory (expand-file-name "notes" user-emacs-directory))
+  (denote-known-keywords '("emacs" "mpc" "mhe" "paper"))
+  (denote-infer-keywords t)
+  (denote-sort-keywords t)
+  (denote-file-type nil) ; Org is the default, set others here
+  (denote-prompts '(title keywords))
+  (denote-date-prompt-use-org-read-date t) ;; Pick dates, where relevant, with Org's advanced interface:
+  (denote-allow-multi-word-keywords t) ;; default
+  (denote-date-format nil) ; read doc string
+  (denote-backlinks-show-context t)
+  (denote-templates '((reference . "#+reference:")))
+
+  ;; Also see `denote-link-backlinks-display-buffer-action' which is a bit advanced.
+
+  ;; We use different ways to specify a path for demo purposes.
+  (denote-dired-directories
+   (list denote-directory
+	 (thread-last denote-directory (expand-file-name "attachments"))
+	 (expand-file-name denote-directory)))
+  ;; Also check the commands `denote-link-after-creating',
+  ;; `denote-link-or-create'.  You may want to bind them to keys as well.
+  :custom
+  ;; Here is a custom, user-level command from one of the examples we
+  ;; showed in this manual.  We define it here and add it to a key binding
+  ;; below.
+  (defun my-denote-journal ()
+    "Create an entry tagged 'journal', while prompting for a title."
+    (interactive)
+    (denote
+     (denote--title-prompt)
+     '("journal")))
+
+  (with-eval-after-load 'org-capture
+    (setq denote-org-capture-specifiers "%l\n%i\n%?")
+    (add-to-list 'org-capture-templates
+		 '("n" "New note (with denote.el)" plain
+		   (file denote-last-path)
+		   #'denote-org-capture
+		   :no-save t
+		   :immediate-finish nil
+		   :kill-buffer t
+		   :jump-to-captured t))))
+
+(use-package deft
+  :straight t
+  :commands deft
+  :custom (deft-recursive t)
+          (deft-extensions '("txt" "tex" "org"))
+	  (deft-use-filter-string-for-filename t)
+	  (deft-directory "~/org"))
 
 ;;; misc
-(use-package org-contrib :straight t :after org)
+(use-package org-contrib
+  :straight t
+  :after org)
+
 (use-package org-protocol :after org)
-(use-package org-modern :straight t :defer t)
-(use-package org-drill :disabled t :straight t :defer t)
+
+(use-package org-drill
+  :disabled t
+  :straight t
+  :defer t)
+
+(use-package org-yt
+  :after org
+  :straight (org-yt :type git
+		    :host github
+		    :repo "TobiasZawada/org-yt"))
 
 (provide 'lg-org)
+;;; lg-org.el ends here

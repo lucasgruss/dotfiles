@@ -1,10 +1,14 @@
 ;;; lg-dired --- configuration for the directory editor -*- lexical-binding: t; -*-
+;; Author: Lucas Gruss
+;; This file is NOT part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;; Code:
 
-;;; Dired
 (use-package dired
-  :hook
-  (dired-mode . dired-hide-details-mode)
-  (dired-mode . auto-revert-mode)
+  :hook (dired-mode . dired-hide-details-mode)
+        (dired-mode . auto-revert-mode)
   :custom
   (dired-kill-when-opening-new-dired-buffer nil)
   (dired-clean-confirm-killing-deleted-buffers nil)
@@ -20,46 +24,36 @@
 	    "h" #'dired-up-directory
 	    "l" #'dired-find-file))
 
-;;; dired-x
 (use-package dired-x 
-  :custom
-  (dired-omit-extensions "config"))
+  :after dired
+  :custom (dired-omit-extensions "config"))
 
-;;; dired-async-mode
+;; make dired operations asynchronous so they don't block the UI
 (use-package dired-async
+  :after dired
   :hook (dired-mode . dired-async-mode))
 
-;;; Diredfl
 (use-package diredfl
+  :disabled t ;; apparently, it does not play well with all-the-icons-dired
   :straight t
   :after dired
   :hook (dired-mode . diredfl-mode))
 
-;;; Dired-sidebar
 (use-package dired-sidebar
   :straight t
-  ;:commands (dired-sidebar-find-file dired-sidebar-toggle)
   :bind (:map dired-sidebar-mode-map ("<localleader>m" . emms-play-dired))
   :general
-  (general-def :keymaps 'dired-sidebar-mode-map :states 'normal
-    "h" #'dired-sidebar-up-directory
-    "l" #'dired-sidebar-find-file)
-  :hook
-  (dired-sidebar-mode . (lambda () (setq-local header-line-format "Dired-sidebar")))
-  :custom
-  (dired-sidebar-width 30)
+  (:keymaps 'dired-sidebar-mode-map
+	    :states 'normal
+	    "h" #'dired-sidebar-up-directory
+	    "l" #'dired-sidebar-find-file)
+  :hook (dired-sidebar-mode . (lambda () (setq-local header-line-format "Dired-sidebar")))
+  :custom (dired-sidebar-width 30)
   (dired-sidebar-no-delete-other-windows t))
 
-;;; Dired-hide-dotfiles
 (use-package dired-hide-dotfiles
   :after dired
-  ;:hook (dired-mode . dired-hide-dotfiles-mode)
   :straight t)
 
-;;; dired-get
-(use-package dired-git
-  :disabled t
-  :straight t
-  :hook (dired-mode . dired-git-mode))
-
 (provide 'lg-dired)
+;;; lg-dired.el ends here
