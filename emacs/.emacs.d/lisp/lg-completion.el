@@ -134,23 +134,7 @@ targets."
       (apply fn args)))
 
   (advice-add #'embark-completing-read-prompter
-	      :around #'embark-hide-which-key-indicator)
-
-  (when (featurep 'selectrum)
-    (defun refresh-selectrum ()
-      (setq selectrum--previous-input-string nil))
-
-    (add-hook 'embark-pre-action-hook #'refresh-selectrum) 
-
-    (defun shrink-selectrum ()
-      (when (eq embark-collect--kind :live)
-	(with-selected-window (active-minibuffer-window)
-	  (setq-local selectrum-num-candidates-displayed 1)
-	  (setq-local selectrum-display-style
-		      '(horizontal :before-candidates "[" :after-candidates "]"
-				   :more-candidates "" :candidates-separator "")))))
-
-    (add-hook 'embark-collect-mode-hook #'shrink-selectrum)))
+	      :around #'embark-hide-which-key-indicator))
 
 (use-package embark-consult
   :straight t
