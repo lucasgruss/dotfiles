@@ -119,7 +119,7 @@
 
 (use-package org-id
   :after org
-  :custom (org-id-method 'ts)
+  :custom (org-id-method 'uuid)
 	  (org-id-ts-format "%Y%m%dT%H%M%S"))
 
 (use-package org-agenda
@@ -164,22 +164,63 @@
 		  (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
 		  (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n"))))
     "Custom agenda for use in `org-agenda-custom-commands'.")
-
   :custom
   (org-agenda-files '("~/org/todo.org")); "~/org/contacts.org"))
   (org-agenda-include-diary t)
   (org-agenda-custom-commands
 	`(("A" "Daily agenda and top priority tasks"
-	   ,lg/org-custom-daily-agenda))))
+	   ,lg/org-custom-daily-agenda)))
+  :config
+  (transient-define-prefix lg/org-agenda-transient ()
+    "Replace the org-agenda buffer by a transient."
+    [["Built-in agendas"
+      ("a" "Current day/week" (lambda () (interactive) (org-agenda nil "a")))
+      ("t" "Global todo list" (lambda () (interactive) (org-agenda nil "t")))
+      ("T" "Global todo list + choose" (lambda () (interactive) (org-agenda nil "T")))
+      ("m" "Search tags" (lambda () (interactive) (org-agenda nil "m")))
+      ("M" "Search tags with TODO" (lambda () (interactive) (org-agenda nil "M")))
+      ("e" "Export" (lambda () (interactive) (org-agenda nil "e")))
+      ("s" "Search" (lambda () (interactive) (org-agenda nil "s")))
+      ("S" "Search with TODO" (lambda () (interactive) (org-agenda nil "S")))
+      ("/" "Multi-occur" (lambda () (interactive) (org-agenda nil "/")))
+      ("<" "Restrict" (lambda () (interactive) (org-agenda nil "<")))
+      (">" "Remove restiction" (lambda () (interactive) (org-agenda nil ">")))
+      ("#" "List stuck projects" (lambda () (interactive) (org-agenda nil "#")))
+      ("!" "Define \"stuck\"" (lambda () (interactive) (org-agenda nil "!")))
+      ("C" "Configure custom agenda views" (lambda () (interactive) (org-agenda nil "C")))]
+     ["Custom agendas"
+      ("A" "Daily and overview" (lambda () (interactive) (org-agenda nil "A")))
+      ("H" "Habits tracker" (lambda () (interactive) (org-agenda nil "H")))]]))
+	  ;; ("H" "Habits tracker"
+	  ;; ,lg/org-agenda-habits-tracker))))
 
 (use-package org-habit
   :straight nil
   :after org
+  :init
+  (defvar lg/org-agenda-habits-tracker
+    `((agenda ""
+	      ((org-habit-show-habits t)
+	       (org-habit-show-habits-only-for-today nil)
+	       (org-habit-following-days 7)
+	       (org-habit-preceding-days 14)
+	       (org-habit-graph-column 60)
+	       (org-agenda-span 'month)
+	       (org-agenda-include-diary nil)
+	       (org-agenda-use-time-grid nil)
+	       (org-agenda-time-grid nil)
+	       (org-agenda-show-log t)
+	       (org-agenda-remove-tags t)
+	       (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "habitudes"))
+	       (org-agenda-overriding-header "Habits tracker"))))
+    "An habits tracker view.")
+  (add-to-list 'org-agenda-custom-commands 
+	       `("H" "Habits tracker"
+		 ,lg/org-agenda-habits-tracker))
   :custom
-  (org-habit-show-habits-only-for-today t)
-  (org-habit-following-days 7)
-  (org-habit-preceding-days 14)
-  (org-habit-graph-column 60))
+  (org-log-into-drawer "LOGBOOK" "Don't clutter the notes.")
+  (org-agenda-show-future-repeats 'next "More legible repeated tasks.")
+  (org-habit-show-habits nil "Only show habits in the habits-tracker."))
 
 (use-package org-journal
   :straight t
@@ -253,7 +294,7 @@
 ;;; Notes
 (use-package org-noter
   :straight t
-  :defer t
+  :defer 20
   :custom
   (org-noter-notes-search-path '("~/org/roam/reference/")); "~/org" ))
   (org-noter-auto-save-last-location t)
